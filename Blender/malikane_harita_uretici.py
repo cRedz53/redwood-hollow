@@ -111,6 +111,20 @@ M = {
     "oak": material("M_OakLeaves", (0.025, 0.055, 0.015)),
     "bush": material("M_Bush", (0.02, 0.045, 0.015)),
     "lamp": material("M_LampGlow", (1.0, 0.7, 0.4), emit=(1.0, 0.6, 0.25), emit_strength=15.0),
+    "fire": material("M_Fire", (1.0, 0.4, 0.1), emit=(1.0, 0.35, 0.08), emit_strength=25.0),
+    "marble_w": material("M_MarbleWhite", (0.78, 0.76, 0.72), rough=0.15),
+    "marble_b": material("M_MarbleBlack", (0.025, 0.025, 0.025), rough=0.15),
+    "carpet": material("M_Carpet", (0.22, 0.015, 0.02), rough=0.95),
+    "rug_border": material("M_RugBorder", (0.3, 0.18, 0.05), rough=0.9),
+    "velvet": material("M_Velvet", (0.16, 0.01, 0.02), rough=0.8),
+    "dark_wood": material("M_DarkWood", (0.05, 0.025, 0.012), rough=0.35),
+    "upholstery": material("M_Upholstery", (0.1, 0.02, 0.025), rough=0.85),
+    "lacquer": material("M_Lacquer", (0.008, 0.008, 0.008), rough=0.08),
+    "linen": material("M_Linen", (0.7, 0.67, 0.6), rough=0.9),
+    "canvas": material("M_Canvas", (0.06, 0.045, 0.03), rough=0.7),
+    "book_r": material("M_BookRed", (0.2, 0.03, 0.02), rough=0.6),
+    "book_g": material("M_BookGreen", (0.03, 0.1, 0.05), rough=0.6),
+    "book_b": material("M_BookBrown", (0.12, 0.06, 0.025), rough=0.6),
 }
 
 
@@ -140,6 +154,16 @@ class Builder:
 
     def cyl(self, center, r, depth, segments=16, mi=0):
         self.cone(center, r, r, depth, segments, mi)
+
+    def beam(self, p0, p1, w, h, mi=0):
+        """Box from p0 to p1 (any direction), w x h cross-section — sloped rails, posts."""
+        p0, p1 = Vector(p0), Vector(p1)
+        d = p1 - p0
+        rot = d.to_track_quat('X', 'Z').to_matrix().to_4x4()
+        before = set(self.bm.faces)
+        mat = Matrix.Translation((p0 + p1) / 2) @ rot @ Matrix.Diagonal((d.length, w, h, 1.0))
+        bmesh.ops.create_cube(self.bm, size=1.0, matrix=mat, calc_uvs=True)
+        self._tag(before, mi)
 
     def blob(self, center, radius, squash=1.0, mi=0, subdiv=1):
         before = set(self.bm.faces)
@@ -412,7 +436,22 @@ def balustrade(b, a, c, z, h=1.1, spacing=0.3, mi=0):
         b.cyl((q.x, q.y, z + h / 2), 0.07, h - 0.3, 8, mi)
 
 
-mw, wf, wg = Builder(), Builder(), Builder()
+def curtain(cb, a, b, s, w, zt, base_z):
+    """Two velvet drapes and a pelmet on the interior side of a window."""
+    a, b = Vector(a), Vector(b)
+    d = (b - a).normalized()
+    rot = math.atan2(d.y, d.x)
+    inward = -Vector((-d.y, d.x))  # walls run clockwise, so the left normal points outside
+    p = a + d * s + inward * (T / 2 + 0.12)
+    h = zt + 0.6
+    for side in (-1, 1):
+        q = p + d * side * (w / 2 + 0.2)
+        cb.box((q.x, q.y, base_z + h / 2), (0.55, 0.14, h), rot)
+        cb.box((q.x, q.y, base_z + 1.2), (0.6, 0.18, 0.08), rot, mi=1)  # brass tie-back
+    cb.box((p.x, p.y, base_z + zt + 0.45), (w + 1.4, 0.2, 0.5), rot)
+
+
+mw, wf, wg, cu = Builder(), Builder(), Builder(), Builder()
 walls = [
     ((mx0, my0), (mx0, my1)),  # west (front, door)
     ((mx0, my1), (mx1, my1)),  # north
@@ -428,6 +467,7 @@ for idx, (a, b) in enumerate(walls):
                 + ([(door_s, 2.8, 0.0, 3.6)] if door_s is not None and floor == 1 else []), z)
         for s, w, zb, zt in ops:
             add_window(wf, wg, a, b, s, w, zb, zt, z, T)
+            curtain(cu, a, b, s, w, zt, z)
         if door_s is not None and floor == 1:
             add_window(wf, wg, a, b, door_s, 2.8, 0.0, 3.6, z, T)  # glazed balcony door
 
@@ -443,33 +483,119 @@ for cx in (mx0, mx1):
     for cy in (my0, my1):
         wf.box((cx, cy, (Z1 + TOTAL_H) / 2), (1.0, 1.0, TOTAL_H - Z1))
 
-# interior: corridor from the front door, cross wall, back hall
-cor_end = mx0 + 22
-for y in (dy - 3.5, dy + 3.5):
-    for z in (Z1, Z2):
-        mw.wall((mx0 + T / 2, y), (cor_end, y), FLOOR_H, 0.25, [(6.0, 1.4, 0, 2.6), (16.0, 1.4, 0, 2.6)], z)
-for z in (Z1, Z2):
-    mw.wall((cor_end, my0 + T / 2), (cor_end, my1 - T / 2), FLOOR_H, 0.25,
-            [(dy - my0, 3.0, 0, 3.2), (10.0, 1.4, 0, 2.6), (my1 - my0 - 10.0, 1.4, 0, 2.6)], z)
+# interior: double-height entrance hall with an imperial staircase facing the door,
+# salon (north), dining room (south), library (east); bedrooms upstairs.
+HALL_Y0, HALL_Y1 = dy - 12.0, dy + 12.0
+HALL_X1 = mx0 + 28.0          # back wall of the hall
+SX0 = mx0 + 16.0              # foot of the central flight
+SX_L = mx0 + 22.0             # landing starts here
+SX_B = mx0 + 26.0             # upper back gallery starts here
+ZM = Z1 + FLOOR_H / 2         # landing height
+for y in (HALL_Y0, HALL_Y1):
+    mw.wall((mx0 + T / 2, y), (HALL_X1, y), FLOOR_H, 0.3, [(10.0, 2.6, 0, 3.6)], Z1)
+    mw.wall((mx0 + T / 2, y), (HALL_X1, y), FLOOR_H, 0.3, [(8.0, 2.2, 0, 3.0)], Z2)
+back_len = my1 - my0 - T
+for z, doors in ((Z1, (dy - 20, dy + 20)), (Z2, (dy - 20, dy, dy + 20))):
+    mw.wall((HALL_X1, my0 + T / 2), (HALL_X1, my1 - T / 2), FLOOR_H, 0.3,
+            [(yy - (my0 + T / 2), 2.6, 0, 3.4) for yy in doors], z)
 mw.finish("Malikane_Duvarlar", [M["plaster"]], C_MANSION)
 wf.finish("Malikane_Pencere_Cerceve", [M["frame"]], C_MANSION)
 wg.finish("Malikane_Cam", [M["glass"]], C_MANSION)
+cu.finish("Malikane_Perdeler", [M["velvet"], M["brass"]], C_MANSION)
 
 # floors & roof
 fl = Builder()
 ix0, iy0, ix1, iy1 = mx0 + T / 2, my0 + T / 2, mx1 - T / 2, my1 - T / 2
 fl.box(((ix0 + ix1) / 2, (iy0 + iy1) / 2, Z1 - 0.1), (ix1 - ix0, iy1 - iy0, 0.2))
-# upper floor with stair hole along the south wall at the east end
-hx0, hx1, hy1 = mx1 - 11.0, mx1 - 1.0, iy0 + 3.4
-z = Z2 - 0.1
-fl.box(((ix0 + hx0) / 2, (iy0 + iy1) / 2, z), (hx0 - ix0, iy1 - iy0, 0.2))
-fl.box(((hx1 + ix1) / 2, (iy0 + iy1) / 2, z), (ix1 - hx1, iy1 - iy0, 0.2))
-fl.box(((hx0 + hx1) / 2, (hy1 + iy1) / 2, z), (hx1 - hx0, iy1 - hy1, 0.2))
-steps = 28
-rise, run = FLOOR_H / steps, (hx1 - hx0 - 0.4) / steps
-for i in range(steps):
-    fl.box((hx0 + 0.2 + run * (i + 0.5), iy0 + 1.6, Z1 + rise * (i + 1) / 2), (run, 3.0, rise * (i + 1)))
+# upper floor with the hall void: gallery strips along the west wall and both sides,
+# open over the central floor and over the staircase
+
+
+def slab_with_holes(b, rect, holes, z, t=0.2):
+    x0, x1, y0, y1 = rect
+    xs = sorted({x0, x1, *[v for h in holes for v in h[:2] if x0 < v < x1]})
+    ys = sorted({y0, y1, *[v for h in holes for v in h[2:] if y0 < v < y1]})
+    for xa, xb in zip(xs, xs[1:]):
+        for ya, yb in zip(ys, ys[1:]):
+            cx, cy = (xa + xb) / 2, (ya + yb) / 2
+            if any(h[0] < cx < h[1] and h[2] < cy < h[3] for h in holes):
+                continue
+            b.box((cx, cy, z - t / 2), (xb - xa, yb - ya, t))
+
+
+VOID_C = (ix0 + 4.0, SX0, dy - 5.0, dy + 5.0)      # over the hall floor
+VOID_S = (SX0, SX_B, dy - 9.0, dy + 9.0)           # over the staircase
+slab_with_holes(fl, (ix0, ix1, iy0, iy1), [VOID_C, VOID_S], Z2)
 fl.finish("Malikane_Zeminler", [M["floor"]], C_MANSION)
+
+# black and white marble chequerboard in the hall
+mf = Builder()
+for i in range(int(HALL_X1 - ix0)):
+    for j in range(int(HALL_Y1 - HALL_Y0) - 1):
+        mf.box((ix0 + i + 0.5, HALL_Y0 + 0.65 + j, Z1 + 0.01), (1.0, 1.0, 0.02), mi=(i + j) % 2)
+mf.finish("Malikane_Mermer_Zemin", [M["marble_w"], M["marble_b"]], C_MANSION)
+
+# imperial staircase: central flight to a landing, two return flights to the gallery
+sb = Builder()  # mats: marble, carpet, dark wood, brass
+STEPS, RUN = 14, (SX_L - SX0) / 14
+for i in range(STEPS):
+    top = Z1 + (ZM - Z1) * (i + 1) / STEPS
+    x = SX0 + RUN * (i + 0.5)
+    sb.box((x, dy, (Z1 + top) / 2), (RUN, 6.0, top - Z1))
+    sb.box((x, dy, top + 0.015), (RUN, 3.6, 0.03), mi=1)
+    for s in (-1, 1):  # return flights climb back towards the door
+        top2 = ZM + (Z2 - ZM) * (i + 1) / STEPS
+        x2 = SX_L - RUN * (i + 0.5)
+        sb.box((x2, dy + s * 7, top2 - 0.2), (RUN, 4.0, 0.4))                # open underside
+        if i % 4 == 3:
+            sb.cyl((x2, dy + s * 8.6, (Z1 + top2) / 2), 0.18, top2 - Z1 - 0.3, 16)  # columns under the flight
+            sb.cyl((x2, dy + s * 5.4, (Z1 + top2) / 2), 0.18, top2 - Z1 - 0.3, 16)
+        sb.box((x2, dy + s * 7, top2 + 0.015), (RUN, 2.4, 0.03), mi=1)
+for s in (-1, 1):  # sloped soffits under the return flights
+    sb.beam((SX_L, dy + s * 7, ZM - 0.45), (SX0, dy + s * 7, Z2 - 0.45), 3.8, 0.3)
+sb.box(((SX_L + HALL_X1) / 2, dy, (Z1 + ZM) / 2), (HALL_X1 - SX_L, 18.0, ZM - Z1))
+sb.box(((SX_L + HALL_X1) / 2, dy, ZM + 0.015), (HALL_X1 - SX_L - 1.0, 3.6, 0.03), mi=1)
+for s in (-1, 1):
+    sb.box(((SX_L + HALL_X1) / 2 - 0.5, dy + s * 4.6, ZM + 0.015), (2.4, 5.6, 0.03), mi=1)
+
+
+def rail(b, p0, p1, h=1.0, spacing=0.35):
+    """Handrail from p0 to p1 (stair nosing points) with turned balusters."""
+    p0, p1 = Vector(p0), Vector(p1)
+    b.beam(p0 + Vector((0, 0, h)), p1 + Vector((0, 0, h)), 0.12, 0.1, mi=2)
+    n = max(1, int((p1 - p0).length / spacing))
+    for i in range(n + 1):
+        q = p0.lerp(p1, i / n)
+        b.cyl((q.x, q.y, q.z + h / 2), 0.04, h, 8, mi=0)
+
+
+for s in (-1, 1):
+    rail(sb, (SX0, dy + s * 3.05, Z1), (SX_L, dy + s * 3.05, ZM))                 # central flight
+    for yy in (5.05, 8.95):                                                        # return flights
+        rail(sb, (SX_L, dy + s * yy, ZM), (SX0, dy + s * yy, Z2))
+    rail(sb, (SX_L, dy + s * 3.05, ZM), (SX_L, dy + s * 4.95, ZM))                # landing front
+    rail(sb, (SX_L, dy + s * 9.0, ZM), (HALL_X1 - 0.2, dy + s * 9.0, ZM))         # landing sides
+    sb.box((SX0 - 0.1, dy + s * 3.05, Z1 + 0.7), (0.45, 0.45, 1.4), mi=2)          # newel posts
+    sb.blob((SX0 - 0.1, dy + s * 3.05, Z1 + 1.55), 0.18, 1.0, mi=3)
+# gallery balustrades around the void
+balustrade(sb, (VOID_C[0], dy - 5), (SX0, dy - 5), Z2)
+balustrade(sb, (VOID_C[0], dy + 5), (SX0, dy + 5), Z2)
+balustrade(sb, (VOID_C[0], dy - 5), (VOID_C[0], dy + 5), Z2)
+balustrade(sb, (SX0, dy - 9), (SX_B, dy - 9), Z2)
+balustrade(sb, (SX0, dy + 9), (SX_B, dy + 9), Z2)
+balustrade(sb, (SX_B, dy - 9), (SX_B, dy + 9), Z2)
+sb.finish("Malikane_Saray_Merdiveni", [M["marble_w"], M["carpet"], M["dark_wood"], M["brass"]], C_MANSION)
+
+# hall decor: dark wood wainscoting, pilasters, cornice
+hd = Builder()
+for y, sgn in ((HALL_Y0, 1), (HALL_Y1, -1)):
+    yi = y + sgn * 0.18
+    hd.wall((mx0 + T / 2, yi), (HALL_X1, yi), 1.3, 0.06, [(10.0, 3.0, 0, 3.8)], Z1, mi=0)
+    for x in (mx0 + 4, mx0 + 15, mx0 + 20, mx0 + 25):
+        hd.box((x, yi, (Z1 + TOTAL_H) / 2), (0.7, 0.25, TOTAL_H - Z1), mi=1)
+    hd.box(((mx0 + HALL_X1) / 2, yi, TOTAL_H - 0.3), (HALL_X1 - mx0, 0.4, 0.5), mi=1)
+    hd.box(((mx0 + HALL_X1) / 2, yi, Z2 - 0.35), (HALL_X1 - mx0, 0.3, 0.3), mi=1)
+hd.finish("Malikane_Hol_Dekor", [M["dark_wood"], M["trim"]], C_MANSION)
 
 rf = Builder()
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, TOTAL_H + 0.1), (mx1 - mx0, my1 - my0, 0.2))
@@ -548,17 +674,313 @@ chandelier = ab.finish("Avize", [M["brass"], M["lamp"]], C_PROTO)
 chandelier.location = (-150, -90, 0)
 
 C_CHAND = collection("Avizeler")
-rooms_x = [(mx0 + 8, dy), (mx0 + 17, dy),                      # corridor
-           (mx0 + 11, dy + 14), (mx0 + 11, my1 - 9),          # north front rooms
-           (mx0 + 11, dy - 14), (mx0 + 11, my0 + 9),          # south front rooms
-           (cor_end + 10, my1 - 12), (cor_end + 10, dy), (cor_end + 7, my0 + 14)]  # back hall
-for fi, (ceil, lvl) in enumerate(((Z2 - 0.2, "Zemin"), (TOTAL_H, "Ust"))):
-    for i, (x, y) in enumerate(rooms_x):
+CX_N, CX_S = (HALL_Y1 + my1) / 2, (HALL_Y0 + my0) / 2          # room centre lines (y)
+CX_MID = (mx0 + HALL_X1) / 2                                     # front rooms centre (x)
+CX_BACK = (HALL_X1 + mx1) / 2                                    # library centre (x)
+rooms = {
+    "Zemin": (Z2 - 0.2, [(CX_MID - 6, CX_N), (CX_MID + 6, CX_N), (CX_MID - 4, CX_S), (CX_MID + 4, CX_S),
+                         (CX_BACK, my1 - 14), (CX_BACK, dy), (CX_BACK, my0 + 14)]),
+    "Ust": (TOTAL_H, [(CX_MID - 6, CX_N), (CX_MID + 6, CX_N), (CX_MID - 6, CX_S), (CX_MID + 6, CX_S),
+                      (CX_BACK, my1 - 14), (CX_BACK, my0 + 14)]),
+}
+for lvl, (ceil, spots) in rooms.items():
+    for i, (x, y) in enumerate(spots):
         ob = bpy.data.objects.new(f"Avize_{lvl}_{i + 1}", chandelier.data)
         ob.location = (x, y, ceil)
         ob.visible_shadow = False  # the light sits inside the chandelier
         C_CHAND.objects.link(ob)
         point_light(f"Avize_{lvl}_{i + 1}_Isik", (x, y, ceil - 0.9), 400, (1.0, 0.62, 0.32), 0.6)
+# great chandelier in the double-height hall
+ob = bpy.data.objects.new("Avize_Hol", chandelier.data)
+ob.location = ((ix0 + 4 + SX0) / 2, dy, TOTAL_H)
+ob.scale = (2.4, 2.4, 2.4)
+ob.visible_shadow = False
+C_CHAND.objects.link(ob)
+point_light("Avize_Hol_Isik", ((ix0 + 4 + SX0) / 2, dy, TOTAL_H - 2.4), 1500, (1.0, 0.62, 0.32), 1.0)
+
+
+# ---------------------------------------------------------------- palace furniture (shared meshes, local front = +X)
+C_FURN = collection("Mobilya")
+FM = [M["dark_wood"], M["upholstery"], M["brass"], M["marble_w"], M["linen"], M["velvet"],
+      M["lacquer"], M["canvas"], M["fire"], M["book_r"], M["book_g"], M["book_b"], M["carpet"], M["rug_border"]]
+WOOD, UPH, BRASS, MARBLE, LINEN, VELVET, LACQ, CANVAS, FIRE, BR, BG, BB, CARPET, BORDER = range(14)
+
+
+def proto(name, build):
+    b = Builder()
+    build(b)
+    ob = b.finish(f"Mob_{name}", FM, C_PROTO)
+    ob.location = (-150, -120 - len(C_PROTO.objects) * 6, 0)
+    return ob
+
+
+def legs(b, sx, sy, h, r=0.035):
+    for lx in (-sx / 2, sx / 2):
+        for ly in (-sy / 2, sy / 2):
+            b.cyl((lx, ly, h / 2), r, h, 8, WOOD)
+
+
+def armchair(b, w=0.85):
+    legs(b, 0.65, w - 0.15, 0.2)
+    b.box((0, 0, 0.32), (0.8, w, 0.25), mi=UPH)
+    b.box((-0.36, 0, 0.85), (0.14, w, 0.9), mi=UPH)
+    b.box((-0.43, 0, 1.33), (0.08, w + 0.05, 0.08), mi=WOOD)
+    for s in (-1, 1):
+        b.box((0.02, s * (w / 2 - 0.05), 0.6), (0.78, 0.12, 0.3), mi=UPH)
+
+
+def sofa(b):
+    armchair(b, 2.3)
+
+
+def coffee_table(b):
+    legs(b, 1.1, 0.6, 0.42)
+    b.box((0, 0, 0.45), (1.3, 0.75, 0.06), mi=MARBLE)
+
+
+def dining_table(b, length=14.0):
+    for x in [i * 2.0 - length / 2 + 1 for i in range(int(length / 2))]:
+        b.cyl((x, 0, 0.38), 0.07, 0.76, 10, WOOD)
+    b.box((0, 0, 0.78), (length, 1.6, 0.08), mi=WOOD)
+    b.box((0, 0, 0.825), (length - 0.6, 0.5, 0.01), mi=CARPET)  # table runner
+
+
+def chair(b):
+    legs(b, 0.42, 0.42, 0.45, 0.025)
+    b.box((0, 0, 0.48), (0.5, 0.5, 0.07), mi=UPH)
+    b.box((-0.23, 0, 0.95), (0.05, 0.46, 0.85), mi=WOOD)
+    b.box((-0.2, 0, 0.98), (0.03, 0.34, 0.6), mi=UPH)
+
+
+def fireplace(b):
+    b.box((0.35, 0, 0.05), (0.7, 2.8, 0.1), mi=MARBLE)
+    for s in (-1, 1):
+        b.box((0.1, s * 1.05, 0.7), (0.4, 0.35, 1.3), mi=MARBLE)
+    b.box((0.12, 0, 1.42), (0.55, 3.0, 0.16), mi=MARBLE)
+    b.box((0.1, 0, 1.2), (0.38, 1.8, 0.3), mi=MARBLE)
+    b.box((-0.15, 0, 0.55), (0.1, 1.8, 1.0), mi=LACQ)                      # sooty back
+    for k in range(5):
+        b.blob((0.05, -0.5 + k * 0.25, 0.25), 0.16, 1.6, mi=FIRE)
+    b.box((-0.1, 0, 3.0), (0.5, 2.4, 3.0), mi=WOOD)                        # overmantel panel
+    b.box((-0.0, 0, 2.6), (0.08, 1.6, 1.4), mi=BRASS)                       # mirror frame
+    b.box((0.03, 0, 2.6), (0.04, 1.4, 1.2), mi=LACQ)
+
+
+def bookcase(b):
+    rnd = random.Random(5)
+    w, h, dpt = 1.8, 2.6, 0.45
+    b.box((-dpt / 2 + 0.02, 0, h / 2), (0.04, w, h), mi=WOOD)
+    for s in (-1, 1):
+        b.box((0, s * w / 2, h / 2), (dpt, 0.05, h), mi=WOOD)
+    for k in range(6):
+        z = 0.1 + k * 0.48
+        b.box((0, 0, z), (dpt, w, 0.04), mi=WOOD)
+        if k == 5:
+            break
+        y = -w / 2 + 0.05
+        while y < w / 2 - 0.08:
+            t = rnd.uniform(0.03, 0.07)
+            bh = rnd.uniform(0.28, 0.4)
+            b.box((0.02, y + t / 2, z + 0.02 + bh / 2), (0.3, t, bh), mi=rnd.choice((BR, BG, BB)))
+            y += t + 0.004
+    b.box((0, 0, h + 0.08), (dpt + 0.1, w + 0.1, 0.16), mi=WOOD)
+
+
+def bed(b):
+    b.box((0, 0, 0.3), (2.3, 2.0, 0.45), mi=WOOD)
+    b.box((0.05, 0, 0.62), (2.15, 1.9, 0.25), mi=LINEN)
+    b.box((0.35, 0, 0.76), (1.5, 1.95, 0.06), mi=VELVET)                   # bedspread
+    for s in (-1, 1):
+        b.box((-0.85, s * 0.45, 0.82), (0.4, 0.75, 0.18), mi=LINEN)        # pillows
+    b.box((-1.13, 0, 1.2), (0.1, 2.0, 1.6), mi=WOOD)                       # headboard
+    for lx in (-1.12, 1.12):
+        for ly in (-0.98, 0.98):
+            b.cyl((lx, ly, 1.25), 0.06, 2.5, 10, WOOD)
+            b.box((lx, ly, 1.3), (0.12, 0.35, 2.3), mi=VELVET)             # drapes
+    b.box((0, 0, 2.52), (2.4, 2.1, 0.12), mi=WOOD)                         # canopy
+
+
+def wardrobe(b):
+    b.box((0, 0, 1.15), (0.65, 1.6, 2.3), mi=WOOD)
+    b.box((0.33, 0, 1.15), (0.02, 0.02, 2.1), mi=LACQ)
+    for s in (-1, 1):
+        b.box((0.34, s * 0.12, 1.2), (0.03, 0.03, 0.18), mi=BRASS)
+    b.box((0, 0, 2.38), (0.75, 1.75, 0.16), mi=WOOD)
+
+
+def sideboard(b):
+    b.box((0, 0, 0.45), (0.55, 1.9, 0.8), mi=WOOD)
+    b.box((0, 0, 0.88), (0.6, 2.0, 0.05), mi=MARBLE)
+    for s in (-1, 0, 1):
+        b.box((0.28, s * 0.6, 0.6), (0.02, 0.04, 0.04), mi=BRASS)
+
+
+def clock(b):
+    b.box((0, 0, 0.4), (0.4, 0.6, 0.8), mi=WOOD)
+    b.box((0, 0, 1.25), (0.32, 0.45, 0.9), mi=WOOD)
+    b.box((0, 0, 1.95), (0.42, 0.62, 0.55), mi=WOOD)
+    b.box((0.21, 0, 1.95), (0.02, 0.38, 0.38), mi=BRASS)
+    b.box((0.17, 0, 1.25), (0.01, 0.06, 0.6), mi=BRASS)                    # pendulum
+    b.prism_roof((0, 0), 0.62, 0.45, 2.22, 0.2, rot_z=math.pi / 2, mi=WOOD)
+
+
+def piano(b):
+    for p in ((0.5, 0.5), (0.5, -0.5), (-0.7, 0)):
+        b.cyl((p[0], p[1], 0.35), 0.06, 0.7, 10, LACQ)
+    b.box((-0.1, 0, 0.85), (1.8, 1.45, 0.32), mi=LACQ)
+    b.box((0.85, 0, 0.78), (0.2, 1.3, 0.06), mi=LINEN)                     # keys
+    b.beam((-0.95, 0.7, 1.02), (0.7, 0.7, 1.75), 0.03, 1.4, mi=LACQ)       # open lid
+
+
+def painting(b, w=1.4, h=1.0):
+    b.box((0.0, 0, 0), (0.03, w, h), mi=CANVAS)
+    for s in (-1, 1):
+        b.box((0.03, s * (w / 2 + 0.05), 0), (0.08, 0.1, h + 0.2), mi=BRASS)
+        b.box((0.03, 0, s * (h / 2 + 0.05)), (0.08, w + 0.2, 0.1), mi=BRASS)
+
+
+def rug(b, sx=6.0, sy=4.0):
+    b.box((0, 0, 0.012), (sx, sy, 0.012), mi=BORDER)
+    b.box((0, 0, 0.02), (sx - 0.4, sy - 0.4, 0.012), mi=CARPET)
+
+
+def candelabra(b):
+    b.cyl((0, 0, 0.02), 0.09, 0.04, 12, BRASS)
+    b.cyl((0, 0, 0.25), 0.02, 0.45, 8, BRASS)
+    for k in range(5):
+        ang = math.tau * k / 5
+        x, y = (0.13 * math.cos(ang), 0.13 * math.sin(ang)) if k else (0, 0)
+        if k:
+            b.box((x / 2, y / 2, 0.42), (0.14, 0.015, 0.015), ang, BRASS)
+        b.cyl((x, y, 0.53), 0.012, 0.18, 6, LINEN)
+        b.blob((x, y, 0.65), 0.018, 1.8, mi=FIRE)
+
+
+def pedestal_vase(b):
+    b.box((0, 0, 0.55), (0.45, 0.45, 1.1), mi=MARBLE)
+    b.box((0, 0, 1.12), (0.55, 0.55, 0.06), mi=MARBLE)
+    b.blob((0, 0, 1.45), 0.25, 1.4, mi=LACQ, subdiv=2)
+    b.cyl((0, 0, 1.8), 0.08, 0.2, 12, LACQ)
+
+
+def desk(b):
+    for s in (-1, 1):
+        b.box((0, s * 0.7, 0.38), (0.75, 0.45, 0.72), mi=WOOD)
+    b.box((0, 0, 0.76), (0.9, 1.9, 0.05), mi=WOOD)
+    b.box((0, 0, 0.79), (0.6, 1.0, 0.01), mi=UPH)                         # leather top
+
+
+P = {n: proto(n, f) for n, f in (
+    ("Koltuk", armchair), ("Kanepe", sofa), ("Sehpa", coffee_table), ("Yemek_Masasi", dining_table),
+    ("Sandalye", chair), ("Somine", fireplace), ("Kitaplik", bookcase), ("Yatak", bed), ("Gardirop", wardrobe),
+    ("Konsol", sideboard), ("Saat", clock), ("Piyano", piano), ("Tablo", painting), ("Hali", rug),
+    ("Samdan", candelabra), ("Vazo", pedestal_vase), ("Calisma_Masasi", desk))}
+count = {}
+
+
+def place(name, x, y, z, deg=0.0, s=1.0):
+    count[name] = count.get(name, 0) + 1
+    ob = bpy.data.objects.new(f"Mob_{name}_{count[name]:02d}", P[name].data)
+    ob.location = (x, y, z)
+    ob.rotation_euler.z = math.radians(deg)
+    ob.scale = (s, s, s) if isinstance(s, (int, float)) else s
+    C_FURN.objects.link(ob)
+    return ob
+
+
+N_IN, S_IN = HALL_Y1 + 0.15, HALL_Y0 - 0.15        # room faces of the hall side walls
+W_IN, E_IN, NW, SW = mx0 + T / 2, mx1 - T / 2, my1 - T / 2, my0 + T / 2
+BACK_W, BACK_E = HALL_X1 - 0.15, HALL_X1 + 0.15      # faces of the hall back wall
+
+# entrance hall
+place("Hali", (ix0 + SX0) / 2, dy, Z1, 0, (2.6, 0.9, 1))
+for s in (-1, 1):
+    place("Vazo", mx0 + 2.0, dy + s * 4.0, Z1)
+    place("Vazo", SX0 - 1.2, dy + s * 4.2, Z1)
+    for x in (mx0 + 5, mx0 + 15, mx0 + 21):
+        place("Tablo", x, dy + s * 11.75, Z1 + 2.6, -90 * s, 1.6)
+        place("Tablo", x, dy + s * 11.75, Z2 + 2.3, -90 * s, 1.3)
+    place("Saat", HALL_X1 - 0.5, dy + s * 10.5, Z1, 180)
+
+# salon (north, ground floor)
+place("Somine", CX_MID, NW - 0.25, Z1, -90)
+place("Hali", CX_MID, CX_N + 2, Z1, 0, (1.5, 1.6, 1))
+place("Kanepe", CX_MID, CX_N - 1.5, Z1, 90)
+place("Sehpa", CX_MID, CX_N + 1.5, Z1, 90)
+place("Koltuk", CX_MID - 3, CX_N + 2, Z1, 0)
+place("Koltuk", CX_MID + 3, CX_N + 2, Z1, 180)
+place("Piyano", mx0 + 5, HALL_Y1 + 6, Z1, 30)
+place("Saat", BACK_W - 0.3, NW - 2, Z1, 180)
+for y in (HALL_Y1 + 3, HALL_Y1 + 13, HALL_Y1 + 15, HALL_Y1 + 17, HALL_Y1 + 19):
+    place("Kitaplik", BACK_W - 0.25, y, Z1, 180)
+for x in (mx0 + 4, CX_MID + 7):
+    place("Tablo", x, N_IN + 0.05, Z1 + 2.5, 90, 1.5)
+place("Koltuk", mx0 + 4, NW - 4, Z1, -45)
+place("Koltuk", mx0 + 6.5, NW - 4, Z1, -135)
+place("Sehpa", mx0 + 5.2, NW - 5.2, Z1, 0, 0.6)
+
+# dining room (south, ground floor)
+place("Hali", CX_MID, CX_S, Z1, 0, (2.8, 1.3, 1))
+place("Yemek_Masasi", CX_MID, CX_S, Z1)
+for i in range(13):
+    x = CX_MID - 6 + i
+    place("Sandalye", x, CX_S + 1.15, Z1, -90)
+    place("Sandalye", x, CX_S - 1.15, Z1, 90)
+place("Sandalye", CX_MID - 7.6, CX_S, Z1, 0)
+place("Sandalye", CX_MID + 7.6, CX_S, Z1, 180)
+for x in (-4.5, -1.5, 1.5, 4.5):
+    place("Samdan", CX_MID + x, CX_S, Z1 + 0.82)
+place("Somine", CX_MID, SW + 0.25, Z1, 90)
+for y in (my0 + 6, HALL_Y0 - 4):
+    place("Konsol", BACK_W - 0.3, y, Z1, 180)
+    place("Samdan", BACK_W - 0.3, y, Z1 + 0.9)
+for x in (mx0 + 4, CX_MID + 7):
+    place("Tablo", x, S_IN - 0.05, Z1 + 2.5, -90, 1.6)
+
+# library (east, ground floor)
+y = my0 + 2.0
+while y < my1 - 2.0:
+    if all(abs(y - d) > 2.2 for d in (dy - 20, dy + 20)):
+        place("Kitaplik", BACK_E + 0.25, y, Z1, 0)
+    y += 1.85
+for yy in (my1 - 14, my0 + 14):
+    place("Hali", CX_BACK, yy, Z1, 90, (1.3, 1.1, 1))
+    place("Koltuk", CX_BACK - 1.6, yy - 1.4, Z1, 45)
+    place("Koltuk", CX_BACK + 1.6, yy - 1.4, Z1, 135)
+    place("Sehpa", CX_BACK, yy, Z1, 0, 0.7)
+place("Calisma_Masasi", CX_BACK + 3, dy, Z1, 180)
+place("Sandalye", CX_BACK + 3.8, dy, Z1, 180)
+place("Samdan", CX_BACK + 3, dy + 0.6, Z1 + 0.8)
+place("Hali", CX_BACK + 2, dy, Z1, 90, (1.0, 1.0, 1))
+place("Saat", E_IN - 0.3, dy + 4, Z1, 180)
+
+# upper floor: master bedroom (north), guest bedroom + study (south), portrait gallery (east)
+for side, yc, wall_y, face in ((1, CX_N, NW, -90), (-1, CX_S, SW, 90)):
+    place("Yatak", CX_MID + 4, wall_y - side * 1.3, Z2, face)
+    place("Hali", CX_MID + 4, wall_y - side * 3.5, Z2, 0, (0.9, 1.1, 1))
+    for dx in (-1.6, 1.6):
+        place("Konsol", CX_MID + 4 + dx * 1.2, wall_y - side * 0.4, Z2, face, (0.8, 0.3, 0.7))
+    place("Gardirop", BACK_W - 0.4, yc + 4, Z2, 180)
+    place("Gardirop", BACK_W - 0.4, yc + 6, Z2, 180)
+    place("Somine", mx0 + 8, (N_IN if side > 0 else S_IN) + side * 0.25, Z2, 90 * side)
+    place("Koltuk", mx0 + 6.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 45 * side)
+    place("Koltuk", mx0 + 9.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 135 * side)
+    place("Calisma_Masasi", mx0 + 3, yc - side * 6, Z2, 0)
+    place("Samdan", mx0 + 3, yc - side * 6, Z2 + 0.8)
+    place("Tablo", CX_MID - 6, wall_y - side * 0.05, Z2 + 2.4, face, 1.5)
+y = my0 + 3.0
+while y < my1 - 3.0:
+    if all(abs(y - d) > 2.0 for d in (dy - 20, dy, dy + 20)):
+        place("Tablo", BACK_E + 0.05, y, Z2 + 2.3, 0, 1.4)
+    y += 4.0
+for yy in (my1 - 14, my0 + 14):
+    place("Kanepe", CX_BACK - 2, yy, Z2, 0)
+    place("Sehpa", CX_BACK, yy, Z2, 0)
+
+# fireplaces glow
+for i, (x, y, z) in enumerate([(CX_MID, NW - 0.6, Z1), (CX_MID, SW + 0.6, Z1),
+                               (mx0 + 8, N_IN + 0.6, Z2), (mx0 + 8, S_IN - 0.6, Z2)], 1):
+    point_light(f"Somine_{i}_Ates", (x, y, z + 0.5), 250, (1.0, 0.45, 0.15), 0.4)
 
 
 # ---------------------------------------------------------------- huts
@@ -786,10 +1208,17 @@ if bpy.app.background:
     scene.render.filepath = os.path.join(PREVIEW_DIR, "onizleme_giris.png")
     bpy.ops.render.render(write_still=True)
     cam_in = camera("Kamera_Ic", (0, 0, 0), (0, 0, 0))
-    look(cam_in, (mx0 + 2, dy, Z1 + 1.7), (cor_end, dy, Z1 + 2.5))
+    look(cam_in, (mx0 + 1.5, dy - 3, Z1 + 1.7), (SX_L, dy, ZM + 1.5))
     scene.camera = cam_in
     scene.render.filepath = os.path.join(PREVIEW_DIR, "onizleme_ic.png")
     bpy.ops.render.render(write_still=True)
+    for fname, eye, target in (("onizleme_salon.png", (mx0 + 3, CX_N - 9, Z1 + 2.2), (CX_MID, NW, Z1 + 1.2)),
+                               ("onizleme_yemek_salonu.png", (mx0 + 2.5, CX_S + 7, Z1 + 2.6), (CX_MID + 3, CX_S, Z1 + 0.8)),
+                               ("onizleme_kutuphane.png", (mx1 - 2, my1 - 4, Z1 + 1.8), (HALL_X1, dy - 6, Z1 + 1.4)),
+                               ("onizleme_yatak_odasi.png", (mx0 + 3, CX_N - 8, Z2 + 1.8), (CX_MID + 4, NW, Z2 + 1.0))):
+        look(cam_in, eye, target)
+        scene.render.filepath = os.path.join(PREVIEW_DIR, fname)
+        bpy.ops.render.render(write_still=True)
     # top view in flat light for checking the layout
     scene.camera = cam_top
     bg.inputs["Strength"].default_value = 0

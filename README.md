@@ -4,6 +4,8 @@ Gece geçen, slasher tarzı bir korku oyunu için harita. Haritada demir çitle 
 Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarılıyor.
 
 ![Oyun içi görünüm](Gorseller/ue_oyun_ici.png)
+![Saray holü ve merdiven](Blender/Cikti/Onizlemeler/onizleme_ic.png)
+![Yemek salonu](Blender/Cikti/Onizlemeler/onizleme_yemek_salonu.png)
 ![Malikane girişi](Blender/Cikti/Onizlemeler/onizleme_giris.png)
 ![Üstten harita](Blender/Cikti/Onizlemeler/onizleme_ustten.png)
 
@@ -28,7 +30,9 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarı
 | Kapılar | Batı: **Giriş kapısı** (aralık), güney: **Kaçış kapısı** (kapalı). Kemerli demir kanatlar; pivot menteşede, UE'de Z ekseninde döndürülerek açılır |
 | Malikane | 44 m × 80 m, 2 kat (5 m), 1,5 m kaide. Büyük merdiven, 6 dev sütun, balkon, alınlık, 5 m çift kanatlı kapı |
 | Pencereler | Gerçek açıklık, çerçeve, kayıt, denizlik, lento ve yarı saydam cam |
-| İç mekan | Koridor, odalar, arka salon, ikinci kata merdiven, 18 avize (her birinde ışık) |
+| Giriş holü | İki kat yüksekliğinde, siyah-beyaz mermer zemin, kapının tam karşısında kırmızı halılı imparatorluk merdiveni (orta kol, sahanlık, iki yana dönen kollar), holü çevreleyen üst galeri, dev avize, ahşap lambri, pilastrlar, tablolar, vazolar |
+| Odalar | Zemin kat: şömineli salon (kanepe, koltuklar, piyano, kitaplıklar, ayaklı saat), 28 kişilik yemek salonu (şamdanlar, konsollar, şömine), kütüphane. Üst kat: sayvanlı yataklı iki yatak odası (gardırop, şömine, çalışma masası), portre galerisi |
+| Işık | 14 avize, 4 şömine ateşi; her pencerede kadife perde |
 | Kulübeler | 7 kulübe, taş temel, camlı pencereler, aralık kapı; bazılarının içi yanıyor |
 | Oyun | `PlayerStart` (giriş kapısı), `Kacis_Trigger` (kaçış kapısının dışında) |
 

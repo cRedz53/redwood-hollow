@@ -165,7 +165,7 @@ if not world.get_path_name().startswith(LEVEL):
 
 def folder_for(name):
     for prefix, folder in (("Agac_", "Agaclar"), ("Cali_", "Agaclar"), ("Kulube", "Kulubeler"),
-                           ("Malikane", "Malikane"), ("Avize", "Malikane/Avizeler"),
+                           ("Malikane", "Malikane"), ("Avize", "Malikane/Avizeler"), ("Mob_", "Malikane/Mobilya"),
                            ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Sinir", "Duvar")):
         if name.startswith(prefix):
             return f"Malikane/{folder}"
@@ -262,10 +262,13 @@ for prop, val in (
 pp.set_editor_property("settings", s)
 
 # ---------------------------------------------------------------- gameplay
+# MALIKANE_START=hol puts the player inside the mansion hall (handy for testing the interior)
+start_marker = "Malikane_Giris" if os.environ.get("MALIKANE_START") == "hol" else "PlayerStart"
 for m in scene["markers"]:
-    if m["name"] == "PlayerStart":
-        spawn(unreal.PlayerStart, (m["loc"][0], m["loc"][1], 100), label="PlayerStart", folder="Malikane/Oyun")
-    elif m["name"] == "Kacis_Noktasi":
+    if m["name"] == start_marker:
+        spawn(unreal.PlayerStart, (m["loc"][0], m["loc"][1], m["loc"][2] if m["name"] != "PlayerStart" else 100),
+              label="PlayerStart", folder="Malikane/Oyun")
+    if m["name"] == "Kacis_Noktasi":
         t = spawn(unreal.TriggerBox, (m["loc"][0], m["loc"][1], 150), label="Kacis_Trigger", folder="Malikane/Oyun")
         t.set_actor_scale3d(unreal.Vector(6, 2, 3))
 

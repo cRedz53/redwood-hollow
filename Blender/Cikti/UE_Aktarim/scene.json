@@ -1,5 +1,50 @@
 {
  "materials": {
+  "M_BookBrown": {
+   "base": [
+    0.11999999731779099,
+    0.05999999865889549,
+    0.02500000037252903
+   ],
+   "roughness": 0.6000000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_BookGreen": {
+   "base": [
+    0.029999999329447746,
+    0.10000000149011612,
+    0.05000000074505806
+   ],
+   "roughness": 0.6000000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_BookRed": {
+   "base": [
+    0.20000000298023224,
+    0.029999999329447746,
+    0.019999999552965164
+   ],
+   "roughness": 0.6000000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
   "M_Brass": {
    "base": [
     0.6000000238418579,
@@ -30,6 +75,36 @@
    ],
    "glass": false
   },
+  "M_Canvas": {
+   "base": [
+    0.05999999865889549,
+    0.04500000178813934,
+    0.029999999329447746
+   ],
+   "roughness": 0.699999988079071,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_Carpet": {
+   "base": [
+    0.2199999988079071,
+    0.014999999664723873,
+    0.019999999552965164
+   ],
+   "roughness": 0.949999988079071,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
   "M_Column": {
    "base": [
     0.550000011920929,
@@ -37,6 +112,21 @@
     0.4699999988079071
    ],
    "roughness": 0.6000000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_DarkWood": {
+   "base": [
+    0.05000000074505806,
+    0.02500000037252903,
+    0.012000000104308128
+   ],
+   "roughness": 0.3499999940395355,
    "metallic": 0.0,
    "emissive": [
     0.0,
@@ -57,6 +147,21 @@
     0.0,
     0.0,
     0.0
+   ],
+   "glass": false
+  },
+  "M_Fire": {
+   "base": [
+    1.0,
+    0.4000000059604645,
+    0.10000000149011612
+   ],
+   "roughness": 0.8500000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    25.0,
+    8.749999850988388,
+    1.9999999552965164
    ],
    "glass": false
   },
@@ -135,6 +240,21 @@
    ],
    "glass": false
   },
+  "M_Lacquer": {
+   "base": [
+    0.00800000037997961,
+    0.00800000037997961,
+    0.00800000037997961
+   ],
+   "roughness": 0.07999999821186066,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
   "M_LampGlow": {
    "base": [
     1.0,
@@ -150,6 +270,21 @@
    ],
    "glass": false
   },
+  "M_Linen": {
+   "base": [
+    0.699999988079071,
+    0.6700000166893005,
+    0.6000000238418579
+   ],
+   "roughness": 0.8999999761581421,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
   "M_MansionWall": {
    "base": [
     0.36000001430511475,
@@ -157,6 +292,36 @@
     0.28999999165534973
    ],
    "roughness": 0.8500000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_MarbleBlack": {
+   "base": [
+    0.02500000037252903,
+    0.02500000037252903,
+    0.02500000037252903
+   ],
+   "roughness": 0.15000000596046448,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_MarbleWhite": {
+   "base": [
+    0.7799999713897705,
+    0.7599999904632568,
+    0.7200000286102295
+   ],
+   "roughness": 0.15000000596046448,
    "metallic": 0.0,
    "emissive": [
     0.0,
@@ -210,6 +375,21 @@
    ],
    "glass": false
   },
+  "M_RugBorder": {
+   "base": [
+    0.30000001192092896,
+    0.18000000715255737,
+    0.05000000074505806
+   ],
+   "roughness": 0.8999999761581421,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
   "M_Stone": {
    "base": [
     0.23999999463558197,
@@ -232,6 +412,51 @@
     0.029999999329447746
    ],
    "roughness": 0.8500000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_Trim": {
+   "base": [
+    0.550000011920929,
+    0.5299999713897705,
+    0.49000000953674316
+   ],
+   "roughness": 0.6000000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_Upholstery": {
+   "base": [
+    0.10000000149011612,
+    0.019999999552965164,
+    0.02500000037252903
+   ],
+   "roughness": 0.8500000238418579,
+   "metallic": 0.0,
+   "emissive": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "glass": false
+  },
+  "M_Velvet": {
+   "base": [
+    0.1599999964237213,
+    0.009999999776482582,
+    0.019999999552965164
+   ],
+   "roughness": 0.800000011920929,
    "metallic": 0.0,
    "emissive": [
     0.0,
@@ -453,8 +678,68 @@
    ]
   },
   {
+   "name": "Malikane_Perdeler",
+   "mesh": "SM_Malikane_Perdeler",
+   "loc": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
    "name": "Malikane_Zeminler",
    "mesh": "SM_Malikane_Zeminler",
+   "loc": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Malikane_Mermer_Zemin",
+   "mesh": "SM_Malikane_Mermer_Zemin",
+   "loc": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Malikane_Saray_Merdiveni",
+   "mesh": "SM_Malikane_Saray_Merdiveni",
+   "loc": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Malikane_Hol_Dekor",
+   "mesh": "SM_Malikane_Hol_Dekor",
    "loc": [
     0.0,
     -0.0,
@@ -547,7 +832,7 @@
    "mesh": "SM_Avize",
    "loc": [
     2600.0,
-    -200.0,
+    -2800.0,
     630.0
    ],
    "yaw": -0.0,
@@ -561,8 +846,8 @@
    "name": "Avize_Zemin_2",
    "mesh": "SM_Avize",
    "loc": [
-    3500.0,
-    -200.0,
+    3800.0,
+    -2800.0,
     630.0
    ],
    "yaw": -0.0,
@@ -576,8 +861,8 @@
    "name": "Avize_Zemin_3",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    -1600.0,
+    2800.0,
+    2400.0,
     630.0
    ],
    "yaw": -0.0,
@@ -591,8 +876,8 @@
    "name": "Avize_Zemin_4",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    -3300.0,
+    3600.0,
+    2400.0,
     630.0
    ],
    "yaw": -0.0,
@@ -606,8 +891,8 @@
    "name": "Avize_Zemin_5",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    1200.0,
+    5400.0,
+    -2800.0,
     630.0
    ],
    "yaw": -0.0,
@@ -621,8 +906,8 @@
    "name": "Avize_Zemin_6",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    2900.0,
+    5400.0,
+    -200.0,
     630.0
    ],
    "yaw": -0.0,
@@ -636,37 +921,7 @@
    "name": "Avize_Zemin_7",
    "mesh": "SM_Avize",
    "loc": [
-    5000.0,
-    -3000.0,
-    630.0
-   ],
-   "yaw": -0.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Avize_Zemin_8",
-   "mesh": "SM_Avize",
-   "loc": [
-    5000.0,
-    -200.0,
-    630.0
-   ],
-   "yaw": -0.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Avize_Zemin_9",
-   "mesh": "SM_Avize",
-   "loc": [
-    4700.0,
+    5400.0,
     2400.0,
     630.0
    ],
@@ -682,7 +937,7 @@
    "mesh": "SM_Avize",
    "loc": [
     2600.0,
-    -200.0,
+    -2800.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -696,8 +951,8 @@
    "name": "Avize_Ust_2",
    "mesh": "SM_Avize",
    "loc": [
-    3500.0,
-    -200.0,
+    3800.0,
+    -2800.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -711,8 +966,8 @@
    "name": "Avize_Ust_3",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    -1600.0,
+    2600.0,
+    2400.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -726,8 +981,8 @@
    "name": "Avize_Ust_4",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    -3300.0,
+    3800.0,
+    2400.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -741,8 +996,8 @@
    "name": "Avize_Ust_5",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    1200.0,
+    5400.0,
+    -2800.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -756,8 +1011,8 @@
    "name": "Avize_Ust_6",
    "mesh": "SM_Avize",
    "loc": [
-    2900.0,
-    2900.0,
+    5400.0,
+    2400.0,
     1150.0
    ],
    "yaw": -0.0,
@@ -768,42 +1023,2607 @@
    ]
   },
   {
-   "name": "Avize_Ust_7",
+   "name": "Avize_Hol",
    "mesh": "SM_Avize",
    "loc": [
-    5000.0,
-    -3000.0,
-    1150.0
-   ],
-   "yaw": -0.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Avize_Ust_8",
-   "mesh": "SM_Avize",
-   "loc": [
-    5000.0,
+    2812.5,
     -200.0,
     1150.0
    ],
    "yaw": -0.0,
    "scale": [
+    2.4,
+    2.4,
+    2.4
+   ]
+  },
+  {
+   "name": "Mob_Hali_01",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    2612.5,
+    -200.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    2.6,
+    0.9,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_01",
+   "mesh": "SM_Mob_Vazo",
+   "loc": [
+    2000.0,
+    200.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
     1.0,
     1.0,
     1.0
    ]
   },
   {
-   "name": "Avize_Ust_9",
-   "mesh": "SM_Avize",
+   "name": "Mob_Vazo_02",
+   "mesh": "SM_Mob_Vazo",
    "loc": [
-    4700.0,
+    3280.0,
+    220.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_01",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2300.0,
+    975.0,
+    410.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_02",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2300.0,
+    975.0,
+    880.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Tablo_03",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3300.0,
+    975.0,
+    410.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_04",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3300.0,
+    975.0,
+    880.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Tablo_05",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    975.0,
+    410.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_06",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    975.0,
+    880.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Saat_01",
+   "mesh": "SM_Mob_Saat",
+   "loc": [
+    4550.0,
+    850.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_03",
+   "mesh": "SM_Mob_Vazo",
+   "loc": [
+    2000.0,
+    -600.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_04",
+   "mesh": "SM_Mob_Vazo",
+   "loc": [
+    3280.0,
+    -620.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_07",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2300.0,
+    -1375.0,
+    410.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_08",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2300.0,
+    -1375.0,
+    880.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Tablo_09",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3300.0,
+    -1375.0,
+    410.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_10",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3300.0,
+    -1375.0,
+    880.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Tablo_11",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    -1375.0,
+    410.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_12",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    -1375.0,
+    880.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ]
+  },
+  {
+   "name": "Mob_Saat_02",
+   "mesh": "SM_Mob_Saat",
+   "loc": [
+    4550.0,
+    -1250.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Somine_01",
+   "mesh": "SM_Mob_Somine",
+   "loc": [
+    3200.0,
+    -4150.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_02",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3200.0,
+    -3000.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.5,
+    1.6,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kanepe_01",
+   "mesh": "SM_Mob_Kanepe",
+   "loc": [
+    3200.0,
+    -2650.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_01",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    3200.0,
+    -2950.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_01",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2900.0,
+    -3000.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_02",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    3500.0,
+    -3000.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Piyano_01",
+   "mesh": "SM_Mob_Piyano",
+   "loc": [
+    2300.0,
+    -2000.0,
+    150.0
+   ],
+   "yaw": -30.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Saat_03",
+   "mesh": "SM_Mob_Saat",
+   "loc": [
+    4555.0,
+    -3975.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_01",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4560.0,
+    -1700.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_02",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4560.0,
+    -2700.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_03",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4560.0,
+    -2900.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_04",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4560.0,
+    -3100.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_05",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4560.0,
+    -3300.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_13",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2200.0,
+    -1420.0,
+    400.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ]
+  },
+  {
+   "name": "Mob_Tablo_14",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    -1420.0,
+    400.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_03",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2200.0,
+    -3775.0,
+    150.0
+   ],
+   "yaw": 45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_04",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2450.0,
+    -3775.0,
+    150.0
+   ],
+   "yaw": 135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_02",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    2320.0,
+    -3655.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.6,
+    0.6,
+    0.6
+   ]
+  },
+  {
+   "name": "Mob_Hali_03",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3200.0,
     2400.0,
-    1150.0
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    2.8,
+    1.3,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Yemek_Masasi_01",
+   "mesh": "SM_Mob_Yemek_Masasi",
+   "loc": [
+    3200.0,
+    2400.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_01",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2600.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_02",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2600.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_03",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2700.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_04",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2700.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_05",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2800.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_06",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2800.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_07",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2900.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_08",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2900.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_09",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3000.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_10",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3000.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_11",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3100.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_12",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3100.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_13",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3200.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_14",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3200.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_15",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3300.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_16",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3300.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_17",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3400.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_18",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3400.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_19",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3500.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_20",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3500.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_21",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3600.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_22",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3600.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_23",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3700.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_24",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3700.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_25",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3800.0,
+    2285.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_26",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3800.0,
+    2515.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_27",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    2440.0,
+    2400.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_28",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    3960.0,
+    2400.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_01",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2750.0,
+    2400.0,
+    232.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_02",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    3050.0,
+    2400.0,
+    232.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_03",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    3350.0,
+    2400.0,
+    232.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_04",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    3650.0,
+    2400.0,
+    232.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Somine_02",
+   "mesh": "SM_Mob_Somine",
+   "loc": [
+    3200.0,
+    3750.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_01",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    4555.0,
+    3200.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_05",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    4555.0,
+    3200.0,
+    240.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_02",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    4555.0,
+    1400.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_06",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    4555.0,
+    1400.0,
+    240.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_15",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2200.0,
+    1020.0,
+    400.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Tablo_16",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    3900.0,
+    1020.0,
+    400.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_06",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    3600.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_07",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    3415.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_08",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    3230.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_09",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    3045.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_10",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    2860.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_11",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    2675.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_12",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    2490.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_13",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    2305.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_14",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    2120.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_15",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    1565.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_16",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    1380.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_17",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    1195.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_18",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    1010.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_19",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    825.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_20",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    640.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_21",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    455.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_22",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    270.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_23",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    85.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_24",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -100.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_25",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -285.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_26",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -470.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_27",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -655.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_28",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -840.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_29",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1025.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_30",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1210.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_31",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1395.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_32",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1580.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_33",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1765.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_34",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -1950.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_35",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -2505.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_36",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -2690.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_37",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -2875.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_38",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3060.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_39",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3245.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_40",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3430.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_41",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3615.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_42",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3800.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kitaplik_43",
+   "mesh": "SM_Mob_Kitaplik",
+   "loc": [
+    4640.0,
+    -3985.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_04",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    5400.0,
+    -2800.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.3,
+    1.1,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_05",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5240.0,
+    -2660.0,
+    150.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_06",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5560.0,
+    -2660.0,
+    150.0
+   ],
+   "yaw": -135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_03",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    5400.0,
+    -2800.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.7,
+    0.7,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Hali_05",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    5400.0,
+    2400.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.3,
+    1.1,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_07",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5240.0,
+    2540.0,
+    150.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_08",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5560.0,
+    2540.0,
+    150.0
+   ],
+   "yaw": -135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_04",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    5400.0,
+    2400.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.7,
+    0.7,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Calisma_Masasi_01",
+   "mesh": "SM_Mob_Calisma_Masasi",
+   "loc": [
+    5700.0,
+    -200.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sandalye_29",
+   "mesh": "SM_Mob_Sandalye",
+   "loc": [
+    5780.0,
+    -200.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_07",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    5700.0,
+    -260.0,
+    230.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_06",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    5600.0,
+    -200.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Saat_04",
+   "mesh": "SM_Mob_Saat",
+   "loc": [
+    6145.0,
+    -600.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Yatak_01",
+   "mesh": "SM_Mob_Yatak",
+   "loc": [
+    3600.0,
+    -4045.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_07",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3600.0,
+    -3825.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.9,
+    1.1,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_03",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3408.0,
+    -4135.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    0.8,
+    0.3,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Konsol_04",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3792.0,
+    -4135.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    0.8,
+    0.3,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Gardirop_01",
+   "mesh": "SM_Mob_Gardirop",
+   "loc": [
+    4545.0,
+    -3200.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Gardirop_02",
+   "mesh": "SM_Mob_Gardirop",
+   "loc": [
+    4545.0,
+    -3400.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Somine_03",
+   "mesh": "SM_Mob_Somine",
+   "loc": [
+    2600.0,
+    -1440.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_09",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2450.0,
+    -1715.0,
+    650.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_10",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2750.0,
+    -1715.0,
+    650.0
+   ],
+   "yaw": -135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Calisma_Masasi_02",
+   "mesh": "SM_Mob_Calisma_Masasi",
+   "loc": [
+    2100.0,
+    -2200.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_08",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2100.0,
+    -2200.0,
+    730.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_17",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2600.0,
+    -4170.0,
+    890.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ]
+  },
+  {
+   "name": "Mob_Yatak_02",
+   "mesh": "SM_Mob_Yatak",
+   "loc": [
+    3600.0,
+    3645.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_08",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3600.0,
+    3425.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.9,
+    1.1,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_05",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3408.0,
+    3735.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    0.8,
+    0.3,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Konsol_06",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3792.0,
+    3735.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    0.8,
+    0.3,
+    0.7
+   ]
+  },
+  {
+   "name": "Mob_Gardirop_03",
+   "mesh": "SM_Mob_Gardirop",
+   "loc": [
+    4545.0,
+    2000.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Gardirop_04",
+   "mesh": "SM_Mob_Gardirop",
+   "loc": [
+    4545.0,
+    1800.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Somine_04",
+   "mesh": "SM_Mob_Somine",
+   "loc": [
+    2600.0,
+    1040.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_11",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2450.0,
+    1315.0,
+    650.0
+   ],
+   "yaw": 45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_12",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    2750.0,
+    1315.0,
+    650.0
+   ],
+   "yaw": 135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Calisma_Masasi_03",
+   "mesh": "SM_Mob_Calisma_Masasi",
+   "loc": [
+    2100.0,
+    1800.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_09",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2100.0,
+    1800.0,
+    730.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Tablo_18",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    2600.0,
+    3770.0,
+    890.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ]
+  },
+  {
+   "name": "Mob_Tablo_19",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    3500.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_20",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    3100.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_21",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    2700.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_22",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    2300.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_23",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    1500.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_24",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    1100.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_25",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    700.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_26",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    300.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_27",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -500.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_28",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -900.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_29",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -1300.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_30",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -1700.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_31",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -2500.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_32",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -2900.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_33",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -3300.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Tablo_34",
+   "mesh": "SM_Mob_Tablo",
+   "loc": [
+    4620.0,
+    -3700.0,
+    880.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ]
+  },
+  {
+   "name": "Mob_Kanepe_02",
+   "mesh": "SM_Mob_Kanepe",
+   "loc": [
+    5200.0,
+    -2800.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_05",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    5400.0,
+    -2800.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kanepe_03",
+   "mesh": "SM_Mob_Kanepe",
+   "loc": [
+    5200.0,
+    2400.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_06",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    5400.0,
+    2400.0,
+    650.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -8944,7 +11764,7 @@
    "type": "POINT",
    "loc": [
     2600.0,
-    -200.0,
+    -2800.0,
     540.0
    ],
    "color": [
@@ -8963,8 +11783,8 @@
    "name": "Avize_Zemin_2_Isik",
    "type": "POINT",
    "loc": [
-    3500.0,
-    -200.0,
+    3800.0,
+    -2800.0,
     540.0
    ],
    "color": [
@@ -8983,8 +11803,8 @@
    "name": "Avize_Zemin_3_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    -1600.0,
+    2800.0,
+    2400.0,
     540.0
    ],
    "color": [
@@ -9003,8 +11823,8 @@
    "name": "Avize_Zemin_4_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    -3300.0,
+    3600.0,
+    2400.0,
     540.0
    ],
    "color": [
@@ -9023,8 +11843,8 @@
    "name": "Avize_Zemin_5_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    1200.0,
+    5400.0,
+    -2800.0,
     540.0
    ],
    "color": [
@@ -9043,8 +11863,8 @@
    "name": "Avize_Zemin_6_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    2900.0,
+    5400.0,
+    -200.0,
     540.0
    ],
    "color": [
@@ -9063,47 +11883,7 @@
    "name": "Avize_Zemin_7_Isik",
    "type": "POINT",
    "loc": [
-    5000.0,
-    -3000.0,
-    540.0
-   ],
-   "color": [
-    1.0,
-    0.6200000047683716,
-    0.3199999928474426
-   ],
-   "energy": 400.0,
-   "rot": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Avize_Zemin_8_Isik",
-   "type": "POINT",
-   "loc": [
-    5000.0,
-    -200.0,
-    540.0
-   ],
-   "color": [
-    1.0,
-    0.6200000047683716,
-    0.3199999928474426
-   ],
-   "energy": 400.0,
-   "rot": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Avize_Zemin_9_Isik",
-   "type": "POINT",
-   "loc": [
-    4700.0,
+    5400.0,
     2400.0,
     540.0
    ],
@@ -9124,7 +11904,7 @@
    "type": "POINT",
    "loc": [
     2600.0,
-    -200.0,
+    -2800.0,
     1060.0
    ],
    "color": [
@@ -9143,8 +11923,8 @@
    "name": "Avize_Ust_2_Isik",
    "type": "POINT",
    "loc": [
-    3500.0,
-    -200.0,
+    3800.0,
+    -2800.0,
     1060.0
    ],
    "color": [
@@ -9163,8 +11943,8 @@
    "name": "Avize_Ust_3_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    -1600.0,
+    2600.0,
+    2400.0,
     1060.0
    ],
    "color": [
@@ -9183,8 +11963,8 @@
    "name": "Avize_Ust_4_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    -3300.0,
+    3800.0,
+    2400.0,
     1060.0
    ],
    "color": [
@@ -9203,8 +11983,8 @@
    "name": "Avize_Ust_5_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    1200.0,
+    5400.0,
+    -2800.0,
     1060.0
    ],
    "color": [
@@ -9223,67 +12003,7 @@
    "name": "Avize_Ust_6_Isik",
    "type": "POINT",
    "loc": [
-    2900.0,
-    2900.0,
-    1060.0
-   ],
-   "color": [
-    1.0,
-    0.6200000047683716,
-    0.3199999928474426
-   ],
-   "energy": 400.0,
-   "rot": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Avize_Ust_7_Isik",
-   "type": "POINT",
-   "loc": [
-    5000.0,
-    -3000.0,
-    1060.0
-   ],
-   "color": [
-    1.0,
-    0.6200000047683716,
-    0.3199999928474426
-   ],
-   "energy": 400.0,
-   "rot": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Avize_Ust_8_Isik",
-   "type": "POINT",
-   "loc": [
-    5000.0,
-    -200.0,
-    1060.0
-   ],
-   "color": [
-    1.0,
-    0.6200000047683716,
-    0.3199999928474426
-   ],
-   "energy": 400.0,
-   "rot": [
-    0.0,
-    0.0,
-    0.0
-   ]
-  },
-  {
-   "name": "Avize_Ust_9_Isik",
-   "type": "POINT",
-   "loc": [
-    4700.0,
+    5400.0,
     2400.0,
     1060.0
    ],
@@ -9293,6 +12013,106 @@
     0.3199999928474426
    ],
    "energy": 400.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Avize_Hol_Isik",
+   "type": "POINT",
+   "loc": [
+    2812.5,
+    -200.0,
+    910.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.3199999928474426
+   ],
+   "energy": 1500.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Somine_1_Ates",
+   "type": "POINT",
+   "loc": [
+    3200.0,
+    -4115.0,
+    200.0
+   ],
+   "color": [
+    1.0,
+    0.44999998807907104,
+    0.15000000596046448
+   ],
+   "energy": 250.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Somine_2_Ates",
+   "type": "POINT",
+   "loc": [
+    3200.0,
+    3715.0,
+    200.0
+   ],
+   "color": [
+    1.0,
+    0.44999998807907104,
+    0.15000000596046448
+   ],
+   "energy": 250.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Somine_3_Ates",
+   "type": "POINT",
+   "loc": [
+    2600.0,
+    -1475.0,
+    700.0
+   ],
+   "color": [
+    1.0,
+    0.44999998807907104,
+    0.15000000596046448
+   ],
+   "energy": 250.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Somine_4_Ates",
+   "type": "POINT",
+   "loc": [
+    2600.0,
+    1075.0,
+    700.0
+   ],
+   "color": [
+    1.0,
+    0.44999998807907104,
+    0.15000000596046448
+   ],
+   "energy": 250.0,
    "rot": [
     0.0,
     0.0,
