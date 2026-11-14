@@ -1,0 +1,66 @@
+# Malikane – Slasher Korku Oyunu
+
+Gece geçen, slasher tarzı bir korku oyunu için harita. Haritada demir çitle çevrili büyük bir bahçe, iki kapı (giriş ve kaçış), bahçeye dağılmış kulübeler ve ağaçlar, ortada da sütunlu, balkonlu, iki katlı bir malikane var.
+Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarılıyor.
+
+![Oyun içi görünüm](Gorseller/ue_oyun_ici.png)
+![Malikane girişi](Blender/Cikti/Onizlemeler/onizleme_giris.png)
+![Üstten harita](Blender/Cikti/Onizlemeler/onizleme_ustten.png)
+
+## Klasörler
+| Klasör / dosya | Ne işe yarar |
+|---|---|
+| `Unreal/MalikaneGame/` | **UE 5.8 projesi.** `MalikaneGame.uproject` dosyasını açıp Play'e bas (First Person karakter, WASD + fare) |
+| `Unreal/ue_haritayi_kur.py` | UE içinde haritayı baştan kurar: mesh import, materyaller, ağaçlar, ay ışığı, fenerler, avizeler, sis, gökyüzü, post process, PlayerStart |
+| `Unreal/ue_megascans_uygula.py` | Fab'dan eklenen Megascans asset'lerini haritaya uygular (gerçek yüzeyler, ağaçlar, çimen) |
+| `Blender/malikane_harita_uretici.py` | Haritayı Blender'da sıfırdan üreten script (tüm ölçüler en üstte) |
+| `Blender/Cikti/Malikane_Harita.blend` | Üretilmiş Blender sahnesi |
+| `Blender/Cikti/UE_Aktarim/` | UE'ye giden dosyalar: her mesh için ayrı FBX (`SM_*.fbx`) ve tüm konum, ışık ve materyalleri içeren `scene.json` |
+| `Blender/Cikti/Onizlemeler/` | Blender gece render'ları (genel, giriş, iç mekan, üstten) |
+| `Araclar/oyun_ekran_goruntusu.ps1` | Oyunu pencerede açıp ekran görüntüsü alır (`Gorseller/` klasörüne) |
+| `Gorseller/` | UE oyun içi ekran görüntüleri |
+
+## Harita
+| Bölüm | İçerik |
+|---|---|
+| Bahçe | ~200 m × 110 m, 330 ağaç (3 çeşit çam, 2 çeşit meşe), 180 çalı, çakıl yollar |
+| Sınır | Taş kaide üstünde mızrak uçlu siyah demir çit, her ~14 m'de taş sütun |
+| Kapılar | Batı: **Giriş kapısı** (aralık), güney: **Kaçış kapısı** (kapalı). Kemerli demir kanatlar; pivot menteşede, UE'de Z ekseninde döndürülerek açılır |
+| Malikane | 44 m × 80 m, 2 kat (5 m), 1,5 m kaide. Büyük merdiven, 6 dev sütun, balkon, alınlık, 5 m çift kanatlı kapı |
+| Pencereler | Gerçek açıklık, çerçeve, kayıt, denizlik, lento ve yarı saydam cam |
+| İç mekan | Koridor, odalar, arka salon, ikinci kata merdiven, 18 avize (her birinde ışık) |
+| Kulübeler | 7 kulübe, taş temel, camlı pencereler, aralık kapı; bazılarının içi yanıyor |
+| Oyun | `PlayerStart` (giriş kapısı), `Kacis_Trigger` (kaçış kapısının dışında) |
+
+## Haritayı değiştirip yeniden kurmak
+1. `Blender/malikane_harita_uretici.py` üstündeki değerleri değiştir (harita ve malikane boyutu, kulübe listesi, ağaç sayısı), sonra depo kök klasöründen çalıştır:
+   ```
+   "C:\Program Files\Blender Foundation\Blender 5.3\blender.exe" -b -P Blender/malikane_harita_uretici.py -- Blender/Cikti
+   ```
+2. UE editöründe **Tools → Execute Python Script** ile `Unreal/ue_haritayi_kur.py` dosyasını çalıştır. Script `/Game/Malikane` klasörünü ve `/Game/Maps/Malikane` haritasını baştan kurar. Haritaya elle eklediğin aktörler silinir.
+
+## Gerçekçi grafik (Megascans / Fab)
+1. UE'de **Window → Fab** panelini aç ve Epic hesabınla giriş yap.
+2. Aşağıdaki ücretsiz asset'leri ara, her birinde **Add to My Library**, sonra **Add to Project** yap (kalite: Medium ya da High):
+   - Ağaçlar: *Megaplants: Norway Spruce*, *Megaplants: Baltic Pine*, *Megaplants: English Oak*, *Megaplants: Black Poplar*, *Megaplants: European Hornbeam*
+   - Çimen ve çalı: Quixel *Wild Grass*, *Grass Clumps*, *Tall Grass*
+   - Yüzeyler: Quixel *Roof Tiles*, *Gravel Floor*, *Mossy Brick Floor*, *Cracked Plaster Floor*
+   - Hazır paketler (taş, ahşap, metal ve korku havası için): *Medieval Village Megascans Sample*, *Dark Ruins Megascans Sample*
+3. **Tools → Execute Python Script** → `Unreal/ue_megascans_uygula.py`. Script asset'leri isimlerinden tanır:
+   - Blockout materyallerinin yerine gerçek yüzeyleri koyar.
+   - Çam ağaçlarını konifer, meşeleri yapraklı Megaplants ile değiştirir; çalıları da değiştirir.
+   - Bahçeye 20.000 çimen öbeği ekler.
+
+Haritayı `ue_haritayi_kur.py` ile yeniden kurarsan `ue_megascans_uygula.py` dosyasını da tekrar çalıştır.
+
+## Gece ayarları
+`Unreal/ue_haritayi_kur.py` en üstündeki değerler: `MOON_LUX` (ay ışığı), `EXPOSURE_BIAS` (genel parlaklık), `LAMP_CD_PER_WATT` (fener ve avize gücü), `EMISSIVE_SCALE`, `FOG_DENSITY`.
+Editörde de değiştirilebilir: `Gece_PostProcess` (Exposure Compensation), `Sis`, `Ay_Isigi`.
+
+## Notlar
+- Ölçek: Blender'da 1 birim = 1 m, UE'de 100 cm. FBX `FBX_SCALE_NONE` ile export ediliyor. `FBX_SCALE_UNITS` kullanılırsa UE'de her şey 100 kat küçük çıkar.
+- Modeller şimdilik script'le üretilmiş sade geometri (blockout). Gerçekçi görünüm için UE içindeki Fab / Quixel Bridge'den Megascans asset'leri kullanılabilir.
+- UE proje klasöründe `Content/Characters`, `Content/FirstPerson`, `Content/Input` ve `Content/LevelPrototyping` klasörleri UE 5.8 First Person şablonundan geliyor.
+
+## Sonraki adımlar
+Slasher mekanikleri: katil AI, kovalamaca, saklanma, fener, kapı açma Blueprint'leri, kaçış ekranı.

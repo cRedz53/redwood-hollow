@@ -1,0 +1,15 @@
+# Unreal Engine - yeniden olusturulan klasorler
+Unreal/MalikaneGame/Binaries/
+Unreal/MalikaneGame/Build/
+Unreal/MalikaneGame/DerivedDataCache/
+Unreal/MalikaneGame/Intermediate/
+Unreal/MalikaneGame/Saved/
+Unreal/MalikaneGame/.vs/
+*.sln
+
+# Blender yedekleri
+*.blend1
+*.blend2
+
+# Python
+__pycache__/
