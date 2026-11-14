@@ -893,20 +893,23 @@ def coffee_table(b):
     b.box((0, 0, 0.45), (1.3, 0.75, 0.06), mi=MARBLE)
 
 
-TABLE_CLEAR = 0.77  # underside of tables the player can crouch under (crouched capsule is 72 cm)
+TABLE_CLEAR = 1.18  # underside of tables the player can crouch under (crouched capsule is 110 cm)
+DINING_W = 1.9
+CHAIR_SCALE = 1.25  # dining chairs grown with the oversized table
 
 
 def dining_table(b, length=14.0):
     # legs along the long edges so the space underneath stays open for hiding
+    hw = DINING_W / 2
     for x in [i * 3.5 - length / 2 + 0.25 for i in range(int(length / 3.5) + 1)]:
-        for y in (-0.68, 0.68):
-            b.cyl((x, y, TABLE_CLEAR / 2), 0.06, TABLE_CLEAR, 10, WOOD)
-    for y in (-0.72, 0.72):                                                          # apron, edges only
+        for y in (-(hw - 0.12), hw - 0.12):
+            b.cyl((x, y, TABLE_CLEAR / 2), 0.08, TABLE_CLEAR, 12, WOOD)
+    for y in (-(hw - 0.08), hw - 0.08):                                              # apron, edges only
         b.box((0, y, TABLE_CLEAR - 0.03), (length - 0.2, 0.04, 0.06), mi=WOOD)
     for x in (-length / 2 + 0.12, length / 2 - 0.12):
-        b.box((x, 0, TABLE_CLEAR - 0.03), (0.04, 1.44, 0.06), mi=WOOD)
-    b.box((0, 0, TABLE_CLEAR + 0.03), (length, 1.6, 0.06), mi=WOOD)
-    b.box((0, 0, TABLE_CLEAR + 0.065), (length - 0.6, 0.5, 0.01), mi=CARPET)        # table runner
+        b.box((x, 0, TABLE_CLEAR - 0.03), (0.04, DINING_W - 0.16, 0.06), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.04), (length, DINING_W, 0.08), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.085), (length - 0.6, 0.55, 0.01), mi=CARPET)       # table runner
 
 
 def chair(b):
@@ -1108,12 +1111,12 @@ place("Hali", CX_MID, CX_S, Z1, 0, (2.8, 1.3, 1))
 place("Yemek_Masasi", CX_MID, CX_S, Z1)
 for i in range(9):  # 1.5 m apart: the gaps between chairs are wide enough to crawl under the table
     x = CX_MID - 6 + i * 1.5
-    place("Sandalye", x, CX_S + 1.15, Z1, -90)
-    place("Sandalye", x, CX_S - 1.15, Z1, 90)
-place("Sandalye", CX_MID - 7.9, CX_S, Z1, 0)
-place("Sandalye", CX_MID + 7.9, CX_S, Z1, 180)
+    place("Sandalye", x, CX_S + DINING_W / 2 + 0.4, Z1, -90, CHAIR_SCALE)
+    place("Sandalye", x, CX_S - DINING_W / 2 - 0.4, Z1, 90, CHAIR_SCALE)
+place("Sandalye", CX_MID - 8.0, CX_S, Z1, 0, CHAIR_SCALE)
+place("Sandalye", CX_MID + 8.0, CX_S, Z1, 180, CHAIR_SCALE)
 for x in (-4.5, -1.5, 1.5, 4.5):
-    place("Samdan", CX_MID + x, CX_S, Z1 + TABLE_CLEAR + 0.07)
+    place("Samdan", CX_MID + x, CX_S, Z1 + TABLE_CLEAR + 0.09)
 place("Somine", CX_MID, SW + 0.25, Z1, 90)
 for y in (my0 + 6, HALL_Y0 - 4):
     place("Konsol", BACK_W - 0.3, y, Z1, 180)
@@ -1133,7 +1136,7 @@ for yy in (my1 - 14, my0 + 14):
     place("Koltuk", CX_BACK + 1.6, yy - 1.4, Z1, 135)
     place("Sehpa", CX_BACK, yy, Z1, 0, 0.7)
 place("Calisma_Masasi", CX_BACK + 3, dy, Z1, 180)
-place("Sandalye", CX_BACK + 3.8, dy, Z1, 180)
+place("Sandalye", CX_BACK + 3.8, dy, Z1, 180, CHAIR_SCALE)
 place("Samdan", CX_BACK + 3, dy + 0.6, Z1 + TABLE_CLEAR + 0.06)
 place("Hali", CX_BACK + 2, dy, Z1, 90, (1.0, 1.0, 1))
 place("Saat", E_IN - 0.3, dy + 4, Z1, 180)

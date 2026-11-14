@@ -43,6 +43,9 @@ public:
 
 	void Begin(APlayerController* PC);
 
+	/** True while someone is squeezing through. */
+	bool IsBusy() const { return Alpha >= 0.f; }
+
 	/** Where the HUD prompt floats: the middle of the gap, a little above eye height. */
 	FVector GetPromptLocation() const { return (PointA + PointB) * 0.5f + FVector(0.f, 0.f, 70.f); }
 

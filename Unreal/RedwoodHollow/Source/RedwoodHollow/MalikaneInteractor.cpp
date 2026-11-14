@@ -1,7 +1,11 @@
 #include "MalikaneInteractor.h"
 
+#include "Animation/AnimSequence.h"
+#include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -25,6 +29,13 @@ void AMalikaneInteractor::Tick(float DeltaSeconds)
 		TryBind();  // the player controller may not exist yet on the first frames
 		return;
 	}
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+	if (Pawn && CameraPawn.Get() != Pawn)
+	{
+		SetupCamera(Pawn);  // again after a respawn
+	}
+	UpdateCrouchAnimation();
 	if (!bHoldingUse)
 	{
 		return;
@@ -73,6 +84,85 @@ void AMalikaneInteractor::TryBind()
 			PC->PlayerCameraManager->AddNewCameraModifier(UMalikaneCrouchCamera::StaticClass());
 		}
 		bBound = true;
+	}
+}
+
+void AMalikaneInteractor::SetupCamera(APawn* Pawn)
+{
+	CameraPawn = Pawn;
+	if (USpringArmComponent* Boom = Pawn->FindComponentByClass<USpringArmComponent>())
+	{
+		// close over-the-shoulder view: right shoulder, slightly above the head, a touch of lag
+		Boom->TargetArmLength = CameraDistance;
+		Boom->SocketOffset = CameraOffset;
+		Boom->bEnableCameraLag = true;
+		Boom->CameraLagSpeed = 14.f;
+		Boom->ProbeSize = 14.f;
+	}
+	if (UCameraComponent* Camera = Pawn->FindComponentByClass<UCameraComponent>())
+	{
+		Camera->SetFieldOfView(80.f);
+	}
+}
+
+void AMalikaneInteractor::UpdateCrouchAnimation()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	ACharacter* Character = PC ? Cast<ACharacter>(PC->GetPawn()) : nullptr;
+	USkeletalMeshComponent* Mesh = Character ? Character->GetMesh() : nullptr;
+	if (!Mesh)
+	{
+		return;
+	}
+	if (!CrouchIdle)
+	{
+		CrouchIdle = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Idle.MM_Unarmed_Crouch_Idle"));
+		CrouchWalk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Walk_Fwd.MM_Unarmed_Crouch_Walk_Fwd"));
+		CrouchStrafe = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Walk_Right.MM_Unarmed_Crouch_Walk_Right"));
+	}
+	bool bSqueezing = false;
+	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
+	{
+		bSqueezing |= It->IsBusy();
+	}
+
+	// pick the clip: shuffle sideways in a gap, crouch walk / idle while crouched, else the anim blueprint
+	UAnimSequence* Wanted = nullptr;
+	const float Speed = Character->GetVelocity().Size2D();
+	if (bSqueezing)
+	{
+		Wanted = CrouchStrafe;
+	}
+	else if (Character->bIsCrouched)
+	{
+		Wanted = Speed > 15.f ? CrouchWalk : CrouchIdle;
+	}
+
+	if (Wanted && Wanted != PlayingOverride)
+	{
+		if (!PlayingOverride)
+		{
+			NormalAnimClass = Mesh->GetAnimClass();
+		}
+		Mesh->PlayAnimation(Wanted, true);
+		PlayingOverride = Wanted;
+	}
+	else if (!Wanted && PlayingOverride)
+	{
+		Mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		if (NormalAnimClass)
+		{
+			Mesh->SetAnimInstanceClass(NormalAnimClass);
+		}
+		PlayingOverride = nullptr;
+	}
+	if (PlayingOverride == CrouchWalk)
+	{
+		Mesh->SetPlayRate(FMath::Clamp(Speed / 150.f, 0.6f, 1.5f));  // keep the feet from sliding
+	}
+	else if (PlayingOverride)
+	{
+		Mesh->SetPlayRate(1.f);
 	}
 }
 

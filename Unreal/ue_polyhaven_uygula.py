@@ -357,6 +357,8 @@ for a in list(actor_sub.get_all_level_actors()):
             s = 1.0
             if kind in FRAMED:
                 s = FRAMED[kind] * sc.y / max(meshes[mid][1][1] * 100.0, 1.0)
+            elif kind == "Sandalye":
+                s = sc.x  # chairs grown along with the oversized dining table
             new = spawn(mid, loc, yaw, s, label, "Malikane/Mobilya")
     elif label.startswith("Avize_"):
         mid = pick("Chandelier_03" if label == "Avize_Hol" else "Chandelier_01")

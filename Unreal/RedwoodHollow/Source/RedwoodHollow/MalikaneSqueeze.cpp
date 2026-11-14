@@ -77,7 +77,8 @@ void AMalikaneSqueeze::Tick(float DeltaSeconds)
 	Pawn->SetActorLocation(Pos);
 
 	const float PathYaw = Dir.Rotation().Yaw;
-	const float SideYaw = PathYaw + 90.f;  // face the wardrobe / wall while sliding sideways
+	// face side-on so the path runs to the character's right (it plays the crouch strafe-right clip)
+	const float SideYaw = PathYaw - 90.f;
 	float Yaw;
 	if (Alpha < 0.15f)
 	{
@@ -94,6 +95,7 @@ void AMalikaneSqueeze::Tick(float DeltaSeconds)
 	const float Squeeze = FMath::Sin(Slide * PI);  // tightest in the middle
 	const FRotator View(-6.f * Squeeze, Yaw, 4.f * Squeeze * Shuffle);
 	User->SetControlRotation(View);
+	Pawn->SetActorRotation(FRotator(0.f, Alpha < 0.85f ? Yaw : SideYaw, 0.f));
 
 	if (Alpha >= 1.f)
 	{

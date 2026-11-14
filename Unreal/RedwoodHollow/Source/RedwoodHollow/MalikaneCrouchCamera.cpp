@@ -15,17 +15,15 @@ bool UMalikaneCrouchCamera::ModifyCamera(float DeltaTime, FMinimalViewInfo& InOu
 	{
 		return false;
 	}
-	// capsule bottom stays put while crouching, so it is a stable floor reference
+	// the capsule bottom stays put while crouching, so it is a stable floor reference
 	const UCapsuleComponent* Capsule = Character->GetCapsuleComponent();
 	const float Floor = Capsule->GetComponentLocation().Z - Capsule->GetScaledCapsuleHalfHeight();
-	const float Natural = InOutPOV.Location.Z - Floor;
-	const float Target = Character->bIsCrouched ? FMath::Min(CrouchedEyeHeight, Natural) : Natural;
-
-	EyeHeight = EyeHeight < 0.f ? Natural : FMath::FInterpTo(EyeHeight, Target, DeltaTime, Speed);
-	if (!Character->bIsCrouched && FMath::IsNearlyEqual(EyeHeight, Natural, 0.5f))
+	const float Wanted = InOutPOV.Location.Z - Floor;
+	if (Height < 0.f || FMath::Abs(Wanted - Height) > 300.f)
 	{
-		EyeHeight = Natural;  // standing and settled: leave the camera exactly as the character made it
+		Height = Wanted;  // first frame, teleports, stairs falls: no easing
 	}
-	InOutPOV.Location.Z = Floor + EyeHeight;
+	Height = FMath::FInterpTo(Height, Wanted, DeltaTime, Speed);
+	InOutPOV.Location.Z = Floor + Height;
 	return false;
 }
