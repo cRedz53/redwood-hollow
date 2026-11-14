@@ -6,7 +6,8 @@
 
 /**
  * Placed once in the level. Listens for the left mouse button on the first player controller,
- * traces from the camera and toggles the door the player is looking at.
+ * traces from the camera and toggles the door the player is looking at. E squeezes through a
+ * narrow gap (AMalikaneSqueeze) the player is standing at.
  */
 UCLASS()
 class REDWOODHOLLOW_API AMalikaneInteractor : public AActor
@@ -29,4 +30,5 @@ private:
 	bool bBound = false;
 	void TryBind();
 	void OnClick();
+	void OnUse();
 };

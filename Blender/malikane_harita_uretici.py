@@ -1134,6 +1134,8 @@ for side, yc, wall_y, face in ((1, CX_N, NW, -90), (-1, CX_S, SW, 90)):
     place("Hali", CX_MID + 4, wall_y - side * 3.5, Z2, 0, (0.9, 1.1, 1))
     for dx in (-1.6, 1.6):
         place("Konsol", CX_MID + 4 + dx * 1.2, wall_y - side * 0.4, Z2, face, (0.8, 0.3, 0.7))
+    # in the south bedroom these two wardrobes stand half in front of the door to the east wing,
+    # leaving only a sliver to squeeze through (see SQUEEZE_GAPS) — kept on purpose
     place("Gardirop", BACK_W - 0.4, yc + 4, Z2, 180)
     place("Gardirop", BACK_W - 0.4, yc + 6, Z2, 180)
     # fireplace on the hall wall, clear of the gallery door at mx0 + 8
@@ -1293,8 +1295,13 @@ for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
         for s, w, zb, zt in ops:
             if zb > 0:
                 add_window(hf, hg, a, b, s, w, zb, zt, 0.3, t, mullions=False)
-    for k in range(int(h / 0.3)):                                             # plank lines
-        hb.box((0, -hy - t / 2 - 0.01, 0.3 + k * 0.3), (sx, 0.02, 0.03))
+    for k in range(int(h / 0.3)):                                             # plank lines, not across the doorway
+        z = 0.3 + k * 0.3
+        if z > HUT_FLOOR_Z + 2.2 + 0.15:
+            hb.box((0, -hy - t / 2 - 0.01, z), (sx, 0.02, 0.03))
+        else:
+            for x0, x1 in ((-hx, -0.55 - 0.13), (0.55 + 0.13, hx)):
+                hb.box(((x0 + x1) / 2, -hy - t / 2 - 0.01, z), (x1 - x0, 0.02, 0.03))
     # roof with a generous overhang over all four walls, fascia boards along the eaves
     hb.prism_roof((0, 0), sx + 2.4, sy + 2.0, h + 0.3, 2.6, rot_z=math.pi / 2, mi=2)
     for s in (-1, 1):
@@ -1655,6 +1662,15 @@ for o in objs:
         })
     elif o.type == 'EMPTY':
         data["markers"].append({"name": o.name, "loc": to_ue(o.location)})
+
+# narrow gaps the player squeezes through sideways with E (AMalikaneSqueeze in UE)
+gap_y = (MANSION_DOOR_Y - 20) + 1.3 - 0.22      # between the south-bedroom wardrobe and the door jamb
+capsule_z = Z2 + 0.96
+data["squeeze"] = [{
+    "name": "Dar_Gecit_Dolap", "door": "Kapi_Dogu_Ust_-20_R",
+    "a": to_ue((MANSION_MIN.x + 28.0 - 1.75, gap_y, capsule_z)),  # bedroom side, in front of the wardrobe
+    "b": to_ue((MANSION_MIN.x + 28.0 + 1.3, gap_y, capsule_z)),   # east-wing side, past the open leaf
+}]
 
 with open(os.path.join(UE_DIR, "scene.json"), "w", encoding="utf-8") as f:
     json.dump(data, f, indent=1)

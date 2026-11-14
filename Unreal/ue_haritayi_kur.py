@@ -214,7 +214,16 @@ if doors and hasattr(unreal, "MalikaneInteractor"):
     it = actors.spawn_actor_from_class(unreal.MalikaneInteractor, unreal.Vector(0, 0, 0))
     it.set_actor_label("Kapi_Etkilesim")
     it.set_folder_path("Malikane/Oyun")
-unreal.log(f"[Malikane] {len(doors)} acilir kapi" if DoorClass else "[Malikane] C++ modulu yok: kapilar sabit")
+for g in scene.get("squeeze", []) if hasattr(unreal, "MalikaneSqueeze") else []:
+    sq = actors.spawn_actor_from_class(unreal.MalikaneSqueeze, vec(g["a"]))
+    sq.set_editor_property("point_a", vec(g["a"]))
+    sq.set_editor_property("point_b", vec(g["b"]))
+    if g.get("door") in doors:
+        sq.set_editor_property("required_door", doors[g["door"]][0])
+    sq.set_actor_label(g["name"])
+    sq.set_folder_path("Malikane/Oyun")
+unreal.log(f"[Malikane] {len(doors)} acilir kapi, {len(scene.get('squeeze', []))} dar gecit"
+           if DoorClass else "[Malikane] C++ modulu yok: kapilar sabit")
 
 
 def color8(c):

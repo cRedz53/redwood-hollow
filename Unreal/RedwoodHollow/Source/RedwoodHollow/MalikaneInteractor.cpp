@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "MalikaneDoor.h"
+#include "MalikaneSqueeze.h"
 
 AMalikaneInteractor::AMalikaneInteractor()
 {
@@ -33,6 +34,8 @@ void AMalikaneInteractor::TryBind()
 		InputComponent->bBlockInput = false;
 		FInputKeyBinding& Binding = InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AMalikaneInteractor::OnClick);
 		Binding.bConsumeInput = false;  // leave the click for anything else that wants it
+		FInputKeyBinding& Use = InputComponent->BindKey(EKeys::E, IE_Pressed, this, &AMalikaneInteractor::OnUse);
+		Use.bConsumeInput = false;
 		bBound = true;
 	}
 }
@@ -59,6 +62,20 @@ void AMalikaneInteractor::OnClick()
 		if (AMalikaneDoor* Door = Cast<AMalikaneDoor>(Hit.GetActor()))
 		{
 			Door->Toggle();
+		}
+	}
+}
+
+void AMalikaneInteractor::OnUse()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
+	{
+		if (It->CanUse(Pawn))
+		{
+			It->Begin(PC);
+			return;
 		}
 	}
 }
