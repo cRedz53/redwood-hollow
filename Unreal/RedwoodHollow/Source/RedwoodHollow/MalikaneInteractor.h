@@ -4,8 +4,10 @@
 #include "GameFramework/Actor.h"
 #include "MalikaneInteractor.generated.h"
 
+class AMalikaneDoor;
 class AMalikaneSqueeze;
 class UAnimSequence;
+class USkeletalMeshComponent;
 
 /**
  * Placed once in the level. Listens for the left mouse button on the first player controller,
@@ -33,8 +35,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
 	float CrouchedHalfHeight = 55.f;
 
+	/** Crouched walking speed (cm/s); the crouch-walk clip is played at a rate matched to it. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
-	float CrouchSpeed = 200.f;
+	float CrouchSpeed = 140.f;
+
+	/** Speed (cm/s) at which the crouch-walk clip's feet don't slide at play rate 1. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
+	float CrouchWalkClipSpeed = 140.f;
 
 	/** Over-the-shoulder camera: boom length and offset to the right / up (cm). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kamera")
@@ -58,6 +65,15 @@ private:
 	float HoldTime = 0.f;
 	TWeakObjectPtr<APawn> CameraPawn;  // pawn whose camera boom has been set up
 
+	/** What the mesh is doing instead of its animation blueprint. */
+	enum class ECrouchAnim : uint8 { Normal, Entering, Crouched, Exiting, Squeezing };
+	ECrouchAnim AnimState = ECrouchAnim::Normal;
+	float StateTime = 0.f;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> CrouchEntry;
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimSequence> CrouchExit;
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> CrouchIdle;
 	UPROPERTY(Transient)
@@ -71,7 +87,11 @@ private:
 
 	void TryBind();
 	void SetupCamera(APawn* Pawn);
-	void UpdateCrouchAnimation();
+	void UpdateCrouchAnimation(float DeltaSeconds);
+	void PlayOverride(USkeletalMeshComponent* Mesh, UAnimSequence* Clip, bool bLoop);
+	void RestoreAnimBlueprint(USkeletalMeshComponent* Mesh);
+	/** A door near the pawn in the view direction, for when the trace is blocked by furniture. */
+	AMalikaneDoor* FindDoorInFront(const FVector& Eye, const FVector& ViewDir) const;
 	void OnClick();
 	void OnUsePressed();
 	void OnUseReleased();

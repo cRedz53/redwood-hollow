@@ -35,7 +35,7 @@ void AMalikaneInteractor::Tick(float DeltaSeconds)
 	{
 		SetupCamera(Pawn);  // again after a respawn
 	}
-	UpdateCrouchAnimation();
+	UpdateCrouchAnimation(DeltaSeconds);
 	if (!bHoldingUse)
 	{
 		return;
@@ -105,7 +105,37 @@ void AMalikaneInteractor::SetupCamera(APawn* Pawn)
 	}
 }
 
-void AMalikaneInteractor::UpdateCrouchAnimation()
+void AMalikaneInteractor::PlayOverride(USkeletalMeshComponent* Mesh, UAnimSequence* Clip, bool bLoop)
+{
+	if (!Clip || Clip == PlayingOverride)
+	{
+		return;
+	}
+	if (!PlayingOverride)
+	{
+		NormalAnimClass = Mesh->GetAnimClass();  // remember the blueprint to hand back to
+	}
+	Mesh->PlayAnimation(Clip, bLoop);
+	PlayingOverride = Clip;
+	StateTime = 0.f;
+}
+
+void AMalikaneInteractor::RestoreAnimBlueprint(USkeletalMeshComponent* Mesh)
+{
+	if (!PlayingOverride)
+	{
+		return;
+	}
+	Mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	if (NormalAnimClass)
+	{
+		Mesh->SetAnimInstanceClass(NormalAnimClass);
+	}
+	Mesh->SetPlayRate(1.f);
+	PlayingOverride = nullptr;
+}
+
+void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	ACharacter* Character = PC ? Cast<ACharacter>(PC->GetPawn()) : nullptr;
@@ -116,49 +146,83 @@ void AMalikaneInteractor::UpdateCrouchAnimation()
 	}
 	if (!CrouchIdle)
 	{
-		CrouchIdle = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Idle.MM_Unarmed_Crouch_Idle"));
-		CrouchWalk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Walk_Fwd.MM_Unarmed_Crouch_Walk_Fwd"));
-		CrouchStrafe = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Crouch/MM_Unarmed_Crouch_Walk_Right.MM_Unarmed_Crouch_Walk_Right"));
+		const TCHAR* Dir = TEXT("/Game/Characters/Mannequins/Anims/Crouch/");
+		auto Load = [Dir](const TCHAR* Name) {
+			return LoadObject<UAnimSequence>(nullptr, *FString::Printf(TEXT("%s%s.%s"), Dir, Name, Name));
+		};
+		CrouchEntry = Load(TEXT("MM_Unarmed_Crouch_Entry"));
+		CrouchExit = Load(TEXT("MM_Unarmed_Crouch_Exit"));
+		CrouchIdle = Load(TEXT("MM_Unarmed_Crouch_Idle"));
+		CrouchWalk = Load(TEXT("MM_Unarmed_Crouch_Walk_Fwd"));
+		CrouchStrafe = Load(TEXT("MM_Unarmed_Crouch_Walk_Right"));
 	}
+	StateTime += DeltaSeconds;
+	const float Speed = Character->GetVelocity().Size2D();
+	const bool bCrouched = Character->bIsCrouched;
 	bool bSqueezing = false;
 	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
 	{
 		bSqueezing |= It->IsBusy();
 	}
+	auto Length = [](const UAnimSequence* Clip) { return Clip ? Clip->GetPlayLength() : 0.f; };
 
-	// pick the clip: shuffle sideways in a gap, crouch walk / idle while crouched, else the anim blueprint
-	UAnimSequence* Wanted = nullptr;
-	const float Speed = Character->GetVelocity().Size2D();
+	// state machine: Normal -> Entering (crouch down) -> Crouched (idle / walk) -> Exiting (stand up) -> Normal
 	if (bSqueezing)
 	{
-		Wanted = CrouchStrafe;
+		AnimState = ECrouchAnim::Squeezing;
+		PlayOverride(Mesh, CrouchStrafe, true);
 	}
-	else if (Character->bIsCrouched)
+	else switch (AnimState)
 	{
-		Wanted = Speed > 15.f ? CrouchWalk : CrouchIdle;
-	}
-
-	if (Wanted && Wanted != PlayingOverride)
-	{
-		if (!PlayingOverride)
+	case ECrouchAnim::Squeezing:
+		AnimState = bCrouched ? ECrouchAnim::Crouched : ECrouchAnim::Exiting;
+		PlayOverride(Mesh, bCrouched ? CrouchIdle : CrouchExit, bCrouched);
+		break;
+	case ECrouchAnim::Normal:
+		if (bCrouched)
 		{
-			NormalAnimClass = Mesh->GetAnimClass();
+			AnimState = ECrouchAnim::Entering;
+			PlayOverride(Mesh, CrouchEntry, false);
 		}
-		Mesh->PlayAnimation(Wanted, true);
-		PlayingOverride = Wanted;
-	}
-	else if (!Wanted && PlayingOverride)
-	{
-		Mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		if (NormalAnimClass)
+		break;
+	case ECrouchAnim::Entering:
+		if (!bCrouched)
 		{
-			Mesh->SetAnimInstanceClass(NormalAnimClass);
+			AnimState = ECrouchAnim::Exiting;
+			PlayOverride(Mesh, CrouchExit, false);
 		}
-		PlayingOverride = nullptr;
+		else if (StateTime >= Length(CrouchEntry) || Speed > 15.f)
+		{
+			AnimState = ECrouchAnim::Crouched;  // down (or already moving): loop idle / walk
+		}
+		break;
+	case ECrouchAnim::Crouched:
+		if (!bCrouched)
+		{
+			AnimState = ECrouchAnim::Exiting;
+			PlayOverride(Mesh, CrouchExit, false);
+		}
+		break;
+	case ECrouchAnim::Exiting:
+		if (bCrouched)
+		{
+			AnimState = ECrouchAnim::Crouched;
+		}
+		else if (StateTime >= Length(CrouchExit) || Speed > 15.f)
+		{
+			AnimState = ECrouchAnim::Normal;
+			RestoreAnimBlueprint(Mesh);
+		}
+		break;
+	}
+	if (AnimState == ECrouchAnim::Crouched)
+	{
+		PlayOverride(Mesh, Speed > 15.f ? CrouchWalk : CrouchIdle, true);
 	}
 	if (PlayingOverride == CrouchWalk)
 	{
-		Mesh->SetPlayRate(FMath::Clamp(Speed / 150.f, 0.6f, 1.5f));  // keep the feet from sliding
+		// play the walk cycle at the speed the feet actually travel so it reads as a creep, not a run
+		Mesh->SetPlayRate(FMath::Clamp(Speed / CrouchWalkClipSpeed, 0.4f, 1.1f));
 	}
 	else if (PlayingOverride)
 	{
@@ -199,13 +263,56 @@ void AMalikaneInteractor::OnClick()
 		Params.AddIgnoredActor(Pawn);
 	}
 	FHitResult Hit;
+	AMalikaneDoor* Door = nullptr;
 	if (GetWorld()->LineTraceSingleByChannel(Hit, Eye, Eye + View.Vector() * InteractRange, ECC_Visibility, Params))
 	{
-		if (AMalikaneDoor* Door = Cast<AMalikaneDoor>(Hit.GetActor()))
+		Door = Cast<AMalikaneDoor>(Hit.GetActor());
+	}
+	if (!Door)
+	{
+		// the over-the-shoulder trace can be blocked by furniture standing half in front of a door
+		Door = FindDoorInFront(Eye, View.Vector());
+	}
+	if (Door)
+	{
+		Door->Toggle();
+	}
+}
+
+AMalikaneDoor* AMalikaneInteractor::FindDoorInFront(const FVector& Eye, const FVector& ViewDir) const
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+	if (!Pawn)
+	{
+		return nullptr;
+	}
+	const FVector P = Pawn->GetActorLocation();
+	const FVector Look = ViewDir.GetSafeNormal2D();
+	AMalikaneDoor* Best = nullptr;
+	float BestScore = 0.f;
+	for (TActorIterator<AMalikaneDoor> It(GetWorld()); It; ++It)
+	{
+		const FVector Center = It->Leaf->Bounds.Origin;
+		const FVector To = Center - P;
+		const float Dist = To.Size2D();
+		if (Dist > 200.f || FMath::Abs(To.Z) > 250.f)
 		{
-			Door->Toggle();
+			continue;
+		}
+		const float Facing = FVector::DotProduct(To.GetSafeNormal2D(), Look);
+		if (Facing < 0.5f)  // within ~60 degrees of where the camera points
+		{
+			continue;
+		}
+		const float Score = Facing / FMath::Max(Dist, 30.f);
+		if (Score > BestScore)
+		{
+			BestScore = Score;
+			Best = *It;
 		}
 	}
+	return Best;
 }
 
 void AMalikaneInteractor::OnUsePressed()
