@@ -8,7 +8,7 @@ public class W { [StructLayout(LayoutKind.Sequential)] public struct R { public 
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out R r);
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }
 "@
-$proj = (Resolve-Path (Join-Path $PSScriptRoot "..\Unreal\MalikaneGame\MalikaneGame.uproject")).Path
+$proj = (Resolve-Path (Join-Path $PSScriptRoot "..\Unreal\RedwoodHollow\RedwoodHollow.uproject")).Path
 $exe = "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe"
 $p = Start-Process -FilePath $exe -ArgumentList "`"$proj`"", "-game", "-windowed", "-ResX=1600", "-ResY=900", "-nosplash" -PassThru
 Start-Sleep -Seconds $Wait

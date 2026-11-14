@@ -1,10 +1,10 @@
 # Unreal Engine - yeniden olusturulan klasorler
-Unreal/MalikaneGame/Binaries/
-Unreal/MalikaneGame/Build/
-Unreal/MalikaneGame/DerivedDataCache/
-Unreal/MalikaneGame/Intermediate/
-Unreal/MalikaneGame/Saved/
-Unreal/MalikaneGame/.vs/
+Unreal/RedwoodHollow/Binaries/
+Unreal/RedwoodHollow/Build/
+Unreal/RedwoodHollow/DerivedDataCache/
+Unreal/RedwoodHollow/Intermediate/
+Unreal/RedwoodHollow/Saved/
+Unreal/RedwoodHollow/.vs/
 *.sln
 
 # Blender yedekleri

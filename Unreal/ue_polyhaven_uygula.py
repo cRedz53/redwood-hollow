@@ -262,8 +262,14 @@ for mid, info in models.items():
             ns.set_editor_property("shape_preservation", keep)
             sm.set_editor_property("nanite_settings", ns)
     sme = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
-    if info.get("base") == "dead_tree_trunk_02" and sme.get_simple_collision_count(sm) == 0:
-        sme.add_simple_collisions(sm, unreal.ScriptingCollisionShapeType.BOX)  # fallen logs block the player
+    if info.get("base") == "dead_tree_trunk_02":
+        # fallen logs: collide with the real shape, not a big box around the branches
+        if not sm.get_editor_property("body_setup"):
+            sme.add_simple_collisions(sm, unreal.ScriptingCollisionShapeType.BOX)
+        sme.remove_collisions(sm)
+        body = sm.get_editor_property("body_setup")
+        if body:
+            body.set_editor_property("collision_trace_flag", unreal.CollisionTraceFlag.CTF_USE_COMPLEX_AS_SIMPLE)
     slots = sm.get_editor_property("static_materials")
     for i, mat in enumerate(info["materials"]):
         if i >= len(slots):
@@ -371,10 +377,12 @@ for a in list(actor_sub.get_all_level_actors()):
     elif label.startswith("Cali_"):
         mid = pick(*BUSHES)
         if mid:
-            s = random.uniform(100, 180) / max(height(mid), 1.0)
+            # scale towards ~1.2 m but never blow a flat fern up into a sprawling 5 m mat
+            s = min(random.uniform(100, 150) / max(height(mid), 1.0), 2.2)
             new = spawn(mid, loc, random.uniform(0, 360), s, label, "Malikane/Agaclar")
             sx, sy, _ = meshes[mid][1]
-            blocker(loc, 35.0 * max(sx, sy) * s, 120.0, label)
+            if height(mid) * s >= 80.0:  # low ground cover stays walkable
+                blocker(loc, min(25.0 * max(sx, sy) * s, 55.0), 110.0, label)
     if new:
         actor_sub.destroy_actor(a)
         counts[label.split("_")[0]] = counts.get(label.split("_")[0], 0) + 1

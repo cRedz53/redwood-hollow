@@ -2,7 +2,7 @@
 # gece isiklandirmasi (ay, fenerler), sis, gokyuzu, post process, PlayerStart.
 #
 # Editorde: Tools > Execute Python Script (veya komut satirindan
-#   UnrealEditor.exe MalikaneGame.uproject -ExecutePythonScript="ue_build_level.py").
+#   UnrealEditor.exe RedwoodHollow.uproject -ExecutePythonScript="ue_haritayi_kur.py").
 # Aktor yerlestirmek editor dunyasi gerektirdigi icin -run=pythonscript commandlet'i ile calismaz.
 # Ortam degiskeni MALIKANE_SRC = scene.json + SM_*.fbx klasoru
 # (varsayilan: depodaki Blender/Cikti/UE_Aktarim).
@@ -182,7 +182,7 @@ def vec(v):
     return unreal.Vector(v[0], v[1], v[2])
 
 
-# openable doors need the C++ module (Source/MalikaneGame); without it they are placed as static meshes
+# openable doors need the C++ module (Source/RedwoodHollow); without it they are placed as static meshes
 DoorClass = getattr(unreal, "MalikaneDoor", None)
 doors = {}
 for o in scene["objects"]:
@@ -286,12 +286,16 @@ for prop, val in (
 pp.set_editor_property("settings", s)
 
 # ---------------------------------------------------------------- gameplay
-# MALIKANE_START=hol puts the player inside the mansion hall (handy for testing the interior)
-start_marker = "Malikane_Giris" if os.environ.get("MALIKANE_START") == "hol" else "PlayerStart"
+# test starts: MALIKANE_START=hol (inside the mansion hall), =kapi (2.5 m from the entrance gate, facing it)
+start = os.environ.get("MALIKANE_START")
+start_marker = "Malikane_Giris" if start == "hol" else "PlayerStart"
 for m in scene["markers"]:
     if m["name"] == start_marker:
-        spawn(unreal.PlayerStart, (m["loc"][0], m["loc"][1], m["loc"][2] if m["name"] != "PlayerStart" else 100),
-              label="PlayerStart", folder="Malikane/Oyun")
+        x, y, z = m["loc"][0], m["loc"][1], m["loc"][2] if m["name"] != "PlayerStart" else 100
+        yaw = 0.0
+        if start == "kapi":
+            x, yaw = x - 250, 180.0
+        spawn(unreal.PlayerStart, (x, y, z), unreal.Rotator(0, 0, yaw), label="PlayerStart", folder="Malikane/Oyun")
     if m["name"] == "Kacis_Noktasi":
         t = spawn(unreal.TriggerBox, (m["loc"][0], m["loc"][1], 150), label="Kacis_Trigger", folder="Malikane/Oyun")
         t.set_actor_scale3d(unreal.Vector(6, 2, 3))

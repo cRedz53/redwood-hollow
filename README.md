@@ -1,18 +1,18 @@
-# Malikane – Slasher Korku Oyunu
+# Redwood Hollow – Slasher Korku Oyunu
 
 Gece geçen, slasher tarzı bir korku oyunu için harita. Haritada demir çitle çevrili büyük bir bahçe, iki kapı (giriş ve kaçış), bahçeye dağılmış kulübeler ve ağaçlar, ortada da sütunlu, balkonlu, iki katlı bir malikane var.
 Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarılıyor.
 
+![Yemek salonu](Gorseller/kamera_yemek.png)
+![Saray holü ve merdiven](Gorseller/kamera_hol.png)
 ![Oyun içi görünüm](Gorseller/ue_oyun_ici.png)
-![Saray holü ve merdiven](Blender/Cikti/Onizlemeler/onizleme_ic.png)
-![Yemek salonu](Blender/Cikti/Onizlemeler/onizleme_yemek_salonu.png)
 ![Malikane girişi](Blender/Cikti/Onizlemeler/onizleme_giris.png)
 ![Üstten harita](Blender/Cikti/Onizlemeler/onizleme_ustten.png)
 
 ## Klasörler
 | Klasör / dosya | Ne işe yarar |
 |---|---|
-| `Unreal/MalikaneGame/` | **UE 5.8 projesi.** `MalikaneGame.uproject` dosyasını açıp Play'e bas (First Person karakter, WASD + fare) |
+| `Unreal/RedwoodHollow/` | **UE 5.8 projesi.** `RedwoodHollow.uproject` dosyasını açıp Play'e bas (First Person karakter, WASD + fare, sol tık kapıları açar) |
 | `Unreal/ue_haritayi_kur.py` | UE içinde haritayı baştan kurar: mesh import, materyaller, ağaçlar, ay ışığı, fenerler, avizeler, sis, gökyüzü, post process, PlayerStart |
 | `Unreal/ue_megascans_uygula.py` | Fab'dan eklenen Megascans asset'lerini haritaya uygular (gerçek yüzeyler, ağaçlar, çimen) |
 | `Blender/malikane_harita_uretici.py` | Haritayı Blender'da sıfırdan üreten script (tüm ölçüler en üstte) |
@@ -83,14 +83,14 @@ Kapıların hepsi menteşesinden açılır:
 - Kulübe kapıları
 - İki bahçe kapısı
 
-Kapılar `Source/MalikaneGame` içindeki C++ sınıflarıyla çalışır:
+Kapılar `Unreal/RedwoodHollow/Source/RedwoodHollow` içindeki C++ sınıflarıyla çalışır:
 - `AMalikaneDoor`: menteşeden yumuşak dönüş; çift kanatlı kapılarda eşi de birlikte açılır. `bLocked` ile kilitlenebilir.
-- `AMalikaneInteractor`: sol tıkta kameradan ışın atar ve bakılan kapıyı açar ya da kapatır.
+- `AMalikaneInteractor`: sol tıkta kameradan 3,5 m ışın atar ve bakılan kapıyı açar ya da kapatır.
 
-Derlemek için Visual Studio'da **Game development with C++** bileşeni ve Windows SDK gerekir. Kurduktan sonra:
-1. `MalikaneGame.uproject` içine `"Modules": [{ "Name": "MalikaneGame", "Type": "Runtime", "LoadingPhase": "Default" }]` ekle.
-2. Projeyi aç; UE modülü derlemeyi teklif eder.
-3. `ue_haritayi_kur.py` ve `ue_polyhaven_uygula.py` dosyalarını tekrar çalıştır. Kapılar açılır olarak yerleşir; modül yoksa sabit kalırlar.
+Derlemek için Visual Studio'da **Game development with C++** bileşeni ve Windows SDK gerekir. Depoyu klonladıktan sonra `RedwoodHollow.uproject` dosyasını açınca UE modülü derlemeyi teklif eder. Elle derlemek için:
+```
+"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" RedwoodHollowEditor Win64 Development -Project="<depo>\Unreal\RedwoodHollow\RedwoodHollow.uproject"
+```
 
 ## Gece ayarları
 `Unreal/ue_haritayi_kur.py` en üstündeki değerler: `MOON_LUX` (ay ışığı), `EXPOSURE_BIAS` (genel parlaklık), `LAMP_CD_PER_WATT` (fener ve avize gücü), `EMISSIVE_SCALE`, `FOG_DENSITY`.
