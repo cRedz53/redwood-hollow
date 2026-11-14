@@ -1,6 +1,5 @@
 #include "MalikaneSqueeze.h"
 
-#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -52,16 +51,9 @@ void AMalikaneSqueeze::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
 	if (Alpha < 0.f)
 	{
-		// prompt while the player stands at an end of the open gap
-		if (PC && GEngine && CanUse(PC->GetPawn()))
-		{
-			GEngine->AddOnScreenDebugMessage(static_cast<uint64>(GetUniqueID()), 0.f, FColor(255, 225, 180),
-				TEXT("[E] Dar araliktan yan gec"));
-		}
-		return;
+		return;  // idle; AMalikaneHUD draws the prompt and AMalikaneInteractor starts us after the E hold
 	}
 
 	APawn* Pawn = User.IsValid() ? User->GetPawn() : nullptr;

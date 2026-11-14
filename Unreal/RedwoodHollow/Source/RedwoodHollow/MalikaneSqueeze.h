@@ -9,7 +9,7 @@ class APlayerController;
 
 /**
  * A gap too narrow to walk through (e.g. between a wardrobe and an open door). Standing near either end
- * and pressing E plays a "squeeze through sideways" move: the player turns side-on, slides across with
+ * and holding E plays a "squeeze through sideways" move: the player turns side-on, slides across with
  * a slow shuffle and a slight camera tilt, then turns back. Collision is off while squeezing.
  */
 UCLASS()
@@ -42,6 +42,9 @@ public:
 	bool CanUse(const APawn* Pawn) const;
 
 	void Begin(APlayerController* PC);
+
+	/** Where the HUD prompt floats: the middle of the gap, a little above eye height. */
+	FVector GetPromptLocation() const { return (PointA + PointB) * 0.5f + FVector(0.f, 0.f, 70.f); }
 
 	virtual void Tick(float DeltaSeconds) override;
 

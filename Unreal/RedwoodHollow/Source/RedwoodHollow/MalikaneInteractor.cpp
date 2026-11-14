@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "MalikaneDoor.h"
+#include "MalikaneHUD.h"
 #include "MalikaneSqueeze.h"
 
 AMalikaneInteractor::AMalikaneInteractor()
@@ -18,6 +19,25 @@ void AMalikaneInteractor::Tick(float DeltaSeconds)
 	if (!bBound)
 	{
 		TryBind();  // the player controller may not exist yet on the first frames
+		return;
+	}
+	if (!bHoldingUse)
+	{
+		return;
+	}
+	float Progress;
+	AMalikaneSqueeze* Gap = GetUsableGap(Progress);
+	if (!Gap)
+	{
+		HoldTime = 0.f;  // walked away or the door closed: start over
+		return;
+	}
+	HoldTime += DeltaSeconds;
+	if (HoldTime >= HoldDuration)
+	{
+		Gap->Begin(GetWorld()->GetFirstPlayerController());
+		bHoldingUse = false;
+		HoldTime = 0.f;
 	}
 }
 
@@ -32,12 +52,31 @@ void AMalikaneInteractor::TryBind()
 	if (InputComponent)
 	{
 		InputComponent->bBlockInput = false;
-		FInputKeyBinding& Binding = InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AMalikaneInteractor::OnClick);
-		Binding.bConsumeInput = false;  // leave the click for anything else that wants it
-		FInputKeyBinding& Use = InputComponent->BindKey(EKeys::E, IE_Pressed, this, &AMalikaneInteractor::OnUse);
-		Use.bConsumeInput = false;
+		FInputKeyBinding& Click = InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AMalikaneInteractor::OnClick);
+		Click.bConsumeInput = false;  // leave the click for anything else that wants it
+		FInputKeyBinding& UseDown = InputComponent->BindKey(EKeys::E, IE_Pressed, this, &AMalikaneInteractor::OnUsePressed);
+		UseDown.bConsumeInput = false;
+		FInputKeyBinding& UseUp = InputComponent->BindKey(EKeys::E, IE_Released, this, &AMalikaneInteractor::OnUseReleased);
+		UseUp.bConsumeInput = false;
+		PC->ClientSetHUD(AMalikaneHUD::StaticClass());
 		bBound = true;
 	}
+}
+
+AMalikaneSqueeze* AMalikaneInteractor::GetUsableGap(float& OutProgress) const
+{
+	OutProgress = 0.f;
+	APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
+	{
+		if (It->CanUse(Pawn))
+		{
+			OutProgress = HoldDuration > 0.f ? FMath::Clamp(HoldTime / HoldDuration, 0.f, 1.f) : 1.f;
+			return *It;
+		}
+	}
+	return nullptr;
 }
 
 void AMalikaneInteractor::OnClick()
@@ -66,18 +105,16 @@ void AMalikaneInteractor::OnClick()
 	}
 }
 
-void AMalikaneInteractor::OnUse()
+void AMalikaneInteractor::OnUsePressed()
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
-	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
-	{
-		if (It->CanUse(Pawn))
-		{
-			It->Begin(PC);
-			return;
-		}
-	}
+	bHoldingUse = true;
+	HoldTime = 0.f;
+}
+
+void AMalikaneInteractor::OnUseReleased()
+{
+	bHoldingUse = false;
+	HoldTime = 0.f;
 }
 
 void AMalikaneInteractor::KapilariDegistir()
