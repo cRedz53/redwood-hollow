@@ -893,11 +893,20 @@ def coffee_table(b):
     b.box((0, 0, 0.45), (1.3, 0.75, 0.06), mi=MARBLE)
 
 
+TABLE_CLEAR = 0.77  # underside of tables the player can crouch under (crouched capsule is 72 cm)
+
+
 def dining_table(b, length=14.0):
-    for x in [i * 2.0 - length / 2 + 1 for i in range(int(length / 2))]:
-        b.cyl((x, 0, 0.38), 0.07, 0.76, 10, WOOD)
-    b.box((0, 0, 0.78), (length, 1.6, 0.08), mi=WOOD)
-    b.box((0, 0, 0.825), (length - 0.6, 0.5, 0.01), mi=CARPET)  # table runner
+    # legs along the long edges so the space underneath stays open for hiding
+    for x in [i * 3.5 - length / 2 + 0.25 for i in range(int(length / 3.5) + 1)]:
+        for y in (-0.68, 0.68):
+            b.cyl((x, y, TABLE_CLEAR / 2), 0.06, TABLE_CLEAR, 10, WOOD)
+    for y in (-0.72, 0.72):                                                          # apron, edges only
+        b.box((0, y, TABLE_CLEAR - 0.03), (length - 0.2, 0.04, 0.06), mi=WOOD)
+    for x in (-length / 2 + 0.12, length / 2 - 0.12):
+        b.box((x, 0, TABLE_CLEAR - 0.03), (0.04, 1.44, 0.06), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.03), (length, 1.6, 0.06), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.065), (length - 0.6, 0.5, 0.01), mi=CARPET)        # table runner
 
 
 def chair(b):
@@ -1019,10 +1028,11 @@ def pedestal_vase(b):
 
 
 def desk(b):
+    # two drawer pedestals with a knee hole wide and high enough to crouch into
     for s in (-1, 1):
-        b.box((0, s * 0.7, 0.38), (0.75, 0.45, 0.72), mi=WOOD)
-    b.box((0, 0, 0.76), (0.9, 1.9, 0.05), mi=WOOD)
-    b.box((0, 0, 0.79), (0.6, 1.0, 0.01), mi=UPH)                         # leather top
+        b.box((0, s * 0.72, TABLE_CLEAR / 2), (0.75, 0.42, TABLE_CLEAR), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.025), (0.9, 1.9, 0.05), mi=WOOD)
+    b.box((0, 0, TABLE_CLEAR + 0.055), (0.6, 1.0, 0.01), mi=UPH)          # leather top
 
 
 def pedestal(b):
@@ -1096,14 +1106,14 @@ place("Sehpa", mx0 + 5.2, NW - 5.2, Z1, 0, 0.6)
 # dining room (south, ground floor)
 place("Hali", CX_MID, CX_S, Z1, 0, (2.8, 1.3, 1))
 place("Yemek_Masasi", CX_MID, CX_S, Z1)
-for i in range(13):
-    x = CX_MID - 6 + i
+for i in range(9):  # 1.5 m apart: the gaps between chairs are wide enough to crawl under the table
+    x = CX_MID - 6 + i * 1.5
     place("Sandalye", x, CX_S + 1.15, Z1, -90)
     place("Sandalye", x, CX_S - 1.15, Z1, 90)
-place("Sandalye", CX_MID - 7.6, CX_S, Z1, 0)
-place("Sandalye", CX_MID + 7.6, CX_S, Z1, 180)
+place("Sandalye", CX_MID - 7.9, CX_S, Z1, 0)
+place("Sandalye", CX_MID + 7.9, CX_S, Z1, 180)
 for x in (-4.5, -1.5, 1.5, 4.5):
-    place("Samdan", CX_MID + x, CX_S, Z1 + 0.82)
+    place("Samdan", CX_MID + x, CX_S, Z1 + TABLE_CLEAR + 0.07)
 place("Somine", CX_MID, SW + 0.25, Z1, 90)
 for y in (my0 + 6, HALL_Y0 - 4):
     place("Konsol", BACK_W - 0.3, y, Z1, 180)
@@ -1124,7 +1134,7 @@ for yy in (my1 - 14, my0 + 14):
     place("Sehpa", CX_BACK, yy, Z1, 0, 0.7)
 place("Calisma_Masasi", CX_BACK + 3, dy, Z1, 180)
 place("Sandalye", CX_BACK + 3.8, dy, Z1, 180)
-place("Samdan", CX_BACK + 3, dy + 0.6, Z1 + 0.8)
+place("Samdan", CX_BACK + 3, dy + 0.6, Z1 + TABLE_CLEAR + 0.06)
 place("Hali", CX_BACK + 2, dy, Z1, 90, (1.0, 1.0, 1))
 place("Saat", E_IN - 0.3, dy + 4, Z1, 180)
 
@@ -1149,7 +1159,7 @@ for side, yc, wall_y, face in ((1, CX_N, NW, -90), (-1, CX_S, SW, 90)):
     place("Kaide", mx0 + 1.2, wall_y - side * 1.2, Z2)
     place("Bust", mx0 + 1.2, wall_y - side * 1.2, Z2 + 1.15, -side * 45)
     place("Calisma_Masasi", mx0 + 3, yc - side * 6, Z2, 0)
-    place("Samdan", mx0 + 3, yc - side * 6, Z2 + 0.8)
+    place("Samdan", mx0 + 3, yc - side * 6, Z2 + TABLE_CLEAR + 0.06)
     place("Tablo", CX_MID - 6, wall_y - side * 0.05, Z2 + 2.4, face, 1.5)
 y = my0 + 3.0
 while y < my1 - 3.0:

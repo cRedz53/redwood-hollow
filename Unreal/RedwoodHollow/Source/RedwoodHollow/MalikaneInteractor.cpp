@@ -1,9 +1,13 @@
 #include "MalikaneInteractor.h"
 
+#include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "MalikaneCrouchCamera.h"
 #include "MalikaneDoor.h"
 #include "MalikaneHUD.h"
 #include "MalikaneSqueeze.h"
@@ -58,7 +62,16 @@ void AMalikaneInteractor::TryBind()
 		UseDown.bConsumeInput = false;
 		FInputKeyBinding& UseUp = InputComponent->BindKey(EKeys::E, IE_Released, this, &AMalikaneInteractor::OnUseReleased);
 		UseUp.bConsumeInput = false;
+		for (const FKey& Key : {EKeys::LeftControl, EKeys::RightControl})
+		{
+			InputComponent->BindKey(Key, IE_Pressed, this, &AMalikaneInteractor::OnCrouchPressed).bConsumeInput = false;
+			InputComponent->BindKey(Key, IE_Released, this, &AMalikaneInteractor::OnCrouchReleased).bConsumeInput = false;
+		}
 		PC->ClientSetHUD(AMalikaneHUD::StaticClass());
+		if (PC->PlayerCameraManager)
+		{
+			PC->PlayerCameraManager->AddNewCameraModifier(UMalikaneCrouchCamera::StaticClass());
+		}
 		bBound = true;
 	}
 }
@@ -115,6 +128,28 @@ void AMalikaneInteractor::OnUseReleased()
 {
 	bHoldingUse = false;
 	HoldTime = 0.f;
+}
+
+void AMalikaneInteractor::OnCrouchPressed()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (ACharacter* Character = PC ? Cast<ACharacter>(PC->GetPawn()) : nullptr)
+	{
+		UCharacterMovementComponent* Move = Character->GetCharacterMovement();
+		Move->GetNavAgentPropertiesRef().bCanCrouch = true;
+		Move->SetCrouchedHalfHeight(CrouchedHalfHeight);
+		Move->MaxWalkSpeedCrouched = CrouchSpeed;
+		Character->Crouch();
+	}
+}
+
+void AMalikaneInteractor::OnCrouchReleased()
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (ACharacter* Character = PC ? Cast<ACharacter>(PC->GetPawn()) : nullptr)
+	{
+		Character->UnCrouch();  // movement keeps retrying until there is head room (e.g. under a table)
+	}
 }
 
 void AMalikaneInteractor::KapilariDegistir()

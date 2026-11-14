@@ -2142,7 +2142,7 @@
    "name": "Mob_Sandalye_03",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2700.0,
+    2750.0,
     2285.0,
     150.0
    ],
@@ -2157,7 +2157,7 @@
    "name": "Mob_Sandalye_04",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2700.0,
+    2750.0,
     2515.0,
     150.0
    ],
@@ -2172,7 +2172,7 @@
    "name": "Mob_Sandalye_05",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2800.0,
+    2900.0,
     2285.0,
     150.0
    ],
@@ -2187,7 +2187,7 @@
    "name": "Mob_Sandalye_06",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2800.0,
+    2900.0,
     2515.0,
     150.0
    ],
@@ -2202,7 +2202,7 @@
    "name": "Mob_Sandalye_07",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2900.0,
+    3050.0,
     2285.0,
     150.0
    ],
@@ -2217,7 +2217,7 @@
    "name": "Mob_Sandalye_08",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    2900.0,
+    3050.0,
     2515.0,
     150.0
    ],
@@ -2232,7 +2232,7 @@
    "name": "Mob_Sandalye_09",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3000.0,
+    3200.0,
     2285.0,
     150.0
    ],
@@ -2247,7 +2247,7 @@
    "name": "Mob_Sandalye_10",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3000.0,
+    3200.0,
     2515.0,
     150.0
    ],
@@ -2262,7 +2262,7 @@
    "name": "Mob_Sandalye_11",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3100.0,
+    3350.0,
     2285.0,
     150.0
    ],
@@ -2277,7 +2277,7 @@
    "name": "Mob_Sandalye_12",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3100.0,
+    3350.0,
     2515.0,
     150.0
    ],
@@ -2292,7 +2292,7 @@
    "name": "Mob_Sandalye_13",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3200.0,
+    3500.0,
     2285.0,
     150.0
    ],
@@ -2307,7 +2307,7 @@
    "name": "Mob_Sandalye_14",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3200.0,
+    3500.0,
     2515.0,
     150.0
    ],
@@ -2322,7 +2322,7 @@
    "name": "Mob_Sandalye_15",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3300.0,
+    3650.0,
     2285.0,
     150.0
    ],
@@ -2337,7 +2337,7 @@
    "name": "Mob_Sandalye_16",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3300.0,
+    3650.0,
     2515.0,
     150.0
    ],
@@ -2352,7 +2352,7 @@
    "name": "Mob_Sandalye_17",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3400.0,
+    3800.0,
     2285.0,
     150.0
    ],
@@ -2367,7 +2367,7 @@
    "name": "Mob_Sandalye_18",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3400.0,
+    3800.0,
     2515.0,
     150.0
    ],
@@ -2382,127 +2382,7 @@
    "name": "Mob_Sandalye_19",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3500.0,
-    2285.0,
-    150.0
-   ],
-   "yaw": 90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_20",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3500.0,
-    2515.0,
-    150.0
-   ],
-   "yaw": -90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_21",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3600.0,
-    2285.0,
-    150.0
-   ],
-   "yaw": 90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_22",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3600.0,
-    2515.0,
-    150.0
-   ],
-   "yaw": -90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_23",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3700.0,
-    2285.0,
-    150.0
-   ],
-   "yaw": 90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_24",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3700.0,
-    2515.0,
-    150.0
-   ],
-   "yaw": -90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_25",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3800.0,
-    2285.0,
-    150.0
-   ],
-   "yaw": 90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_26",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    3800.0,
-    2515.0,
-    150.0
-   ],
-   "yaw": -90.0,
-   "scale": [
-    1.0,
-    1.0,
-    1.0
-   ]
-  },
-  {
-   "name": "Mob_Sandalye_27",
-   "mesh": "SM_Mob_Sandalye",
-   "loc": [
-    2440.0,
+    2410.0,
     2400.0,
     150.0
    ],
@@ -2514,10 +2394,10 @@
    ]
   },
   {
-   "name": "Mob_Sandalye_28",
+   "name": "Mob_Sandalye_20",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
-    3960.0,
+    3990.0,
     2400.0,
     150.0
    ],
@@ -2534,7 +2414,7 @@
    "loc": [
     2750.0,
     2400.0,
-    232.0
+    234.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -2549,7 +2429,7 @@
    "loc": [
     3050.0,
     2400.0,
-    232.0
+    234.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -2564,7 +2444,7 @@
    "loc": [
     3350.0,
     2400.0,
-    232.0
+    234.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -2579,7 +2459,7 @@
    "loc": [
     3650.0,
     2400.0,
-    232.0
+    234.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -3399,7 +3279,7 @@
    ]
   },
   {
-   "name": "Mob_Sandalye_29",
+   "name": "Mob_Sandalye_21",
    "mesh": "SM_Mob_Sandalye",
    "loc": [
     5780.0,
@@ -3419,7 +3299,7 @@
    "loc": [
     5700.0,
     -260.0,
-    230.0
+    233.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -3704,7 +3584,7 @@
    "loc": [
     2100.0,
     -2200.0,
-    730.0
+    733.0
    ],
    "yaw": -0.0,
    "scale": [
@@ -3974,7 +3854,7 @@
    "loc": [
     2100.0,
     1800.0,
-    730.0
+    733.0
    ],
    "yaw": -0.0,
    "scale": [
