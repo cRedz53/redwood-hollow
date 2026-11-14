@@ -46,7 +46,9 @@ FURNITURE = {
     "Koltuk": "ArmChair_01", "Kanepe": "Sofa_01", "Sandalye": "dining_chair_02", "Sehpa": "gothic_coffee_table",
     "Yatak": "GothicBed_01", "Gardirop": "GothicCabinet_01", "Konsol": "ClassicConsole_01",
     "Saat": "vintage_grandfather_clock_01", "Samdan": "brass_candleholders",
+    "Bust": "marble_bust_01", "Ayna": "ornate_mirror_01", "Vazo_Kucuk": "antique_ceramic_vase_01",
 }
+FRAMED = {"Tablo": 140.0, "Ayna": 100.0}  # blockout width (cm) at scale 1; the model is scaled to match
 CONIFERS = ["fir_sapling_medium"]
 DECIDUOUS = ["island_tree_01", "island_tree_02", "tree_small_02"]
 BUSHES = ["shrub_02", "shrub_03", "shrub_04", "fern_02"]
@@ -162,7 +164,7 @@ def make_master(name, masked, linear_default):
     return m
 
 
-ROUGH_MUL = {"M_WoodFloor": 1.8, "M_DarkWood": 1.4}  # these maps read as mirror-like under the chandeliers
+ROUGH_MUL = {"M_WoodFloor": 2.6, "M_DarkWood": 1.6}  # these maps read as mirror-like under the chandeliers
 
 
 def make_mi(name, master, base, normal, armtex, tiling=1.0, tint=(1, 1, 1), desat=0.0, metallic=0.0, arm_metal=0.0,
@@ -259,6 +261,9 @@ for mid, info in models.items():
         if ns.get_editor_property("shape_preservation") != keep:
             ns.set_editor_property("shape_preservation", keep)
             sm.set_editor_property("nanite_settings", ns)
+    sme = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+    if info.get("base") == "dead_tree_trunk_02" and sme.get_simple_collision_count(sm) == 0:
+        sme.add_simple_collisions(sm, unreal.ScriptingCollisionShapeType.BOX)  # fallen logs block the player
     slots = sm.get_editor_property("static_materials")
     for i, mat in enumerate(info["materials"]):
         if i >= len(slots):
@@ -308,10 +313,26 @@ def height(mid):
     return meshes[mid][1][2] * 100.0
 
 
+CYLINDER = eal.load_asset("/Engine/BasicShapes/Cylinder")  # 100 cm wide, 100 cm tall, pivot at centre
+
+
+def blocker(loc, radius, height_cm, label):
+    """Invisible collision cylinder (trunks, bushes) — the player can no longer walk through plants."""
+    b = actor_sub.spawn_actor_from_object(CYLINDER, unreal.Vector(loc.x, loc.y, loc.z + height_cm / 2),
+                                          unreal.Rotator(0, 0, 0))
+    b.set_actor_scale3d(unreal.Vector(radius / 50.0, radius / 50.0, height_cm / 100.0))
+    comp = b.get_component_by_class(unreal.StaticMeshComponent)
+    comp.set_visibility(False)
+    comp.set_cast_shadow(False)
+    b.set_actor_label(label + "_Carpisma")
+    b.set_folder_path("Malikane/Agaclar/Carpisma")
+    return b
+
+
 counts = {}
 for a in list(actor_sub.get_all_level_actors()):  # extras from an earlier run of this script
     lbl = a.get_actor_label()
-    if lbl == "Cim_Ortusu" or lbl.endswith(("_Saat", "_Samdan-1", "_Samdan1", "_Model")):
+    if lbl == "Cim_Ortusu" or lbl.endswith(("_Saat", "_Samdan-1", "_Samdan1", "_Model", "_Carpisma")):
         actor_sub.destroy_actor(a)
 for a in list(actor_sub.get_all_level_actors()):
     if not isinstance(a, unreal.StaticMeshActor):
@@ -328,8 +349,8 @@ for a in list(actor_sub.get_all_level_actors()):
             mid = pick("fancy_picture_frame_01", "fancy_picture_frame_02")
         if mid:
             s = 1.0
-            if kind == "Tablo":
-                s = 140.0 * sc.y / max(meshes[mid][1][1] * 100.0, 1.0)
+            if kind in FRAMED:
+                s = FRAMED[kind] * sc.y / max(meshes[mid][1][1] * 100.0, 1.0)
             new = spawn(mid, loc, yaw, s, label, "Malikane/Mobilya")
     elif label.startswith("Avize_"):
         mid = pick("Chandelier_03" if label == "Avize_Hol" else "Chandelier_01")
@@ -345,11 +366,15 @@ for a in list(actor_sub.get_all_level_actors()):
             target = random.uniform(900, 1500) if conifer else random.uniform(800, 1300)
             s = 1.0 if log_tree else target / max(height(mid), 1.0)
             new = spawn(mid, loc, random.uniform(0, 360), s, label, "Malikane/Agaclar")
+            if not log_tree:  # foliage has no collision of its own: block the trunk
+                blocker(loc, 30.0 * s ** 0.5, 400.0, label)
     elif label.startswith("Cali_"):
         mid = pick(*BUSHES)
         if mid:
-            new = spawn(mid, loc, random.uniform(0, 360), random.uniform(100, 180) / max(height(mid), 1.0),
-                        label, "Malikane/Agaclar")
+            s = random.uniform(100, 180) / max(height(mid), 1.0)
+            new = spawn(mid, loc, random.uniform(0, 360), s, label, "Malikane/Agaclar")
+            sx, sy, _ = meshes[mid][1]
+            blocker(loc, 35.0 * max(sx, sy) * s, 120.0, label)
     if new:
         actor_sub.destroy_actor(a)
         counts[label.split("_")[0]] = counts.get(label.split("_")[0], 0) + 1

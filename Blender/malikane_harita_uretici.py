@@ -259,6 +259,112 @@ def add_window(fb, gb, a, b, s, w, zb, zt, base_z, thick, mullions=True):
 
 
 C_LIGHTS = collection("Isiklar")
+C_PROTO = collection("Prototipler")
+
+
+# ---------------------------------------------------------------- doors (leaf meshes: hinge at origin, leaf along +X)
+def door(name, mesh_ob, hinge, ext, inward, col, partner=None, angle=90.0, locked=False):
+    """Openable door leaf. ext: direction the closed leaf points from its hinge; inward: side it swings to."""
+    ext, inward = Vector(ext).normalized(), Vector(inward)
+    ob = bpy.data.objects.new(name, mesh_ob.data)
+    ob.location = hinge
+    ob.rotation_euler.z = math.atan2(ext.y, ext.x)
+    ob["door_open"] = math.copysign(angle, ext.x * inward.y - ext.y * inward.x)
+    ob["door_locked"] = locked
+    if partner:
+        ob["door_partner"] = partner
+    col.objects.link(ob)
+    return ob
+
+
+def raised_panel(b, x0, x1, z0, z1, t, mi=0, frame_mi=0):
+    """Raised panel with a moulded frame on both faces of a leaf of thickness t."""
+    w, h = x1 - x0, z1 - z0
+    cx, cz = (x0 + x1) / 2, (z0 + z1) / 2
+    for s in (-1, 1):
+        y = s * (t / 2 + 0.01)
+        b.box((cx, y, z1 - 0.02), (w, 0.02, 0.04), mi=frame_mi)
+        b.box((cx, y, z0 + 0.02), (w, 0.02, 0.04), mi=frame_mi)
+        b.box((x0 + 0.02, y, cz), (0.04, 0.02, h), mi=frame_mi)
+        b.box((x1 - 0.02, y, cz), (0.04, 0.02, h), mi=frame_mi)
+        b.box((cx, s * (t / 2 + 0.008), cz), (w - 0.16, 0.016, h - 0.16), mi=mi)
+
+
+def leaf_hardware(b, w, h, t, mi):
+    for z in (0.3, h / 2, h - 0.3):                               # hinges
+        b.box((0.015, 0, z), (0.03, t + 0.02, 0.12), mi=mi)
+    for s in (-1, 1):                                             # lever handles with back plates
+        y = s * (t / 2 + 0.01)
+        b.box((w - 0.1, y, 1.05), (0.05, 0.02, 0.24), mi=mi)
+        b.box((w - 0.16, s * (t / 2 + 0.05), 1.1), (0.14, 0.025, 0.025), mi=mi)
+
+
+def panel_leaf(name, w, h, t, rows, glass_top=False):
+    """Classic panelled leaf; mats: wood, brass, glass."""
+    b = Builder()
+    b.box((w / 2, 0, h / 2), (w, t, h))
+    z, gap = 0.18, 0.14
+    usable = h - 0.18 - 0.18 - gap * (len(rows) - 1)
+    for k, frac in enumerate(rows):
+        ph = usable * frac
+        if glass_top and k == len(rows) - 1:
+            b.box((w / 2, 0, z + ph / 2), (w - 0.3, t + 0.004, ph - 0.1), mi=2)
+            for s in (-1, 1):                                     # glazing bars
+                b.box((w / 2, s * (t / 2 + 0.01), z + ph / 2), (0.04, 0.02, ph - 0.1), mi=0)
+        else:
+            raised_panel(b, 0.15, w - 0.15, z, z + ph, t)
+        z += ph + gap
+    leaf_hardware(b, w, h, t, 1)
+    return b.finish(name, [M["door"], M["brass"], M["glass"]], C_PROTO)
+
+
+def french_leaf(name, w, h, t):
+    """Glazed balcony door leaf: stiles, rails and a 2 x 4 grid of panes."""
+    b = Builder()
+    st = 0.1
+    for x in (st / 2, w - st / 2):
+        b.box((x, 0, h / 2), (st, t, h))
+    for z in (0.15, 0.7, h - 0.06):
+        b.box((w / 2, 0, z), (w, t, 0.12 if z != 0.15 else 0.3))
+    raised_panel(b, st, w - st, 0.02, 0.64, t)
+    b.box((w / 2, 0, (0.76 + h - 0.12) / 2), (w - 2 * st, 0.012, h - 0.88), mi=2)
+    b.box((w / 2, 0, (0.76 + h - 0.12) / 2), (0.03, t * 0.6, h - 0.88))
+    for k in range(1, 4):
+        b.box((w / 2, 0, 0.76 + k * (h - 0.88) / 4), (w - 2 * st, t * 0.6, 0.03))
+    leaf_hardware(b, w, h, t, 1)
+    return b.finish(name, [M["frame"], M["brass"], M["glass"]], C_PROTO)
+
+
+def plank_leaf(name, w, h, t):
+    """Rustic hut door: vertical planks, ledges and a Z brace, iron ring pull."""
+    b = Builder()
+    n = 6
+    for k in range(n):
+        pw = w / n
+        b.box((pw * (k + 0.5), 0, h / 2), (pw - 0.008, t, h - 0.01 * (k % 2)))
+    for z in (0.3, h - 0.3):
+        b.box((w / 2, t / 2 + 0.02, z), (w - 0.06, 0.04, 0.14))
+    b.beam((0.12, t / 2 + 0.02, 0.35), (w - 0.12, t / 2 + 0.02, h - 0.35), 0.12, 0.04)
+    for z in (0.3, h - 0.3):                                      # strap hinges
+        b.box((0.25, -(t / 2 + 0.01), z), (0.5, 0.02, 0.05), mi=1)
+    b.box((w - 0.15, -(t / 2 + 0.02), 1.0), (0.03, 0.03, 0.16), mi=1)
+    return b.finish(name, [M["wood"], M["iron"]], C_PROTO)
+
+
+def door_casing(b, a, c, s, w, h, base_z, thick, depth=0.05, width=0.14, mi=0):
+    """Moulded architrave around an opening, on both faces of the wall."""
+    a, c = Vector(a), Vector(c)
+    d = (c - a).normalized()
+    n = Vector((-d.y, d.x))
+    rot = math.atan2(d.y, d.x)
+    p = a + d * s
+    for side in (-1, 1):
+        q = p + n * side * (thick / 2 + depth / 2)
+        for off in (-(w / 2 + width / 2), w / 2 + width / 2):
+            r = q + d * off
+            b.box((r.x, r.y, base_z + (h + width) / 2), (width, depth, h + width), rot, mi)
+        b.box((q.x, q.y, base_z + h + width / 2), (w + 2 * width, depth, width), rot, mi)
+        b.box((q.x, q.y, base_z + h + width + 0.06), (w + 2 * width + 0.2, depth + 0.04, 0.12), rot, mi)
 
 
 def point_light(name, loc, energy, color=(1.0, 0.6, 0.3), radius=0.15):
@@ -375,23 +481,26 @@ for gname, gate in GATES.items():
         point_light(f"{gname}_Fener_{'L' if side < 0 else 'R'}", (c.x, c.y, 4.5), 250)
     pb.finish(f"{gname}_Sutunlar", [M["stone"], M["lamp"]], C_GATES)
 
-    # two leaves, origin at hinge so they can be rotated in UE
+    # two openable leaves (hinge at the pillars), arched so the top rises towards the centre
     leaf_w = width / 2
-    for side in (-1, 1):
-        lb = Builder()
-        dirx = -side  # leaf extends from hinge toward the gate center
-        for z in (0.15, 1.6, 3.0):
-            lb.box((dirx * leaf_w / 2, 0, z), (leaf_w, 0.08, 0.08))
-        n_bars = int(leaf_w / 0.14)
-        for i in range(n_bars + 1):
-            x = dirx * (i * leaf_w / n_bars)
-            top = 3.2 + 0.5 * math.sin(math.pi * i / n_bars)  # arched top
-            lb.box((x, 0, top / 2), (0.03, 0.03, top))
-            lb.cone((x, 0, top + 0.09), 0.04, 0.0, 0.18, 4)
+    lb = Builder()
+    for z in (0.15, 1.6, 3.0):
+        lb.box((leaf_w / 2, 0, z), (leaf_w, 0.08, 0.08))
+    n_bars = int(leaf_w / 0.14)
+    for i in range(n_bars + 1):
+        x = i * leaf_w / n_bars
+        top = 3.2 + 0.6 * (i / n_bars) ** 1.5
+        lb.box((x, 0, top / 2), (0.03, 0.03, top))
+        lb.cone((x, 0, top + 0.09), 0.04, 0.0, 0.18, 4)
+    for i in range(1, n_bars, 2):                                 # scrollwork between the rails
+        lb.blob((i * leaf_w / n_bars, 0, 2.3), 0.07, 1.6)
+    lb.box((leaf_w - 0.06, 0, 1.6), (0.12, 0.12, 0.35))           # lock box
+    leaf_proto = lb.finish(f"{gname}_Kanat", [M["iron"]], C_PROTO)
+    inward = Vector((1, 0)) if on_west else Vector((0, 1))
+    names = [f"{gname}_Kanat_L", f"{gname}_Kanat_R"]
+    for side, nm, other in ((-1, names[0], names[1]), (1, names[1], names[0])):
         hinge = pos + along * side * leaf_w
-        swing = gate["open"] * math.radians(80) * side
-        lb.finish(f"{gname}_Kanat_{'L' if side < 0 else 'R'}", [M["iron"]], C_GATES,
-                  location=(hinge.x, hinge.y, 0), rot_z=rot + swing)
+        door(nm, leaf_proto, (hinge.x, hinge.y, 0), -side * along, inward, C_GATES, other, 80.0)
 
 
 # ---------------------------------------------------------------- mansion
@@ -468,8 +577,6 @@ for idx, (a, b) in enumerate(walls):
         for s, w, zb, zt in ops:
             add_window(wf, wg, a, b, s, w, zb, zt, z, T)
             curtain(cu, a, b, s, w, zt, z)
-        if door_s is not None and floor == 1:
-            add_window(wf, wg, a, b, door_s, 2.8, 0.0, 3.6, z, T)  # glazed balcony door
 
 # parapet, cornices and corner quoins
 for a, b in walls:
@@ -599,10 +706,15 @@ hd.finish("Malikane_Hol_Dekor", [M["dark_wood"], M["trim"]], C_MANSION)
 
 rf = Builder()
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, TOTAL_H + 0.1), (mx1 - mx0, my1 - my0, 0.2))
-rf.prism_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 - 2.0, my1 - my0 - 2.0, TOTAL_H + 0.2, 7.0)
+# hipped-look gable roof sitting on the parapet with a 1.5 m overhang all round
+ROOF_Z, ROOF_H = TOTAL_H + 1.15, 9.5
+rf.prism_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0, my1 - my0 + 3.0, ROOF_Z, ROOF_H)
+rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, ROOF_Z - 0.1), (mx1 - mx0 + 3.0, my1 - my0 + 3.0, 0.2))  # soffit
 for cy in (my0 + 10, dy, my1 - 10):
-    rf.box((mx0 + 30, cy, TOTAL_H + 5.5), (1.6, 1.6, 7))
-    rf.box((mx0 + 30, cy, TOTAL_H + 9.1), (2.0, 2.0, 0.3))
+    rf.box((mx0 + 30, cy, TOTAL_H + 6.0), (1.8, 1.8, 12.0))
+    rf.box((mx0 + 30, cy, TOTAL_H + 12.15), (2.2, 2.2, 0.3))
+    for k in (-0.4, 0.4):
+        rf.cyl((mx0 + 30 + k, cy, TOTAL_H + 12.6), 0.18, 0.6, 10)  # chimney pots
 rf.finish("Malikane_Cati", [M["roof"]], C_MANSION)
 
 # plinth, front terrace and grand staircase
@@ -638,25 +750,51 @@ balustrade(cb, (px0 + 0.25, dy - hw), (mx0 - 0.3, dy - hw), Z2)
 balustrade(cb, (px0 + 0.25, dy + hw), (mx0 - 0.3, dy + hw), Z2)
 cb.finish("Malikane_Sutunlar_Balkon", [M["column"]], C_MANSION)
 
-# big double door, origin at hinge (rotate around Z in UE to open/close)
-DOOR_OPEN = 0.85
-for side in (-1, 1):
-    lb = Builder()
-    w = DOOR_W / 2
-    lb.box((w / 2, 0, DOOR_H / 2), (w, 0.15, DOOR_H))
-    for k in (0.22, 0.6):  # raised panels
-        lb.box((w / 2, -0.09, DOOR_H * k), (w * 0.7, 0.04, DOOR_H * 0.3))
-    lb.box((w - 0.3, -0.13, DOOR_H * 0.45), (0.08, 0.08, 0.6), mi=1)
-    closed = -side * math.pi / 2  # leaf points toward the door center when closed
-    lb.finish(f"Malikane_Kapi_{'L' if side > 0 else 'R'}", [M["door"], M["brass"]], C_MANSION,
-              location=(mx0, dy + side * w, Z1), rot_z=closed * (1 - DOOR_OPEN))
+# ---- openable doors: main entrance, balcony, interior double doors (all leaves hinge-origin)
+C_DOORS = collection("Kapilar_Malikane")
+LEAF_MAIN = panel_leaf("Kapi_Ana", DOOR_W / 2, DOOR_H, 0.16, [0.28, 0.32, 0.4], glass_top=True)
+LEAF_WIDE = panel_leaf("Kapi_Ic_Genis", 1.3, 3.4, 0.08, [0.35, 0.65])
+LEAF_NARROW = panel_leaf("Kapi_Ic_Dar", 1.1, 3.0, 0.08, [0.35, 0.65])
+LEAF_BALCONY = french_leaf("Kapi_Balkon", 1.4, 3.6, 0.08)
+# brass knockers on the outside of the main door
+kb = Builder()
+for s in (-1, 1):
+    kb.cyl((mx0 - 0.11, dy + s * 0.45, Z1 + 2.6), 0.09, 0.03, 16)
+kb.finish("Malikane_Kapi_Tokmak", [M["brass"]], C_MANSION)
+
+
+def double_door(prefix, leaf, center, along, inward, width, z, angle=90.0):
+    """Two leaves hinged at either side of an opening, swinging to `inward`."""
+    c, d = Vector(center), Vector(along).normalized()
+    n1, n2 = f"{prefix}_L", f"{prefix}_R"
+    h1, h2 = c - d * (width / 2), c + d * (width / 2)
+    door(n1, leaf, (h1.x, h1.y, z), d, inward, C_DOORS, n2, angle)
+    door(n2, leaf, (h2.x, h2.y, z), -d, inward, C_DOORS, n1, angle)
+
+
+double_door("Kapi_Ana", LEAF_MAIN, (mx0, dy), (0, 1), (1, 0), DOOR_W, Z1)
+double_door("Kapi_Balkon", LEAF_BALCONY, (mx0, dy), (0, 1), (1, 0), 2.8, Z2)
+casing = Builder()
+door_casing(casing, (mx0, my0), (mx0, my1), dy - my0, DOOR_W, DOOR_H, Z1, T, 0.14, 0.45, mi=1)
+door_casing(casing, (mx0, my0), (mx0, my1), dy - my0, 2.8, 3.6, Z2, T, 0.08, 0.2, mi=1)
+for y, sgn in ((HALL_Y1, 1), (HALL_Y0, -1)):                     # hall side doors, into the rooms
+    xg, xu = mx0 + T / 2 + 10.0, mx0 + T / 2 + 8.0
+    double_door(f"Kapi_Hol_{'K' if sgn > 0 else 'G'}_Zemin", LEAF_WIDE, (xg, y), (1, 0), (0, sgn), 2.6, Z1)
+    double_door(f"Kapi_Hol_{'K' if sgn > 0 else 'G'}_Ust", LEAF_NARROW, (xu, y), (1, 0), (0, sgn), 2.2, Z2)
+    door_casing(casing, (mx0, y), (HALL_X1, y), xg - mx0, 2.6, 3.6, Z1, 0.3)
+    door_casing(casing, (mx0, y), (HALL_X1, y), xu - mx0, 2.2, 3.0, Z2, 0.3)
+for z, ys in ((Z1, (dy - 20, dy + 20)), (Z2, (dy - 20, dy, dy + 20))):  # into the library / east rooms
+    for yy in ys:
+        double_door(f"Kapi_Dogu_{'Zemin' if z == Z1 else 'Ust'}_{int(yy - dy):+d}", LEAF_WIDE,
+                    (HALL_X1, yy), (0, 1), (1, 0), 2.6, z)
+        door_casing(casing, (HALL_X1, my0), (HALL_X1, my1), yy - my0, 2.6, 3.4, z, 0.3)
+casing.finish("Malikane_Kapi_Kasalari", [M["dark_wood"], M["column"]], C_MANSION)
 
 for s, tag in ((1, "L"), (-1, "R")):
     point_light(f"Malikane_Kapi_Feneri_{tag}", (mx0 - 0.8, dy + s * 3.6, Z1 + 3.3), 150)
     point_light(f"Merdiven_Feneri_{tag}", (STAIR_FOOT_X + 0.5, dy + s * 8.3, 2.2), 120)
 
 # chandeliers: one shared mesh, origin at the ceiling mount
-C_PROTO = collection("Prototipler")
 ab = Builder()
 ab.cyl((0, 0, -0.5), 0.03, 1.0, 6)
 ab.cyl((0, 0, -1.15), 0.18, 0.35, 12)
@@ -870,7 +1008,26 @@ def desk(b):
     b.box((0, 0, 0.79), (0.6, 1.0, 0.01), mi=UPH)                         # leather top
 
 
+def pedestal(b):
+    b.box((0, 0, 0.06), (0.6, 0.6, 0.12), mi=MARBLE)
+    b.cyl((0, 0, 0.6), 0.2, 1.0, 16, MARBLE)
+    b.box((0, 0, 1.12), (0.5, 0.5, 0.06), mi=MARBLE)
+
+
+def bust(b):  # placeholder; Poly Haven marble bust replaces it
+    b.blob((0, 0, 0.3), 0.18, 1.5, mi=MARBLE)
+
+
+def mirror(b):  # placeholder; Poly Haven ornate mirror replaces it (front +X, centred)
+    b.box((0, 0, 0), (0.03, 0.9, 1.3), mi=BRASS)
+
+
+def small_vase(b):  # placeholder; Poly Haven ceramic vase replaces it
+    b.blob((0, 0, 0.2), 0.13, 1.6, mi=LACQ)
+
+
 P = {n: proto(n, f) for n, f in (
+    ("Kaide", pedestal), ("Bust", bust), ("Ayna", mirror), ("Vazo_Kucuk", small_vase),
     ("Koltuk", armchair), ("Kanepe", sofa), ("Sehpa", coffee_table), ("Yemek_Masasi", dining_table),
     ("Sandalye", chair), ("Somine", fireplace), ("Kitaplik", bookcase), ("Yatak", bed), ("Gardirop", wardrobe),
     ("Konsol", sideboard), ("Saat", clock), ("Piyano", piano), ("Tablo", painting), ("Hali", rug),
@@ -962,9 +1119,16 @@ for side, yc, wall_y, face in ((1, CX_N, NW, -90), (-1, CX_S, SW, 90)):
         place("Konsol", CX_MID + 4 + dx * 1.2, wall_y - side * 0.4, Z2, face, (0.8, 0.3, 0.7))
     place("Gardirop", BACK_W - 0.4, yc + 4, Z2, 180)
     place("Gardirop", BACK_W - 0.4, yc + 6, Z2, 180)
-    place("Somine", mx0 + 8, (N_IN if side > 0 else S_IN) + side * 0.25, Z2, 90 * side)
-    place("Koltuk", mx0 + 6.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 45 * side)
-    place("Koltuk", mx0 + 9.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 135 * side)
+    # fireplace on the hall wall, clear of the gallery door at mx0 + 8
+    place("Somine", mx0 + 18, (N_IN if side > 0 else S_IN) + side * 0.25, Z2, 90 * side)
+    place("Koltuk", mx0 + 16.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 45 * side)
+    place("Koltuk", mx0 + 19.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 135 * side)
+    place("Hali", mx0 + 18, (N_IN if side > 0 else S_IN) + side * 3, Z2, 0, (0.7, 0.8, 1))
+    place("Konsol", BACK_W - 0.3, yc - 5, Z2, 180)                                   # vanity
+    place("Ayna", BACK_W - 0.05, yc - 5, Z2 + 1.9, 180, 1.0)
+    place("Vazo_Kucuk", BACK_W - 0.3, yc - 5.6, Z2 + 0.92)
+    place("Kaide", mx0 + 1.2, wall_y - side * 1.2, Z2)
+    place("Bust", mx0 + 1.2, wall_y - side * 1.2, Z2 + 1.15, -side * 45)
     place("Calisma_Masasi", mx0 + 3, yc - side * 6, Z2, 0)
     place("Samdan", mx0 + 3, yc - side * 6, Z2 + 0.8)
     place("Tablo", CX_MID - 6, wall_y - side * 0.05, Z2 + 2.4, face, 1.5)
@@ -977,14 +1141,58 @@ for yy in (my1 - 14, my0 + 14):
     place("Kanepe", CX_BACK - 2, yy, Z2, 0)
     place("Sehpa", CX_BACK, yy, Z2, 0)
 
+# more period decor so no room feels empty
+for s in (-1, 1):
+    wy = dy + s * 11.4                                               # hall walls, both floors
+    place("Konsol", mx0 + 5, wy, Z1, -90 * s)
+    place("Vazo_Kucuk", mx0 + 5.4, wy, Z1 + 0.92)
+    place("Samdan", mx0 + 4.5, wy, Z1 + 0.92)
+    place("Kanepe", mx0 + 14.5, dy + s * 10.7, Z1, -90 * s)
+    place("Kaide", SX0 - 3, dy + s * 7, Z1)
+    place("Bust", SX0 - 3, dy + s * 7, Z1 + 1.15, 0)
+    place("Konsol", mx0 + 12, wy, Z2, -90 * s)
+    place("Vazo_Kucuk", mx0 + 12, wy, Z2 + 0.92)
+    place("Kaide", mx0 + 3.5, dy + s * 10.9, Z2)
+    place("Bust", mx0 + 3.5, dy + s * 10.9, Z2 + 1.15, -90 * s)
+    place("Hali", mx0 + 10, dy + s * 8.5, Z2, 0, (2.0, 0.55, 1))     # gallery runners
+# salon
+place("Konsol", mx0 + 4, N_IN + 0.3, Z1, 90)
+place("Vazo_Kucuk", mx0 + 4.4, N_IN + 0.3, Z1 + 0.92)
+place("Samdan", mx0 + 3.6, N_IN + 0.3, Z1 + 0.92)
+place("Hali", mx0 + 5, HALL_Y1 + 6, Z1, 30, (0.6, 0.7, 1))
+for x, y in ((W_IN + 1.2, NW - 1.2), (BACK_W - 1.4, N_IN + 1.3)):
+    place("Kaide", x, y, Z1)
+    place("Bust", x, y, Z1 + 1.15, 225)
+# dining room
+for y in (my0 + 6, HALL_Y0 - 4):
+    place("Ayna", BACK_W - 0.05, y, Z1 + 2.1, 180, 1.0)
+    place("Vazo_Kucuk", BACK_W - 0.3, y + 0.6, Z1 + 0.92)
+for x, y in ((W_IN + 1.2, SW + 1.2), (W_IN + 1.2, S_IN - 1.2)):
+    place("Kaide", x, y, Z1)
+    place("Bust", x, y, Z1 + 1.15, 45)
+# library
+for y in (my1 - 4, my0 + 4):
+    place("Kaide", E_IN - 1.2, y, Z1)
+    place("Bust", E_IN - 1.2, y, Z1 + 1.15, 180)
+place("Koltuk", CX_BACK - 1.6, 20, Z1, 0)
+place("Koltuk", CX_BACK + 1.6, 20, Z1, 180)
+place("Sehpa", CX_BACK, 20, Z1, 90, 0.6)
+place("Samdan", CX_BACK, 20, Z1 + 0.5)
+# upper portrait gallery
+place("Hali", CX_BACK, dy, Z2, 90, (2.4, 0.7, 1))
+for y in (my0 + 9, my1 - 9, dy - 9, dy + 9):
+    place("Kaide", BACK_E + 1.0, y, Z2)
+    place("Bust", BACK_E + 1.0, y, Z2 + 1.15, 0)
+
 # fireplaces glow
 for i, (x, y, z) in enumerate([(CX_MID, NW - 0.6, Z1), (CX_MID, SW + 0.6, Z1),
-                               (mx0 + 8, N_IN + 0.6, Z2), (mx0 + 8, S_IN - 0.6, Z2)], 1):
+                               (mx0 + 18, N_IN + 0.6, Z2), (mx0 + 18, S_IN - 0.6, Z2)], 1):
     point_light(f"Somine_{i}_Ates", (x, y, z + 0.5), 250, (1.0, 0.45, 0.15), 0.4)
 
 
 # ---------------------------------------------------------------- huts
 C_HUTS = collection("Kulubeler")
+LEAF_HUT = plank_leaf("Kapi_Kulube", 1.1, 2.15, 0.06)
 for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
     hb, hf, hg = Builder(), Builder(), Builder()
     hx, hy, h = sx / 2, sy / 2, 3.0
@@ -1001,17 +1209,22 @@ for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
                 add_window(hf, hg, a, b, s, w, zb, zt, 0.3, t, mullions=False)
     for k in range(int(h / 0.3)):                                             # plank lines
         hb.box((0, -hy - t / 2 - 0.01, 0.3 + k * 0.3), (sx, 0.02, 0.03))
-    hb.prism_roof((0, 0), sx + 1.0, sy + 1.0, h + 0.3, 2.0, rot_z=math.pi / 2, mi=2)
+    # roof with a generous overhang over all four walls, fascia boards along the eaves
+    hb.prism_roof((0, 0), sx + 2.4, sy + 2.0, h + 0.3, 2.6, rot_z=math.pi / 2, mi=2)
+    for s in (-1, 1):
+        hb.box((0, s * (sy / 2 + 1.0), h + 0.25), (sx + 2.4, 0.06, 0.18), mi=3)
     if i % 3 == 0:
-        hb.cyl((hx * 0.5, hy * 0.4, h + 2.0), 0.15, 2.5, 8, mi=1)            # stove pipe
-    # wooden door, slightly ajar
-    hb.box((-0.55 + 0.5, -hy - 0.25, 1.4), (1.0, 0.06, 2.1), math.radians(-25), mi=3)
+        hb.cyl((hx * 0.5, hy * 0.4, h + 2.4), 0.15, 2.8, 8, mi=1)            # stove pipe
+    door_casing(hb, (-hx, -hy), (hx, -hy), hx, 1.1, 2.2, 0.3, t, 0.05, 0.12, mi=3)
     hut = hb.finish(f"Kulube_{i}", [M["wood"], M["stone"], M["roof"], M["door"]], C_HUTS,
                     location=(x, y, 0), rot_z=math.radians(deg))
     fr = hf.finish(f"Kulube_{i}_Pencere", [M["frame"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))
     gl = hg.finish(f"Kulube_{i}_Cam", [M["glass"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))
     if i % 2 == 0:
         point_light(f"Kulube_{i}_Isik", (x, y, 2.2), 60, (1.0, 0.5, 0.2), 0.3)
+    rz = Matrix.Rotation(math.radians(deg), 3, 'Z')
+    hinge = rz @ Vector((-0.55, -hy, 0.3)) + Vector((x, y, 0))
+    door(f"Kapi_Kulube_{i}", LEAF_HUT, hinge, (rz @ Vector((1, 0, 0))).xy, (rz @ Vector((0, 1, 0))).xy, C_HUTS)
 
 
 # ---------------------------------------------------------------- trees and bushes
@@ -1287,11 +1500,15 @@ for m in bpy.data.materials:
     }
 for o in objs:
     if o.type == 'MESH' and o.name not in proto_names:
-        data["objects"].append({
+        entry = {
             "name": o.name, "mesh": f"SM_{o.data.name}",
             "loc": to_ue(o.location), "yaw": round(-math.degrees(o.rotation_euler.z), 3),
             "scale": [round(s, 4) for s in o.scale],
-        })
+        }
+        if "door_open" in o:  # mirrored Y flips the swing direction too
+            entry["door"] = {"open": -o["door_open"], "partner": o.get("door_partner"),
+                             "locked": bool(o.get("door_locked", False))}
+        data["objects"].append(entry)
     elif o.type == 'LIGHT':
         data["lights"].append({
             "name": o.name, "type": o.data.type, "loc": to_ue(o.location),

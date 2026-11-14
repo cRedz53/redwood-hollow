@@ -559,33 +559,43 @@
   },
   {
    "name": "Giris_Kapisi_Kanat_L",
-   "mesh": "SM_Giris_Kapisi_Kanat_L",
+   "mesh": "SM_Giris_Kapisi_Kanat",
    "loc": [
     -10000.0,
     -1950.0,
     0.0
    ],
-   "yaw": -62.0,
+   "yaw": -90.0,
    "scale": [
     1.0,
     1.0,
     1.0
-   ]
+   ],
+   "door": {
+    "open": 80.0,
+    "partner": "Giris_Kapisi_Kanat_R",
+    "locked": false
+   }
   },
   {
    "name": "Giris_Kapisi_Kanat_R",
-   "mesh": "SM_Giris_Kapisi_Kanat_R",
+   "mesh": "SM_Giris_Kapisi_Kanat",
    "loc": [
     -10000.0,
     -2850.0,
     0.0
    ],
-   "yaw": -118.0,
+   "yaw": 90.0,
    "scale": [
     1.0,
     1.0,
     1.0
-   ]
+   ],
+   "door": {
+    "open": -80.0,
+    "partner": "Giris_Kapisi_Kanat_L",
+    "locked": false
+   }
   },
   {
    "name": "Kacis_Kapisi_Sutunlar",
@@ -604,7 +614,7 @@
   },
   {
    "name": "Kacis_Kapisi_Kanat_L",
-   "mesh": "SM_Kacis_Kapisi_Kanat_L",
+   "mesh": "SM_Kacis_Kapisi_Kanat",
    "loc": [
     3000.0,
     5500.0,
@@ -615,22 +625,32 @@
     1.0,
     1.0,
     1.0
-   ]
+   ],
+   "door": {
+    "open": -80.0,
+    "partner": "Kacis_Kapisi_Kanat_R",
+    "locked": false
+   }
   },
   {
    "name": "Kacis_Kapisi_Kanat_R",
-   "mesh": "SM_Kacis_Kapisi_Kanat_R",
+   "mesh": "SM_Kacis_Kapisi_Kanat",
    "loc": [
     4000.0,
     5500.0,
     0.0
    ],
-   "yaw": -0.0,
+   "yaw": 180.0,
    "scale": [
     1.0,
     1.0,
     1.0
-   ]
+   ],
+   "door": {
+    "open": 80.0,
+    "partner": "Kacis_Kapisi_Kanat_L",
+    "locked": false
+   }
   },
   {
    "name": "Malikane_Duvarlar",
@@ -798,14 +818,14 @@
    ]
   },
   {
-   "name": "Malikane_Kapi_R",
-   "mesh": "SM_Malikane_Kapi_R",
+   "name": "Malikane_Kapi_Tokmak",
+   "mesh": "SM_Malikane_Kapi_Tokmak",
    "loc": [
-    1800.0,
-    50.0,
-    150.0
+    0.0,
+    -0.0,
+    0.0
    ],
-   "yaw": -13.5,
+   "yaw": -0.0,
    "scale": [
     1.0,
     1.0,
@@ -813,19 +833,459 @@
    ]
   },
   {
-   "name": "Malikane_Kapi_L",
-   "mesh": "SM_Malikane_Kapi_L",
+   "name": "Malikane_Kapi_Kasalari",
+   "mesh": "SM_Malikane_Kapi_Kasalari",
    "loc": [
-    1800.0,
-    -450.0,
-    150.0
+    0.0,
+    -0.0,
+    0.0
    ],
-   "yaw": 13.5,
+   "yaw": -0.0,
    "scale": [
     1.0,
     1.0,
     1.0
    ]
+  },
+  {
+   "name": "Kapi_Ana_L",
+   "mesh": "SM_Kapi_Ana",
+   "loc": [
+    1800.0,
+    50.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Ana_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Ana_R",
+   "mesh": "SM_Kapi_Ana",
+   "loc": [
+    1800.0,
+    -450.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Ana_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Balkon_L",
+   "mesh": "SM_Kapi_Balkon",
+   "loc": [
+    1800.0,
+    -60.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Balkon_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Balkon_R",
+   "mesh": "SM_Kapi_Balkon",
+   "loc": [
+    1800.0,
+    -340.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Balkon_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_K_Zemin_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    2695.0,
+    -1400.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Hol_K_Zemin_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_K_Zemin_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    2955.0,
+    -1400.0,
+    150.0
+   ],
+   "yaw": 180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Hol_K_Zemin_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_K_Ust_L",
+   "mesh": "SM_Kapi_Ic_Dar",
+   "loc": [
+    2515.0,
+    -1400.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Hol_K_Ust_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_K_Ust_R",
+   "mesh": "SM_Kapi_Ic_Dar",
+   "loc": [
+    2735.0,
+    -1400.0,
+    650.0
+   ],
+   "yaw": 180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Hol_K_Ust_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_G_Zemin_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    2695.0,
+    1000.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Hol_G_Zemin_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_G_Zemin_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    2955.0,
+    1000.0,
+    150.0
+   ],
+   "yaw": 180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Hol_G_Zemin_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_G_Ust_L",
+   "mesh": "SM_Kapi_Ic_Dar",
+   "loc": [
+    2515.0,
+    1000.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Hol_G_Ust_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Hol_G_Ust_R",
+   "mesh": "SM_Kapi_Ic_Dar",
+   "loc": [
+    2735.0,
+    1000.0,
+    650.0
+   ],
+   "yaw": 180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Hol_G_Ust_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Zemin_-20_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    1930.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Dogu_Zemin_-20_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Zemin_-20_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    1670.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Dogu_Zemin_-20_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Zemin_+20_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -2070.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Dogu_Zemin_+20_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Zemin_+20_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -2330.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Dogu_Zemin_+20_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_-20_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    1930.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Dogu_Ust_-20_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_-20_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    1670.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Dogu_Ust_-20_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_+0_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -70.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Dogu_Ust_+0_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_+0_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -330.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Dogu_Ust_+0_L",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_+20_L",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -2070.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 90.0,
+    "partner": "Kapi_Dogu_Ust_+20_R",
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Dogu_Ust_+20_R",
+   "mesh": "SM_Kapi_Ic_Genis",
+   "loc": [
+    4600.0,
+    -2330.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": "Kapi_Dogu_Ust_+20_L",
+    "locked": false
+   }
   },
   {
    "name": "Avize_Zemin_1",
@@ -3066,7 +3526,7 @@
    "name": "Mob_Somine_03",
    "mesh": "SM_Mob_Somine",
    "loc": [
-    2600.0,
+    3600.0,
     -1440.0,
     650.0
    ],
@@ -3081,7 +3541,7 @@
    "name": "Mob_Koltuk_09",
    "mesh": "SM_Mob_Koltuk",
    "loc": [
-    2450.0,
+    3450.0,
     -1715.0,
     650.0
    ],
@@ -3096,11 +3556,101 @@
    "name": "Mob_Koltuk_10",
    "mesh": "SM_Mob_Koltuk",
    "loc": [
-    2750.0,
+    3750.0,
     -1715.0,
     650.0
    ],
    "yaw": -135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_08",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3600.0,
+    -1715.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.7,
+    0.8,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_05",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    4555.0,
+    -2300.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Ayna_01",
+   "mesh": "SM_Mob_Ayna",
+   "loc": [
+    4580.0,
+    -2300.0,
+    840.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_01",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    4555.0,
+    -2240.0,
+    742.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_01",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    1920.0,
+    -4055.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_01",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    1920.0,
+    -4055.0,
+    765.0
+   ],
+   "yaw": 45.0,
    "scale": [
     1.0,
     1.0,
@@ -3168,7 +3718,7 @@
    ]
   },
   {
-   "name": "Mob_Hali_08",
+   "name": "Mob_Hali_09",
    "mesh": "SM_Mob_Hali",
    "loc": [
     3600.0,
@@ -3183,7 +3733,7 @@
    ]
   },
   {
-   "name": "Mob_Konsol_05",
+   "name": "Mob_Konsol_06",
    "mesh": "SM_Mob_Konsol",
    "loc": [
     3408.0,
@@ -3198,7 +3748,7 @@
    ]
   },
   {
-   "name": "Mob_Konsol_06",
+   "name": "Mob_Konsol_07",
    "mesh": "SM_Mob_Konsol",
    "loc": [
     3792.0,
@@ -3246,7 +3796,7 @@
    "name": "Mob_Somine_04",
    "mesh": "SM_Mob_Somine",
    "loc": [
-    2600.0,
+    3600.0,
     1040.0,
     650.0
    ],
@@ -3261,7 +3811,7 @@
    "name": "Mob_Koltuk_11",
    "mesh": "SM_Mob_Koltuk",
    "loc": [
-    2450.0,
+    3450.0,
     1315.0,
     650.0
    ],
@@ -3276,11 +3826,101 @@
    "name": "Mob_Koltuk_12",
    "mesh": "SM_Mob_Koltuk",
    "loc": [
-    2750.0,
+    3750.0,
     1315.0,
     650.0
    ],
    "yaw": 135.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_10",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    3600.0,
+    1315.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    0.7,
+    0.8,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_08",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    4555.0,
+    2900.0,
+    650.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Ayna_02",
+   "mesh": "SM_Mob_Ayna",
+   "loc": [
+    4580.0,
+    2900.0,
+    840.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_02",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    4555.0,
+    2960.0,
+    742.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_02",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    1920.0,
+    3655.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_02",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    1920.0,
+    3655.0,
+    765.0
+   ],
+   "yaw": -45.0,
    "scale": [
     1.0,
     1.0,
@@ -3633,6 +4273,831 @@
    ]
   },
   {
+   "name": "Mob_Konsol_09",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    2300.0,
+    940.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_03",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    2340.0,
+    940.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_10",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2250.0,
+    940.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kanepe_04",
+   "mesh": "SM_Mob_Kanepe",
+   "loc": [
+    3250.0,
+    870.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_03",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    3100.0,
+    500.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_03",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    3100.0,
+    500.0,
+    265.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_10",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3000.0,
+    940.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_04",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    3000.0,
+    940.0,
+    742.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_04",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    2150.0,
+    890.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_04",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    2150.0,
+    890.0,
+    765.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_11",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    2800.0,
+    650.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    2.0,
+    0.55,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_11",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    2300.0,
+    -1340.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_05",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    2340.0,
+    -1340.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_11",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2250.0,
+    -1340.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kanepe_05",
+   "mesh": "SM_Mob_Kanepe",
+   "loc": [
+    3250.0,
+    -1270.0,
+    150.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_05",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    3100.0,
+    -900.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_05",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    3100.0,
+    -900.0,
+    265.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_12",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    3000.0,
+    -1340.0,
+    650.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_06",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    3000.0,
+    -1340.0,
+    742.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_06",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    2150.0,
+    -1290.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_06",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    2150.0,
+    -1290.0,
+    765.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_12",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    2800.0,
+    -1050.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    2.0,
+    0.55,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Konsol_13",
+   "mesh": "SM_Mob_Konsol",
+   "loc": [
+    2200.0,
+    -1445.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_07",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    2240.0,
+    -1445.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Samdan_12",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    2160.0,
+    -1445.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_13",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    2300.0,
+    -2000.0,
+    150.0
+   ],
+   "yaw": -30.0,
+   "scale": [
+    0.6,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_07",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    1945.0,
+    -4055.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_07",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    1945.0,
+    -4055.0,
+    265.0
+   ],
+   "yaw": -225.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_08",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    4445.0,
+    -1545.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_08",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    4445.0,
+    -1545.0,
+    265.0
+   ],
+   "yaw": -225.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Ayna_03",
+   "mesh": "SM_Mob_Ayna",
+   "loc": [
+    4580.0,
+    3200.0,
+    360.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_08",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    4555.0,
+    3140.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Ayna_04",
+   "mesh": "SM_Mob_Ayna",
+   "loc": [
+    4580.0,
+    1400.0,
+    360.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Vazo_Kucuk_09",
+   "mesh": "SM_Mob_Vazo_Kucuk",
+   "loc": [
+    4555.0,
+    1340.0,
+    242.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_09",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    1945.0,
+    3655.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_09",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    1945.0,
+    3655.0,
+    265.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_10",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    1945.0,
+    1135.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_10",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    1945.0,
+    1135.0,
+    265.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_11",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    6055.0,
+    -3800.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_11",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    6055.0,
+    -3800.0,
+    265.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_12",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    6055.0,
+    3400.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_12",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    6055.0,
+    3400.0,
+    265.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_13",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5240.0,
+    -2000.0,
+    150.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Koltuk_14",
+   "mesh": "SM_Mob_Koltuk",
+   "loc": [
+    5560.0,
+    -2000.0,
+    150.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Sehpa_07",
+   "mesh": "SM_Mob_Sehpa",
+   "loc": [
+    5400.0,
+    -2000.0,
+    150.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    0.6,
+    0.6,
+    0.6
+   ]
+  },
+  {
+   "name": "Mob_Samdan_13",
+   "mesh": "SM_Mob_Samdan",
+   "loc": [
+    5400.0,
+    -2000.0,
+    200.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Hali_14",
+   "mesh": "SM_Mob_Hali",
+   "loc": [
+    5400.0,
+    -200.0,
+    650.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    2.4,
+    0.7,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_13",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    4715.0,
+    2900.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_13",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    4715.0,
+    2900.0,
+    765.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_14",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    4715.0,
+    -3300.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_14",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    4715.0,
+    -3300.0,
+    765.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_15",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    4715.0,
+    700.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_15",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    4715.0,
+    700.0,
+    765.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Kaide_16",
+   "mesh": "SM_Mob_Kaide",
+   "loc": [
+    4715.0,
+    -1100.0,
+    650.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Mob_Bust_16",
+   "mesh": "SM_Mob_Bust",
+   "loc": [
+    4715.0,
+    -1100.0,
+    765.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
    "name": "Kulube_1",
    "mesh": "SM_Kulube_1",
    "loc": [
@@ -3676,6 +5141,26 @@
     1.0,
     1.0
    ]
+  },
+  {
+   "name": "Kapi_Kulube_1",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -7725.0,
+    -3955.0,
+    30.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
   },
   {
    "name": "Kulube_2",
@@ -3723,6 +5208,26 @@
    ]
   },
   {
+   "name": "Kapi_Kulube_2",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -3245.0,
+    -3900.0,
+    30.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
+  },
+  {
    "name": "Kulube_3",
    "mesh": "SM_Kulube_3",
    "loc": [
@@ -3766,6 +5271,26 @@
     1.0,
     1.0
    ]
+  },
+  {
+   "name": "Kapi_Kulube_3",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -145.0,
+    -4500.0,
+    30.0
+   ],
+   "yaw": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
   },
   {
    "name": "Kulube_4",
@@ -3813,6 +5338,26 @@
    ]
   },
   {
+   "name": "Kapi_Kulube_4",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -4055.0,
+    575.0,
+    30.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
+  },
+  {
    "name": "Kulube_5",
    "mesh": "SM_Kulube_5",
    "loc": [
@@ -3856,6 +5401,26 @@
     1.0,
     1.0
    ]
+  },
+  {
+   "name": "Kapi_Kulube_5",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -6200.0,
+    4055.0,
+    30.0
+   ],
+   "yaw": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
   },
   {
    "name": "Kulube_6",
@@ -3903,6 +5468,26 @@
    ]
   },
   {
+   "name": "Kapi_Kulube_6",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -1344.44,
+    3433.35,
+    30.0
+   ],
+   "yaw": -45.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
+  },
+  {
    "name": "Kulube_7",
    "mesh": "SM_Kulube_7",
    "loc": [
@@ -3946,6 +5531,26 @@
     1.0,
     1.0
    ]
+  },
+  {
+   "name": "Kapi_Kulube_7",
+   "mesh": "SM_Kapi_Kulube",
+   "loc": [
+    -8900.0,
+    745.0,
+    30.0
+   ],
+   "yaw": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": -90.0,
+    "partner": null,
+    "locked": false
+   }
   },
   {
    "name": "Agac_001",
@@ -12083,7 +13688,7 @@
    "name": "Somine_3_Ates",
    "type": "POINT",
    "loc": [
-    2600.0,
+    3600.0,
     -1475.0,
     700.0
    ],
@@ -12103,7 +13708,7 @@
    "name": "Somine_4_Ates",
    "type": "POINT",
    "loc": [
-    2600.0,
+    3600.0,
     1075.0,
     700.0
    ],

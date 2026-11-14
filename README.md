@@ -57,6 +57,41 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarı
 
 Haritayı `ue_haritayi_kur.py` ile yeniden kurarsan `ue_megascans_uygula.py` dosyasını da tekrar çalıştır.
 
+## Gerçekçi grafik (Poly Haven, hesapsız)
+Dokular ve modeller [Poly Haven](https://polyhaven.com)'dan (CC0) gelir:
+1. Asset'leri indir (~405 MB, `Unreal/PolyHaven_Kaynak/`, git'e eklenmez):
+   ```
+   powershell -ExecutionPolicy Bypass -File Araclar\polyhaven_indir.ps1
+   ```
+2. Modelleri hazırla:
+   ```
+   "C:\Program Files\Blender Foundation\Blender 5.3\blender.exe" -b -P Blender/polyhaven_hazirla.py -- Unreal/PolyHaven_Kaynak
+   ```
+3. UE'de **Tools → Execute Python Script** ile önce `Unreal/ue_haritayi_kur.py`, sonra `Unreal/ue_polyhaven_uygula.py` dosyasını çalıştır.
+
+Bu adımlar şunları yapar:
+- PBR yüzeyler: çimen, çakıl, kale taşı, eski sıva, mermer, kayrak, ahşap, parke, paslı metal, kadife.
+- Gerçek ağaçlar, çalılar ve 25.000 çimen öbeği. Ağaç, çalı ve kütüklerin içinden geçilemez.
+- Gerçek avizeler ve mobilyalar: koltuk, kanepe, gotik yatak ve dolap, konsol, ayaklı saat, büst, ayna, tablo, şamdan.
+
+`Content/PolyHaven` klasörü depoda hazır geldiği için bu adımları sadece asset'leri değiştirmek istersen tekrar çalıştırman gerekir.
+
+## Kapılar (sol tıkla aç/kapa)
+Kapıların hepsi menteşesinden açılır:
+- Malikane ana kapısı ve balkon kapısı
+- Tüm iç çift kanatlı kapılar
+- Kulübe kapıları
+- İki bahçe kapısı
+
+Kapılar `Source/MalikaneGame` içindeki C++ sınıflarıyla çalışır:
+- `AMalikaneDoor`: menteşeden yumuşak dönüş; çift kanatlı kapılarda eşi de birlikte açılır. `bLocked` ile kilitlenebilir.
+- `AMalikaneInteractor`: sol tıkta kameradan ışın atar ve bakılan kapıyı açar ya da kapatır.
+
+Derlemek için Visual Studio'da **Game development with C++** bileşeni ve Windows SDK gerekir. Kurduktan sonra:
+1. `MalikaneGame.uproject` içine `"Modules": [{ "Name": "MalikaneGame", "Type": "Runtime", "LoadingPhase": "Default" }]` ekle.
+2. Projeyi aç; UE modülü derlemeyi teklif eder.
+3. `ue_haritayi_kur.py` ve `ue_polyhaven_uygula.py` dosyalarını tekrar çalıştır. Kapılar açılır olarak yerleşir; modül yoksa sabit kalırlar.
+
 ## Gece ayarları
 `Unreal/ue_haritayi_kur.py` en üstündeki değerler: `MOON_LUX` (ay ışığı), `EXPOSURE_BIAS` (genel parlaklık), `LAMP_CD_PER_WATT` (fener ve avize gücü), `EMISSIVE_SCALE`, `FOG_DENSITY`.
 Editörde de değiştirilebilir: `Gece_PostProcess` (Exposure Compensation), `Sis`, `Ay_Isigi`.

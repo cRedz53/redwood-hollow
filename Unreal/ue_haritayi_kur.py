@@ -22,7 +22,9 @@ LEVEL = "/Game/Maps/Malikane"
 MOON_LUX = 0.5            # ay isigi (directional light)
 EXPOSURE_BIAS = 3.5       # manuel pozlama (yuksek = daha aydinlik)
 LAMP_CD_PER_WATT = 0.15   # Blender W -> UE candela
-INDOOR_LIGHT_SCALE = 0.3  # avize / somine isiklari (ic mekan pozlamaya gore cok parlak)
+INDOOR_LIGHT_SCALE = 0.6  # avize / somine isiklari (1.0 ic mekanda patliyor, 0.3 oda koselerini karanlikta birakiyor)
+NANITE_OK = ("Zemin_Cim", "Yol_Cakil", "Malikane_Duvarlar", "Malikane_Cati", "Malikane_Zeminler",
+             "Malikane_Kaide_Merdiven", "Malikane_Mermer_Zemin")
 EMISSIVE_SCALE = 0.05     # yanik pencere / fener parlakligi
 FOG_DENSITY = 0.015
 
@@ -115,8 +117,9 @@ for name in mesh_names:
     sm.set_editor_property("auto_generate_collision", False)
     sm.set_editor_property("generate_lightmap_u_vs", True)
     sm.set_editor_property("convert_scene", True)
-    # Nanite keeps virtual shadow maps cheap; glass is translucent and cannot use it
-    setp(sm, "build_nanite", not name.endswith("_Cam"))
+    # Nanite keeps virtual shadow maps cheap, but its auto precision on these large meshes bends
+    # thin parts (window bars, pickets, balusters) into skewed quads, so only the big plain ones use it
+    setp(sm, "build_nanite", any(k in name for k in NANITE_OK))
     t = unreal.AssetImportTask()
     t.set_editor_property("filename", os.path.join(SRC, f"{name}.fbx"))
     t.set_editor_property("destination_path", f"{ROOT}/Meshes")
@@ -169,7 +172,7 @@ if not world.get_path_name().startswith(LEVEL):
 def folder_for(name):
     for prefix, folder in (("Agac_", "Agaclar"), ("Cali_", "Agaclar"), ("Kulube", "Kulubeler"),
                            ("Malikane", "Malikane"), ("Avize", "Malikane/Avizeler"), ("Mob_", "Malikane/Mobilya"),
-                           ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Sinir", "Duvar")):
+                           ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Kapi_", "Kapilar"), ("Sinir", "Duvar")):
         if name.startswith(prefix):
             return f"Malikane/{folder}"
     return "Malikane/Zemin"
@@ -179,18 +182,35 @@ def vec(v):
     return unreal.Vector(v[0], v[1], v[2])
 
 
+# openable doors need the C++ module (Source/MalikaneGame); without it they are placed as static meshes
+DoorClass = getattr(unreal, "MalikaneDoor", None)
+doors = {}
 for o in scene["objects"]:
     sm = meshes.get(o["mesh"])
     if not sm:
         continue
-    a = actors.spawn_actor_from_object(sm, vec(o["loc"]), unreal.Rotator(0, 0, o["yaw"]))
+    loc, rot = vec(o["loc"]), unreal.Rotator(0, 0, o["yaw"])
+    if o.get("door") and DoorClass:
+        a = actors.spawn_actor_from_class(DoorClass, loc, rot)
+        a.leaf.set_static_mesh(sm)
+        a.set_editor_property("open_angle", o["door"]["open"])
+        a.set_editor_property("locked", o["door"]["locked"])
+        doors[o["name"]] = (a, o["door"].get("partner"))
+    else:
+        a = actors.spawn_actor_from_object(sm, loc, rot)
     a.set_actor_scale3d(vec(o["scale"]))
     a.set_actor_label(o["name"])
     a.set_folder_path(folder_for(o["name"]))
     if o["name"].startswith("Avize_"):
         a.get_component_by_class(unreal.StaticMeshComponent).set_cast_shadow(False)  # light sits inside it
-    if "_Kanat_" in o["name"] or "_Kapi_" in o["name"]:
-        a.get_component_by_class(unreal.StaticMeshComponent).set_mobility(unreal.ComponentMobility.MOVABLE)  # acilip kapanabilsin
+for a, partner in doors.values():
+    if partner in doors:
+        a.set_editor_property("partner", doors[partner][0])
+if doors and hasattr(unreal, "MalikaneInteractor"):
+    it = actors.spawn_actor_from_class(unreal.MalikaneInteractor, unreal.Vector(0, 0, 0))
+    it.set_actor_label("Kapi_Etkilesim")
+    it.set_folder_path("Malikane/Oyun")
+unreal.log(f"[Malikane] {len(doors)} acilir kapi" if DoorClass else "[Malikane] C++ modulu yok: kapilar sabit")
 
 
 def color8(c):
@@ -214,7 +234,7 @@ for l in scene["lights"]:
         indoor = l["name"].startswith(("Avize", "Somine"))
         c.set_editor_property("intensity", l["energy"] * LAMP_CD_PER_WATT * (INDOOR_LIGHT_SCALE if indoor else 1.0))
         c.set_editor_property("light_color", color8(l["color"]))
-        c.set_editor_property("attenuation_radius", 1400.0 if indoor else 1800.0)
+        c.set_editor_property("attenuation_radius", 2200.0 if indoor else 1800.0)
         c.set_editor_property("source_radius", 10.0)
     elif l["type"] == "SUN":
         # Blender sun: shines along local -Z after XYZ euler rotation
