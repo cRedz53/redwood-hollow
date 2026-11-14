@@ -36,6 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kapi")
 	bool bLocked = false;
 
+	/** Floor hatch: the leaf lies flat and swings up around its hinge edge (roll) instead of turning around Z. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kapi")
+	bool bHorizontal = false;
+
 	/** The other leaf of a double door; it opens and closes together with this one. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kapi")
 	TObjectPtr<AMalikaneDoor> Partner;
@@ -47,6 +51,9 @@ public:
 	void SetOpen(bool bNewOpen);
 
 	virtual void Tick(float DeltaSeconds) override;
+
+	/** Shows the open/closed pose in the editor too. */
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	virtual void BeginPlay() override;

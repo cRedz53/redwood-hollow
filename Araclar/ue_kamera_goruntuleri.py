@@ -29,6 +29,12 @@ SHOTS = [
     look("kamera_kutuphane", (5900, -3800, 330), (4600, 400, 250)),
     look("kamera_dis", (-2200, 1500, 600), (2500, -200, 900)),
 ]
+if os.environ.get("MALIKANE_SHOT_SET") == "tunel":  # hut 7 interior, the tunnel and the exit hatch
+    SHOTS = [
+        look("kamera_kulube_ic", (-8450, 600, 200), (-8660, 1000, 40)),
+        look("kamera_tunel", (-9000, 1000, -140), (-11000, 1000, -190)),
+        look("kamera_tunel_cikis", (-11700, 700, 170), (-11350, 1000, 0)),
+    ]
 
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)

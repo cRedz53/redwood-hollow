@@ -573,6 +573,7 @@
    ],
    "door": {
     "open": 80.0,
+    "horizontal": false,
     "partner": "Giris_Kapisi_Kanat_R",
     "locked": false
    }
@@ -593,6 +594,7 @@
    ],
    "door": {
     "open": -80.0,
+    "horizontal": false,
     "partner": "Giris_Kapisi_Kanat_L",
     "locked": false
    }
@@ -628,6 +630,7 @@
    ],
    "door": {
     "open": -80.0,
+    "horizontal": false,
     "partner": "Kacis_Kapisi_Kanat_R",
     "locked": false
    }
@@ -648,6 +651,7 @@
    ],
    "door": {
     "open": 80.0,
+    "horizontal": false,
     "partner": "Kacis_Kapisi_Kanat_L",
     "locked": false
    }
@@ -863,6 +867,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Ana_R",
     "locked": false
    }
@@ -883,6 +888,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Ana_L",
     "locked": false
    }
@@ -903,6 +909,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Balkon_R",
     "locked": false
    }
@@ -923,6 +930,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Balkon_L",
     "locked": false
    }
@@ -943,6 +951,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_K_Zemin_R",
     "locked": false
    }
@@ -963,6 +972,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_K_Zemin_L",
     "locked": false
    }
@@ -983,6 +993,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_K_Ust_R",
     "locked": false
    }
@@ -1003,6 +1014,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_K_Ust_L",
     "locked": false
    }
@@ -1023,6 +1035,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_G_Zemin_R",
     "locked": false
    }
@@ -1043,6 +1056,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_G_Zemin_L",
     "locked": false
    }
@@ -1063,6 +1077,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_G_Ust_R",
     "locked": false
    }
@@ -1083,6 +1098,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Hol_G_Ust_L",
     "locked": false
    }
@@ -1103,6 +1119,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Zemin_-20_R",
     "locked": false
    }
@@ -1123,6 +1140,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Zemin_-20_L",
     "locked": false
    }
@@ -1143,6 +1161,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Zemin_+20_R",
     "locked": false
    }
@@ -1163,6 +1182,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Zemin_+20_L",
     "locked": false
    }
@@ -1183,6 +1203,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_-20_R",
     "locked": false
    }
@@ -1203,6 +1224,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_-20_L",
     "locked": false
    }
@@ -1223,6 +1245,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_+0_R",
     "locked": false
    }
@@ -1243,6 +1266,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_+0_L",
     "locked": false
    }
@@ -1263,6 +1287,7 @@
    ],
    "door": {
     "open": 90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_+20_R",
     "locked": false
    }
@@ -1283,6 +1308,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": "Kapi_Dogu_Ust_+20_L",
     "locked": false
    }
@@ -5158,6 +5184,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5223,6 +5250,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5288,6 +5316,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5353,6 +5382,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5418,6 +5448,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5483,6 +5514,7 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
     "partner": null,
     "locked": false
    }
@@ -5548,6 +5580,64 @@
    ],
    "door": {
     "open": -90.0,
+    "horizontal": false,
+    "partner": null,
+    "locked": false
+   }
+  },
+  {
+   "name": "Kapi_Kapak_Kulube",
+   "mesh": "SM_Kapi_Kapak",
+   "loc": [
+    -8790.0,
+    1065.0,
+    30.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 100.0,
+    "horizontal": true,
+    "partner": null,
+    "locked": false
+   }
+  },
+  {
+   "name": "Gizli_Tunel",
+   "mesh": "SM_Gizli_Tunel",
+   "loc": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "name": "Kapi_Kapak_Cikis",
+   "mesh": "SM_Kapi_Kapak",
+   "loc": [
+    -11480.0,
+    1065.0,
+    0.0
+   ],
+   "yaw": -0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "door": {
+    "open": 100.0,
+    "horizontal": true,
     "partner": null,
     "locked": false
    }
@@ -13725,19 +13815,19 @@
    ]
   },
   {
-   "name": "Kulube_2_Isik",
+   "name": "Kulube_1_Lamba_1",
    "type": "POINT",
    "loc": [
-    -3300.0,
-    -3600.0,
-    220.0
+    -7220.0,
+    -3539.5,
+    235.0
    ],
    "color": [
     1.0,
-    0.5,
-    0.20000000298023224
+    0.6200000047683716,
+    0.30000001192092896
    ],
-   "energy": 60.0,
+   "energy": 70.0,
    "rot": [
     0.0,
     0.0,
@@ -13745,19 +13835,19 @@
    ]
   },
   {
-   "name": "Kulube_4_Isik",
+   "name": "Kulube_1_Lamba_2",
    "type": "POINT",
    "loc": [
-    -4000.0,
-    200.0,
-    220.0
+    -7580.0,
+    -4260.5,
+    235.0
    ],
    "color": [
     1.0,
-    0.5,
-    0.20000000298023224
+    0.6200000047683716,
+    0.30000001192092896
    ],
-   "energy": 60.0,
+   "energy": 70.0,
    "rot": [
     0.0,
     0.0,
@@ -13765,19 +13855,299 @@
    ]
   },
   {
-   "name": "Kulube_6_Isik",
+   "name": "Kulube_2_Lamba_1",
    "type": "POINT",
    "loc": [
-    -1500.0,
-    3200.0,
-    220.0
+    -3610.5,
+    -3420.0,
+    235.0
    ],
    "color": [
     1.0,
-    0.5,
-    0.20000000298023224
+    0.6200000047683716,
+    0.30000001192092896
    ],
-   "energy": 60.0,
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_2_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -2989.5,
+    -3780.0,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_3_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -510.5,
+    -4020.0,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_3_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    110.5,
+    -4380.0,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_4_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -3589.5,
+    20.0,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_4_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -4410.5,
+    380.0,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_5_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -6680.0,
+    3689.5,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_5_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -6320.0,
+    4310.5,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_6_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -1425.4,
+    2870.84,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_6_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -1574.6,
+    3529.16,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_7_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -8420.0,
+    1135.5,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Kulube_7_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -8780.0,
+    464.5,
+    235.0
+   ],
+   "color": [
+    1.0,
+    0.6200000047683716,
+    0.30000001192092896
+   ],
+   "energy": 70.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Tunel_Lamba_1",
+   "type": "POINT",
+   "loc": [
+    -9310.4,
+    1000.0,
+    -145.0
+   ],
+   "color": [
+    1.0,
+    0.550000011920929,
+    0.25
+   ],
+   "energy": 45.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Tunel_Lamba_2",
+   "type": "POINT",
+   "loc": [
+    -10019.0,
+    1000.0,
+    -145.0
+   ],
+   "color": [
+    1.0,
+    0.550000011920929,
+    0.25
+   ],
+   "energy": 45.0,
+   "rot": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "Tunel_Lamba_3",
+   "type": "POINT",
+   "loc": [
+    -10727.6,
+    1000.0,
+    -145.0
+   ],
+   "color": [
+    1.0,
+    0.550000011920929,
+    0.25
+   ],
+   "energy": 45.0,
    "rot": [
     0.0,
     0.0,

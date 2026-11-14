@@ -33,7 +33,8 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine 5.8'e otomatik aktarı
 | Giriş holü | İki kat yüksekliğinde, siyah-beyaz mermer zemin, kapının tam karşısında kırmızı halılı imparatorluk merdiveni (orta kol, sahanlık, iki yana dönen kollar), holü çevreleyen üst galeri, dev avize, ahşap lambri, pilastrlar, tablolar, vazolar |
 | Odalar | Zemin kat: şömineli salon (kanepe, koltuklar, piyano, kitaplıklar, ayaklı saat), 28 kişilik yemek salonu (şamdanlar, konsollar, şömine), kütüphane. Üst kat: sayvanlı yataklı iki yatak odası (gardırop, şömine, çalışma masası), portre galerisi |
 | Işık | 14 avize, 4 şömine ateşi; her pencerede kadife perde |
-| Kulübeler | 7 kulübe, taş temel, camlı pencereler, aralık kapı; bazılarının içi yanıyor |
+| Kulübeler | 7 kulübe: taş temel, geniş saçaklı çatı, camlı pencereler, açılır tahta kapı; içlerinde üstü boş iki ahşap tezgah ve duvara sabit iki gaz lambası |
+| Gizli tünel | 7. kulübenin zemininde tıklayınca açılan tahta kapak → dik merdiven → ahşap destekli, fenerli tünel çitin altından geçer → çitin dışında ikinci bir kapaktan yüzeye çıkılır |
 | Oyun | `PlayerStart` (giriş kapısı), `Kacis_Trigger` (kaçış kapısının dışında) |
 
 ## Haritayı değiştirip yeniden kurmak

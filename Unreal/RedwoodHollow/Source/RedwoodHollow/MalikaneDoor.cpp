@@ -24,6 +24,13 @@ void AMalikaneDoor::BeginPlay()
 	ApplyAlpha();
 }
 
+void AMalikaneDoor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	Alpha = bOpen ? 1.f : 0.f;
+	ApplyAlpha();
+}
+
 void AMalikaneDoor::Toggle()
 {
 	if (bLocked)
@@ -57,5 +64,6 @@ void AMalikaneDoor::ApplyAlpha()
 {
 	// ease in/out so heavy doors start and stop softly
 	const float Eased = 0.5f - 0.5f * FMath::Cos(Alpha * PI);
-	Leaf->SetRelativeRotation(FRotator(0.f, OpenAngle * Eased, 0.f));
+	const float Angle = OpenAngle * Eased;
+	Leaf->SetRelativeRotation(bHorizontal ? FRotator(0.f, 0.f, Angle) : FRotator(0.f, Angle, 0.f));
 }

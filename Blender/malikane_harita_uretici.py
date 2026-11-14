@@ -378,10 +378,37 @@ def point_light(name, loc, energy, color=(1.0, 0.6, 0.3), radius=0.15):
     return ob
 
 
+def slab_with_holes(b, rect, holes, z, t=0.2, mi=0):
+    """Slab (top at z) covering rect = (x0, x1, y0, y1) minus rectangular holes."""
+    x0, x1, y0, y1 = rect
+    xs = sorted({x0, x1, *[v for h in holes for v in h[:2] if x0 < v < x1]})
+    ys = sorted({y0, y1, *[v for h in holes for v in h[2:] if y0 < v < y1]})
+    for xa, xb in zip(xs, xs[1:]):
+        for ya, yb in zip(ys, ys[1:]):
+            cx, cy = (xa + xb) / 2, (ya + yb) / 2
+            if any(h[0] < cx < h[1] and h[2] < cy < h[3] for h in holes):
+                continue
+            b.box((cx, cy, z - t / 2), (xb - xa, yb - ya, t), mi=mi)
+
+
+# ---------------------------------------------------------------- secret tunnel layout (world metres)
+# A hatch in the floor of hut 7 opens onto steep stairs; the tunnel runs west under the fence
+# and comes up through a second hatch outside the grounds.
+TUNNEL_HUT = 7
+TUN_Y, TUN_W = -10.0, 1.3            # tunnel centre line (y) and stair / hatch width
+TUN_FLOOR, TUN_CEIL = -3.0, -0.7
+STEP_R, STEP_T = 0.3, 0.28           # stair rise / tread
+HATCH_L = 2.6                        # hatch length along the stairs (head-room on the way down)
+ENTRY_X0 = -85.3                     # top step of the entry stairs (inside the hut)
+HUT_FLOOR_Z = 0.3
+EXIT_X0 = -112.0                     # foot of the exit stairs (outside the fence at x = -100)
+ENTRY_HOLE = (ENTRY_X0 - HATCH_L, ENTRY_X0, TUN_Y - TUN_W / 2, TUN_Y + TUN_W / 2)
+EXIT_HOLE = (EXIT_X0 - 2.8, EXIT_X0 - 0.2, TUN_Y - TUN_W / 2, TUN_Y + TUN_W / 2)
+
 # ---------------------------------------------------------------- ground + paths
 C_GROUND = collection("Zemin")
 g = Builder()
-g.box((0, 0, -0.25), (400, 300, 0.5))
+slab_with_holes(g, (-200, 200, -150, 150), [ENTRY_HOLE, EXIT_HOLE], 0.0, 0.5)
 g.finish("Zemin_Cim", [M["grass"]], C_GROUND)
 
 p = Builder()
@@ -618,16 +645,6 @@ fl.box(((ix0 + ix1) / 2, (iy0 + iy1) / 2, Z1 - 0.1), (ix1 - ix0, iy1 - iy0, 0.2)
 # open over the central floor and over the staircase
 
 
-def slab_with_holes(b, rect, holes, z, t=0.2):
-    x0, x1, y0, y1 = rect
-    xs = sorted({x0, x1, *[v for h in holes for v in h[:2] if x0 < v < x1]})
-    ys = sorted({y0, y1, *[v for h in holes for v in h[2:] if y0 < v < y1]})
-    for xa, xb in zip(xs, xs[1:]):
-        for ya, yb in zip(ys, ys[1:]):
-            cx, cy = (xa + xb) / 2, (ya + yb) / 2
-            if any(h[0] < cx < h[1] and h[2] < cy < h[3] for h in holes):
-                continue
-            b.box((cx, cy, z - t / 2), (xb - xa, yb - ya, t))
 
 
 VOID_C = (ix0 + 4.0, SX0, dy - 5.0, dy + 5.0)      # over the hall floor
@@ -1193,11 +1210,80 @@ for i, (x, y, z) in enumerate([(CX_MID, NW - 0.6, Z1), (CX_MID, SW + 0.6, Z1),
 # ---------------------------------------------------------------- huts
 C_HUTS = collection("Kulubeler")
 LEAF_HUT = plank_leaf("Kapi_Kulube", 1.1, 2.15, 0.06)
+H_WOOD, H_STONE, H_ROOF, H_DOOR, H_LAMP, H_IRON = range(6)
+
+
+def workbench(b, cx, cy, length, depth, rot, base=HUT_FLOOR_Z):
+    """Bare wooden workbench (empty top): thick top, apron, four legs, lower shelf, back rail."""
+    rz = Matrix.Rotation(rot, 3, 'Z')
+    at = lambda lx, ly, z: tuple(rz @ Vector((lx, ly, 0)) + Vector((cx, cy, z)))
+    b.box(at(0, 0, base + 0.88), (length, depth, 0.07), rot, H_DOOR)
+    b.box(at(0, -depth / 2 + 0.02, base + 0.79), (length - 0.1, 0.03, 0.12), rot, H_WOOD)
+    for lx in (-length / 2 + 0.07, length / 2 - 0.07):
+        for ly in (-depth / 2 + 0.07, depth / 2 - 0.07):
+            b.box(at(lx, ly, base + 0.42), (0.08, 0.08, 0.84), rot, H_WOOD)
+    b.box(at(0, 0, base + 0.22), (length - 0.12, depth - 0.12, 0.035), rot, H_WOOD)
+    b.box(at(0, depth / 2 - 0.03, base + 1.0), (length, 0.04, 0.18), rot, H_WOOD)
+
+
+def wall_lamp(b, px, py, inward, base=HUT_FLOOR_Z, z=1.9):
+    """Wall-mounted gas lamp: back plate, bracket arm, brass cup, glowing glass chimney."""
+    rot = math.atan2(inward[1], inward[0])
+    d = Vector(inward).normalized()
+    p = Vector((px, py))
+    b.box((p.x, p.y, base + z), (0.02, 0.12, 0.22), rot, H_IRON)
+    q = p + d * 0.14
+    b.box((q.x, q.y, base + z - 0.05), (0.26, 0.025, 0.025), rot, H_IRON)
+    q = p + d * 0.27
+    b.cyl((q.x, q.y, base + z - 0.02), 0.06, 0.07, 10, H_IRON)
+    b.cyl((q.x, q.y, base + z + 0.13), 0.045, 0.24, 10, H_LAMP)
+    b.cone((q.x, q.y, base + z + 0.3), 0.06, 0.02, 0.08, 10, H_IRON)
+    return q
+
+
+def hatch_leaf(name, length, width, t=0.06):
+    """Floor hatch: planks along +X, hinge along the X axis, leaf spans +Y, top flush with the floor."""
+    b = Builder()
+    n = 5
+    for k in range(n):
+        pw = width / n
+        b.box((length / 2, pw * (k + 0.5), -t / 2), (length, pw - 0.008, t))
+    for xx in (0.25, length - 0.25):                               # cross battens underneath
+        b.box((xx, width / 2, -t - 0.02), (0.12, width - 0.1, 0.04))
+    for xx in (0.4, length - 0.4):                                 # strap hinges
+        b.box((xx, 0.2, 0.004), (0.06, 0.4, 0.008), mi=1)
+    b.cyl((length / 2, width - 0.18, 0.01), 0.07, 0.015, 12, 1)   # iron ring pull
+    return b.finish(name, [M["wood"], M["iron"]], C_PROTO)
+
+
+def trapdoor(name, leaf, hinge, col, angle=100.0):
+    ob = bpy.data.objects.new(name, leaf.data)
+    ob.location = hinge
+    ob["door_open"] = angle
+    ob["door_axis"] = "roll"
+    ob["door_locked"] = False
+    col.objects.link(ob)
+    return ob
+
+
+LEAF_HATCH = hatch_leaf("Kapi_Kapak", HATCH_L, TUN_W)
 for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
     hb, hf, hg = Builder(), Builder(), Builder()
     hx, hy, h = sx / 2, sy / 2, 3.0
     t = 0.25
-    hb.box((0, 0, 0.15), (sx + 0.4, sy + 0.4, 0.3), mi=1)                      # stone base
+    rz = Matrix.Rotation(math.radians(deg), 3, 'Z')
+    to_world = lambda lx, ly, lz: rz @ Vector((lx, ly, lz)) + Vector((x, y, 0))
+    holes = []
+    if i == TUNNEL_HUT:  # hatch hole in the hut floor, expressed in hut-local coordinates
+        inv = rz.transposed()
+        c0 = inv @ Vector((ENTRY_HOLE[0] - x, ENTRY_HOLE[2] - y, 0))
+        c1 = inv @ Vector((ENTRY_HOLE[1] - x, ENTRY_HOLE[3] - y, 0))
+        holes = [(min(c0.x, c1.x), max(c0.x, c1.x), min(c0.y, c1.y), max(c0.y, c1.y))]
+    slab_with_holes(hb, (-hx - 0.2, hx + 0.2, -hy - 0.2, hy + 0.2), holes, HUT_FLOOR_Z, 0.3, H_STONE)  # stone base
+    # interior: two empty workbenches and two wall gas lamps
+    workbench(hb, -0.6, hy - t / 2 - 0.4, 3.2, 0.7, 0.0)
+    workbench(hb, -hx + t / 2 + 0.4, -0.6, 2.2, 0.7, math.radians(90))
+    lamps = [wall_lamp(hb, hx - t / 2, 1.8, (-1, 0)), wall_lamp(hb, -hx + t / 2, -1.8, (1, 0))]
     walls_h = [((-hx, -hy), (hx, -hy), [(hx, 1.1, 0.0, 2.2)]),               # door side
                ((hx, -hy), (hx, hy), [(hy, 1.0, 1.0, 2.0)]),                 # window
                ((hx, hy), (-hx, hy), []),
@@ -1216,15 +1302,65 @@ for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
     if i % 3 == 0:
         hb.cyl((hx * 0.5, hy * 0.4, h + 2.4), 0.15, 2.8, 8, mi=1)            # stove pipe
     door_casing(hb, (-hx, -hy), (hx, -hy), hx, 1.1, 2.2, 0.3, t, 0.05, 0.12, mi=3)
-    hut = hb.finish(f"Kulube_{i}", [M["wood"], M["stone"], M["roof"], M["door"]], C_HUTS,
+    hut = hb.finish(f"Kulube_{i}", [M["wood"], M["stone"], M["roof"], M["door"], M["lamp"], M["iron"]], C_HUTS,
                     location=(x, y, 0), rot_z=math.radians(deg))
     fr = hf.finish(f"Kulube_{i}_Pencere", [M["frame"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))
     gl = hg.finish(f"Kulube_{i}_Cam", [M["glass"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))
-    if i % 2 == 0:
-        point_light(f"Kulube_{i}_Isik", (x, y, 2.2), 60, (1.0, 0.5, 0.2), 0.3)
-    rz = Matrix.Rotation(math.radians(deg), 3, 'Z')
-    hinge = rz @ Vector((-0.55, -hy, 0.3)) + Vector((x, y, 0))
+    for k, q in enumerate(lamps, 1):
+        point_light(f"Kulube_{i}_Lamba_{k}", to_world(q.x, q.y, HUT_FLOOR_Z + 2.05), 70, (1.0, 0.62, 0.3), 0.08)
+    hinge = to_world(-0.55, -hy, HUT_FLOOR_Z)
     door(f"Kapi_Kulube_{i}", LEAF_HUT, hinge, (rz @ Vector((1, 0, 0))).xy, (rz @ Vector((0, 1, 0))).xy, C_HUTS)
+    if i == TUNNEL_HUT:
+        trapdoor("Kapi_Kapak_Kulube", LEAF_HATCH, (ENTRY_HOLE[0], ENTRY_HOLE[2], HUT_FLOOR_Z), C_HUTS)
+
+
+# ---------------------------------------------------------------- secret tunnel
+C_TUNNEL = collection("Gizli_Tunel")
+tb = Builder()  # mats: planks, dirt floor, stone, lamp, iron
+T_WOOD, T_DIRT, T_STONE, T_LAMP, T_IRON = range(5)
+half = TUN_W / 2
+entry_run = round((HUT_FLOOR_Z - TUN_FLOOR) / STEP_R) * STEP_T     # 11 steps down
+exit_run = round(-TUN_FLOOR / STEP_R) * STEP_T                      # 10 steps up
+x_entry_end = ENTRY_X0 - entry_run
+for k in range(round((HUT_FLOOR_Z - TUN_FLOOR) / STEP_R) - 1):     # entry stairs, heading west
+    top = HUT_FLOOR_Z - STEP_R * (k + 1)
+    tb.box((ENTRY_X0 - STEP_T * (k + 0.5), TUN_Y, (TUN_FLOOR + top) / 2), (STEP_T, TUN_W, top - TUN_FLOOR), mi=T_WOOD)
+for k in range(round(-TUN_FLOOR / STEP_R) - 1):                    # exit stairs, heading west and up
+    top = TUN_FLOOR + STEP_R * (k + 1)
+    tb.box((EXIT_X0 - STEP_T * (k + 0.5), TUN_Y, (TUN_FLOOR + top) / 2), (STEP_T, TUN_W, top - TUN_FLOOR), mi=T_WOOD)
+for x0, x1 in ((ENTRY_X0 + 0.1, x_entry_end), (EXIT_X0, EXIT_X0 - exit_run - 0.1)):   # stair shafts
+    for s in (-1, 1):
+        tb.box(((x0 + x1) / 2, TUN_Y + s * (half + 0.08), (TUN_FLOOR + 0.0) / 2), (abs(x1 - x0), 0.16, -TUN_FLOOR), mi=T_STONE)
+for xe in (ENTRY_X0 + 0.18, EXIT_X0 - exit_run - 0.18):            # shaft end walls
+    tb.box((xe, TUN_Y, TUN_FLOOR / 2), (0.16, TUN_W + 0.32, -TUN_FLOOR), mi=T_STONE)
+# the tunnel itself: dirt floor, plank walls and ceiling, timber frames every 2.2 m
+tx0, tx1 = x_entry_end, EXIT_X0
+tlen, tmid = tx0 - tx1, (tx0 + tx1) / 2
+tb.box((tmid, TUN_Y, TUN_FLOOR - 0.05), (tlen + 0.4, 2.1, 0.1), mi=T_DIRT)
+tb.box((tmid, TUN_Y, TUN_CEIL + 0.05), (tlen + 0.4, 2.1, 0.1), mi=T_WOOD)
+for s in (-1, 1):
+    tb.box((tmid, TUN_Y + s * 0.98, (TUN_FLOOR + TUN_CEIL) / 2), (tlen + 0.4, 0.12, TUN_CEIL - TUN_FLOOR), mi=T_WOOD)
+    for xe in (tx0, tx1):  # close the gap between the narrow shafts and the wider tunnel
+        tb.box((xe, TUN_Y + s * (half + 0.3), (TUN_FLOOR + TUN_CEIL) / 2), (0.16, 0.6, TUN_CEIL - TUN_FLOOR), mi=T_STONE)
+n_frames = int(tlen / 2.2)
+for k in range(n_frames + 1):
+    fx = tx0 - k * tlen / max(n_frames, 1)
+    for s in (-1, 1):
+        tb.box((fx, TUN_Y + s * 0.85, (TUN_FLOOR + TUN_CEIL) / 2 - 0.05), (0.16, 0.16, TUN_CEIL - TUN_FLOOR - 0.1), mi=T_WOOD)
+    tb.box((fx, TUN_Y, TUN_CEIL - 0.1), (0.18, 1.9, 0.16), mi=T_WOOD)
+tunnel_lamps = [tx0 - tlen * f for f in (0.2, 0.5, 0.8)]
+for k, lx in enumerate(tunnel_lamps, 1):                            # hanging lanterns on a chain
+    tb.box((lx, TUN_Y, TUN_CEIL - 0.3), (0.02, 0.02, 0.4), mi=T_IRON)
+    tb.box((lx, TUN_Y, TUN_CEIL - 0.6), (0.16, 0.16, 0.24), mi=T_LAMP)
+    tb.box((lx, TUN_Y, TUN_CEIL - 0.46), (0.2, 0.2, 0.04), mi=T_IRON)
+    point_light(f"Tunel_Lamba_{k}", (lx, TUN_Y, TUN_CEIL - 0.75), 45, (1.0, 0.55, 0.25), 0.05)
+# exit hatch frame on the ground outside the fence
+ex0, ex1, ey0, ey1 = EXIT_HOLE
+for (cx, cy, lx, ly) in (((ex0 + ex1) / 2, ey0 - 0.08, ex1 - ex0 + 0.32, 0.16), ((ex0 + ex1) / 2, ey1 + 0.08, ex1 - ex0 + 0.32, 0.16),
+                         (ex0 - 0.08, (ey0 + ey1) / 2, 0.16, ey1 - ey0), (ex1 + 0.08, (ey0 + ey1) / 2, 0.16, ey1 - ey0)):
+    tb.box((cx, cy, 0.04), (lx, ly, 0.08), mi=T_WOOD)
+tb.finish("Gizli_Tunel", [M["wood"], M["gravel"], M["stone"], M["lamp"], M["iron"]], C_TUNNEL)
+trapdoor("Kapi_Kapak_Cikis", LEAF_HATCH, (ex0, ey0, 0.0), C_TUNNEL)
 
 
 # ---------------------------------------------------------------- trees and bushes
@@ -1505,9 +1641,11 @@ for o in objs:
             "loc": to_ue(o.location), "yaw": round(-math.degrees(o.rotation_euler.z), 3),
             "scale": [round(s, 4) for s in o.scale],
         }
-        if "door_open" in o:  # mirrored Y flips the swing direction too
-            entry["door"] = {"open": -o["door_open"], "partner": o.get("door_partner"),
-                             "locked": bool(o.get("door_locked", False))}
+        if "door_open" in o:
+            hatch = o.get("door_axis") == "roll"
+            # yaw: the mirrored Y flips the swing; roll: UE's positive roll already lifts the (mirrored) -Y edge
+            entry["door"] = {"open": o["door_open"] if hatch else -o["door_open"], "horizontal": hatch,
+                             "partner": o.get("door_partner"), "locked": bool(o.get("door_locked", False))}
         data["objects"].append(entry)
     elif o.type == 'LIGHT':
         data["lights"].append({

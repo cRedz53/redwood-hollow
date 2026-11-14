@@ -172,7 +172,8 @@ if not world.get_path_name().startswith(LEVEL):
 def folder_for(name):
     for prefix, folder in (("Agac_", "Agaclar"), ("Cali_", "Agaclar"), ("Kulube", "Kulubeler"),
                            ("Malikane", "Malikane"), ("Avize", "Malikane/Avizeler"), ("Mob_", "Malikane/Mobilya"),
-                           ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Kapi_", "Kapilar"), ("Sinir", "Duvar")):
+                           ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Kapi_", "Kapilar"), ("Sinir", "Duvar"),
+                           ("Gizli_Tunel", "Tunel")):
         if name.startswith(prefix):
             return f"Malikane/{folder}"
     return "Malikane/Zemin"
@@ -195,6 +196,9 @@ for o in scene["objects"]:
         a.leaf.set_static_mesh(sm)
         a.set_editor_property("open_angle", o["door"]["open"])
         a.set_editor_property("locked", o["door"]["locked"])
+        a.set_editor_property("horizontal", o["door"].get("horizontal", False))
+        if os.environ.get("MALIKANE_OPEN_DOORS") == "1":  # preview: show every door open in the editor
+            a.set_editor_property("open", True)
         doors[o["name"]] = (a, o["door"].get("partner"))
     else:
         a = actors.spawn_actor_from_object(sm, loc, rot)
@@ -234,7 +238,8 @@ for l in scene["lights"]:
         indoor = l["name"].startswith(("Avize", "Somine"))
         c.set_editor_property("intensity", l["energy"] * LAMP_CD_PER_WATT * (INDOOR_LIGHT_SCALE if indoor else 1.0))
         c.set_editor_property("light_color", color8(l["color"]))
-        c.set_editor_property("attenuation_radius", 2200.0 if indoor else 1800.0)
+        small = "_Lamba_" in l["name"]  # hut gas lamps and tunnel lanterns light only their room
+        c.set_editor_property("attenuation_radius", 900.0 if small else 2200.0 if indoor else 1800.0)
         c.set_editor_property("source_radius", 10.0)
     elif l["type"] == "SUN":
         # Blender sun: shines along local -Z after XYZ euler rotation
