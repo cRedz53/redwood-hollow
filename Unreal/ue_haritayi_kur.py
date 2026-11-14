@@ -22,6 +22,7 @@ LEVEL = "/Game/Maps/Malikane"
 MOON_LUX = 0.5            # ay isigi (directional light)
 EXPOSURE_BIAS = 3.5       # manuel pozlama (yuksek = daha aydinlik)
 LAMP_CD_PER_WATT = 0.15   # Blender W -> UE candela
+INDOOR_LIGHT_SCALE = 0.3  # avize / somine isiklari (ic mekan pozlamaya gore cok parlak)
 EMISSIVE_SCALE = 0.05     # yanik pencere / fener parlakligi
 FOG_DENSITY = 0.015
 
@@ -114,6 +115,8 @@ for name in mesh_names:
     sm.set_editor_property("auto_generate_collision", False)
     sm.set_editor_property("generate_lightmap_u_vs", True)
     sm.set_editor_property("convert_scene", True)
+    # Nanite keeps virtual shadow maps cheap; glass is translucent and cannot use it
+    setp(sm, "build_nanite", not name.endswith("_Cam"))
     t = unreal.AssetImportTask()
     t.set_editor_property("filename", os.path.join(SRC, f"{name}.fbx"))
     t.set_editor_property("destination_path", f"{ROOT}/Meshes")
@@ -208,9 +211,10 @@ for l in scene["lights"]:
         a = spawn(unreal.PointLight, l["loc"], label=l["name"], folder="Malikane/Isiklar")
         c = a.get_component_by_class(unreal.PointLightComponent)
         c.set_editor_property("intensity_units", unreal.LightUnits.CANDELAS)
-        c.set_editor_property("intensity", l["energy"] * LAMP_CD_PER_WATT)
+        indoor = l["name"].startswith(("Avize", "Somine"))
+        c.set_editor_property("intensity", l["energy"] * LAMP_CD_PER_WATT * (INDOOR_LIGHT_SCALE if indoor else 1.0))
         c.set_editor_property("light_color", color8(l["color"]))
-        c.set_editor_property("attenuation_radius", 1800.0)
+        c.set_editor_property("attenuation_radius", 1400.0 if indoor else 1800.0)
         c.set_editor_property("source_radius", 10.0)
     elif l["type"] == "SUN":
         # Blender sun: shines along local -Z after XYZ euler rotation
