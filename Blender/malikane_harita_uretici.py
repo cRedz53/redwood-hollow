@@ -7,7 +7,7 @@
 #
 # Olcek: 1 Blender birimi = 1 metre.
 # Harita ~200 m x 110 m, cevresi tas kaideli siyah demir cit, 2 demir kapi
-# (bati: giris kapisi, guney: kacis kapisi), dogu tarafta 2 katli buyuk malikane
+# (bati: giris kapisi, guney: guney kapisi), dogu tarafta 2 katli buyuk malikane
 # (merdivenli sutunlu giris, balkon, camli pencereler, avizeler), bahcede 7 kulube,
 # cam / mese agaclari ve calilar. Gece atmosferi.
 
@@ -32,7 +32,7 @@ FENCE_H, KERB_H = 2.6, 0.45
 
 GATES = {
     "Giris_Kapisi": {"pos": Vector((-MAP_HW, 24.0)), "width": 9.0, "open": 0.35},
-    "Kacis_Kapisi": {"pos": Vector((35.0, -MAP_HH)), "width": 10.0, "open": 0.0},
+    "Guney_Kapisi": {"pos": Vector((35.0, -MAP_HH)), "width": 10.0, "open": 0.0},
 }
 
 MANSION_MIN = Vector((18.0, -38.0))
@@ -2095,8 +2095,8 @@ scatter(trees, 330, 5.0, 2.0, (0.75, 1.3), "Agac", placed)
 scatter(bushes, 180, 2.5, 0.0, (0.7, 1.4), "Cali", placed)
 
 
-# ---------------------------------------------------------------- gameplay markers
-C_MARK = collection("Oyun_Noktalari")
+# ---------------------------------------------------------------- map markers (player start, hall)
+C_MARK = collection("Harita_Noktalari")
 
 
 def marker(name, loc, rot_z=0.0):
@@ -2109,7 +2109,6 @@ def marker(name, loc, rot_z=0.0):
 
 
 marker("PlayerStart", (-MAP_HW + 5, 24.0, 1.0), 0)
-marker("Kacis_Noktasi", (35.0, -MAP_HH - 4, 1.0), 0)
 marker("Malikane_Giris", (mx0 + 3, dy, Z1 + 1.0), 0)
 
 
@@ -2223,7 +2222,7 @@ def export(path, objs):
 
 
 # One FBX per unique mesh, exported at the origin; a JSON scene file holds every
-# object's transform, the lights and the gameplay markers. ue_build_level.py reads
+# object's transform, the lights and the map markers. ue_build_level.py reads
 # both and rebuilds the level in UE5 (same mesh asset shared by all trees).
 UE_DIR = os.path.join(OUT_DIR, "UE_Aktarim")
 os.makedirs(UE_DIR, exist_ok=True)

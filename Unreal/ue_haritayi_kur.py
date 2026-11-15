@@ -175,7 +175,7 @@ if not world.get_path_name().startswith(LEVEL):
 def folder_for(name):
     for prefix, folder in (("Agac_", "Agaclar"), ("Cali_", "Agaclar"), ("Kulube", "Kulubeler"),
                            ("Malikane", "Malikane"), ("Avize", "Malikane/Avizeler"), ("Mob_", "Malikane/Mobilya"),
-                           ("Giris", "Kapilar"), ("Kacis", "Kapilar"), ("Kapi_", "Kapilar"), ("Sinir", "Duvar"),
+                           ("Giris", "Kapilar"), ("Guney_Kapisi", "Kapilar"), ("Kapi_", "Kapilar"), ("Sinir", "Duvar"),
                            ("Gizli_Tunel", "Tunel")):
         if name.startswith(prefix):
             return f"Malikane/{folder}"
@@ -216,7 +216,7 @@ for a, partner in doors.values():
 if doors and hasattr(unreal, "MalikaneInteractor"):
     it = actors.spawn_actor_from_class(unreal.MalikaneInteractor, unreal.Vector(0, 0, 0))
     it.set_actor_label("Kapi_Etkilesim")
-    it.set_folder_path("Malikane/Oyun")
+    it.set_folder_path("Malikane/Etkilesim")
 for g in scene.get("squeeze", []) if hasattr(unreal, "MalikaneSqueeze") else []:
     sq = actors.spawn_actor_from_class(unreal.MalikaneSqueeze, vec(g["a"]))
     sq.set_editor_property("point_a", vec(g["a"]))
@@ -224,7 +224,7 @@ for g in scene.get("squeeze", []) if hasattr(unreal, "MalikaneSqueeze") else []:
     if g.get("door") in doors:
         sq.set_editor_property("required_door", doors[g["door"]][0])
     sq.set_actor_label(g["name"])
-    sq.set_folder_path("Malikane/Oyun")
+    sq.set_folder_path("Malikane/Etkilesim")
 unreal.log(f"[Malikane] {len(doors)} acilir kapi, {len(scene.get('squeeze', []))} dar gecit"
            if DoorClass else "[Malikane] C++ modulu yok: kapilar sabit")
 
@@ -306,7 +306,7 @@ for prop, val in (
     setp(s, "override_" + prop, True)
 pp.set_editor_property("settings", s)
 
-# ---------------------------------------------------------------- gameplay
+# ---------------------------------------------------------------- player start
 # test starts: MALIKANE_START=hol (inside the mansion hall), =kapi (2.5 m from the entrance gate, facing it)
 start = os.environ.get("MALIKANE_START")
 start_marker = "Malikane_Giris" if start == "hol" else "PlayerStart"
@@ -316,10 +316,7 @@ for m in scene["markers"]:
         yaw = 0.0
         if start == "kapi":
             x, yaw = x - 250, 180.0
-        spawn(unreal.PlayerStart, (x, y, z), unreal.Rotator(0, 0, yaw), label="PlayerStart", folder="Malikane/Oyun")
-    if m["name"] == "Kacis_Noktasi":
-        t = spawn(unreal.TriggerBox, (m["loc"][0], m["loc"][1], 150), label="Kacis_Trigger", folder="Malikane/Oyun")
-        t.set_actor_scale3d(unreal.Vector(6, 2, 3))
+        spawn(unreal.PlayerStart, (x, y, z), unreal.Rotator(0, 0, yaw), label="PlayerStart", folder="Malikane/Etkilesim")
 
 levels.save_current_level()
 unreal.log(f"[Malikane] BITTI: {LEVEL} ({len(scene['objects'])} obje, {len(scene['lights'])} isik)")

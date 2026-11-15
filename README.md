@@ -141,7 +141,7 @@ Open `Unreal/RedwoodHollow/RedwoodHollow.uproject` and press **Play**. The camer
 | `Blender/malikane_harita_uretici.py` | Haritayı Blender'da sıfırdan üreten script (ölçüler en üstte) |
 | `Blender/polyhaven_hazirla.py` | Poly Haven modellerini UE için hazırlar |
 | `Blender/Cikti/` | Üretilen `.blend` sahnesi ve UE'ye giden FBX + `scene.json` (önizleme render'ları yerelde kalır) |
-| `Araclar/` | Poly Haven indirme, oyun penceresi ekran görüntüsü ve kamera görüntüsü script'leri (`ue_kamera_goruntuleri.py`: `dis` seti README fotoğraflarını, `odalar` seti iç mekânı çeker) |
+| `Araclar/` | Poly Haven indirme, gezinti penceresi ekran görüntüsü ve kamera görüntüsü script'leri (`ue_kamera_goruntuleri.py`: `dis` seti README fotoğraflarını, `odalar` seti iç mekânı çeker) |
 | `Gorseller/` | README'deki fotoğraflar (UE'de SceneCapture ile çekildi) |
 
 🇬🇧 **English**
@@ -155,7 +155,7 @@ Open `Unreal/RedwoodHollow/RedwoodHollow.uproject` and press **Play**. The camer
 | `Blender/malikane_harita_uretici.py` | The script that builds the whole map in Blender (dimensions at the top) |
 | `Blender/polyhaven_hazirla.py` | Prepares the Poly Haven models for UE |
 | `Blender/Cikti/` | The generated `.blend` scene and the FBX + `scene.json` sent to UE (preview renders stay local) |
-| `Araclar/` | Scripts for the Poly Haven download, game-window screenshots and camera shots (`ue_kamera_goruntuleri.py`: the `dis` set takes the README photos, the `odalar` set the interiors) |
+| `Araclar/` | Scripts for the Poly Haven download, play-window screenshots and camera shots (`ue_kamera_goruntuleri.py`: the `dis` set takes the README photos, the `odalar` set the interiors) |
 | `Gorseller/` | The photos in this README (taken in UE with SceneCapture) |
 
 ---------------------------------------------------------------------------------------------------------------------------------------

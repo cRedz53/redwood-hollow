@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kapi")
 	bool bOpen = false;
 
-	/** Locked doors ignore Toggle (e.g. the escape gate until the player finds the key). */
+	/** Locked doors ignore Toggle and stay as they are. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kapi")
 	bool bLocked = false;
 

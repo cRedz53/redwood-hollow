@@ -1,3 +1,4 @@
+# Git satir sonu ve ikili dosya ayarlari / line endings and binary files
 * text=auto
 *.uasset binary
 *.umap binary

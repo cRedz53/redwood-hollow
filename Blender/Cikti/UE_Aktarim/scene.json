@@ -735,8 +735,8 @@
    }
   },
   {
-   "name": "Kacis_Kapisi_Sutunlar",
-   "mesh": "SM_Kacis_Kapisi_Sutunlar",
+   "name": "Guney_Kapisi_Sutunlar",
+   "mesh": "SM_Guney_Kapisi_Sutunlar",
    "loc": [
     0.0,
     -0.0,
@@ -750,8 +750,8 @@
    ]
   },
   {
-   "name": "Kacis_Kapisi_Kanat_L",
-   "mesh": "SM_Kacis_Kapisi_Kanat",
+   "name": "Guney_Kapisi_Kanat_L",
+   "mesh": "SM_Guney_Kapisi_Kanat",
    "loc": [
     3000.0,
     5500.0,
@@ -766,13 +766,13 @@
    "door": {
     "open": -80.0,
     "horizontal": false,
-    "partner": "Kacis_Kapisi_Kanat_R",
+    "partner": "Guney_Kapisi_Kanat_R",
     "locked": false
    }
   },
   {
-   "name": "Kacis_Kapisi_Kanat_R",
-   "mesh": "SM_Kacis_Kapisi_Kanat",
+   "name": "Guney_Kapisi_Kanat_R",
+   "mesh": "SM_Guney_Kapisi_Kanat",
    "loc": [
     4000.0,
     5500.0,
@@ -787,7 +787,7 @@
    "door": {
     "open": 80.0,
     "horizontal": false,
-    "partner": "Kacis_Kapisi_Kanat_L",
+    "partner": "Guney_Kapisi_Kanat_L",
     "locked": false
    }
   },
@@ -15438,7 +15438,7 @@
    ]
   },
   {
-   "name": "Kacis_Kapisi_Fener_L",
+   "name": "Guney_Kapisi_Fener_L",
    "type": "POINT",
    "loc": [
     2935.0,
@@ -15458,7 +15458,7 @@
    ]
   },
   {
-   "name": "Kacis_Kapisi_Fener_R",
+   "name": "Guney_Kapisi_Fener_R",
    "type": "POINT",
    "loc": [
     4065.0,
@@ -16904,14 +16904,6 @@
    "loc": [
     -9500.0,
     -2400.0,
-    100.0
-   ]
-  },
-  {
-   "name": "Kacis_Noktasi",
-   "loc": [
-    3500.0,
-    5900.0,
     100.0
    ]
   },

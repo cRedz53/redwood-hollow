@@ -1,6 +1,6 @@
-param([string]$Out = (Join-Path $PSScriptRoot "..\Gorseller\ue_oyun_ici.png"), [int]$Wait = 50)
-# Oyunu -game modunda acar, bekler, oyun penceresinin goruntusunu alir ve kapatir.
-#   powershell -ExecutionPolicy Bypass -File Araclar\oyun_ekran_goruntusu.ps1
+param([string]$Out = (Join-Path $PSScriptRoot "..\Gorseller\gezinti.png"), [int]$Wait = 50)
+# Haritayi -game modunda (gezinti penceresi) acar, bekler, pencerenin goruntusunu alir ve kapatir.
+#   powershell -ExecutionPolicy Bypass -File Araclar\gezinti_ekran_goruntusu.ps1
 Add-Type -AssemblyName System.Drawing
 Add-Type @"
 using System; using System.Runtime.InteropServices;
