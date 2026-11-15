@@ -1,6 +1,8 @@
 #include "MalikaneInteractor.h"
 
 #include "Animation/AnimSequence.h"
+#include "Animation/AnimSingleNodeInstance.h"
+#include "Animation/BlendSpace.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
@@ -105,7 +107,7 @@ void AMalikaneInteractor::SetupCamera(APawn* Pawn)
 	}
 }
 
-void AMalikaneInteractor::PlayOverride(USkeletalMeshComponent* Mesh, UAnimSequence* Clip, bool bLoop)
+void AMalikaneInteractor::PlayOverride(USkeletalMeshComponent* Mesh, UAnimationAsset* Clip, bool bLoop)
 {
 	if (!Clip || Clip == PlayingOverride)
 	{
@@ -144,20 +146,24 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 	{
 		return;
 	}
-	if (!CrouchIdle)
+	if (!CrouchBlend)
 	{
 		const TCHAR* Dir = TEXT("/Game/Characters/Mannequins/Anims/Crouch/");
-		auto Load = [Dir](const TCHAR* Name) {
-			return LoadObject<UAnimSequence>(nullptr, *FString::Printf(TEXT("%s%s.%s"), Dir, Name, Name));
-		};
-		CrouchEntry = Load(TEXT("MM_Unarmed_Crouch_Entry"));
-		CrouchExit = Load(TEXT("MM_Unarmed_Crouch_Exit"));
-		CrouchIdle = Load(TEXT("MM_Unarmed_Crouch_Idle"));
-		CrouchWalk = Load(TEXT("MM_Unarmed_Crouch_Walk_Fwd"));
-		CrouchStrafe = Load(TEXT("MM_Unarmed_Crouch_Walk_Right"));
+		auto Path = [Dir](const TCHAR* Name) { return FString::Printf(TEXT("%s%s.%s"), Dir, Name, Name); };
+		CrouchEntry = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Entry")));
+		CrouchExit = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Exit")));
+		CrouchBlend = LoadObject<UBlendSpace>(nullptr, *Path(TEXT("BS_MM_CrouchStrafe")));
+		SideStep = LoadObject<UAnimSequence>(nullptr,
+			TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Right.MF_Unarmed_Walk_Right"));
+		if (!SideStep)  // folder layout differs between template versions
+		{
+			SideStep = LoadObject<UAnimSequence>(nullptr,
+				TEXT("/Game/Characters/Mannequins/Anims/Unarmed/MF_Unarmed_Walk_Right.MF_Unarmed_Walk_Right"));
+		}
 	}
 	StateTime += DeltaSeconds;
-	const float Speed = Character->GetVelocity().Size2D();
+	const FVector Velocity = Character->GetVelocity();
+	const float Speed = Velocity.Size2D();
 	const bool bCrouched = Character->bIsCrouched;
 	bool bSqueezing = false;
 	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
@@ -166,17 +172,26 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 	}
 	auto Length = [](const UAnimSequence* Clip) { return Clip ? Clip->GetPlayLength() : 0.f; };
 
-	// state machine: Normal -> Entering (crouch down) -> Crouched (idle / walk) -> Exiting (stand up) -> Normal
+	// state machine: Normal -> Entering (crouch down) -> Crouched (blend space) -> Exiting (stand up) -> Normal
 	if (bSqueezing)
 	{
 		AnimState = ECrouchAnim::Squeezing;
-		PlayOverride(Mesh, CrouchStrafe, true);
+		PlayOverride(Mesh, SideStep, true);  // upright side-step, slowed to a shuffle
+		Mesh->SetPlayRate(0.55f);
+		return;
 	}
-	else switch (AnimState)
+	switch (AnimState)
 	{
 	case ECrouchAnim::Squeezing:
-		AnimState = bCrouched ? ECrouchAnim::Crouched : ECrouchAnim::Exiting;
-		PlayOverride(Mesh, bCrouched ? CrouchIdle : CrouchExit, bCrouched);
+		if (bCrouched)
+		{
+			AnimState = ECrouchAnim::Crouched;
+		}
+		else
+		{
+			AnimState = ECrouchAnim::Normal;
+			RestoreAnimBlueprint(Mesh);
+		}
 		break;
 	case ECrouchAnim::Normal:
 		if (bCrouched)
@@ -193,7 +208,8 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 		}
 		else if (StateTime >= Length(CrouchEntry) || Speed > 15.f)
 		{
-			AnimState = ECrouchAnim::Crouched;  // down (or already moving): loop idle / walk
+			AnimState = ECrouchAnim::Crouched;  // down (or already moving): hand over to the blend space
+			BlendSpeed = 0.f;
 		}
 		break;
 	case ECrouchAnim::Crouched:
@@ -217,12 +233,21 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 	}
 	if (AnimState == ECrouchAnim::Crouched)
 	{
-		PlayOverride(Mesh, Speed > 15.f ? CrouchWalk : CrouchIdle, true);
-	}
-	if (PlayingOverride == CrouchWalk)
-	{
-		// play the walk cycle at the speed the feet actually travel so it reads as a creep, not a run
-		Mesh->SetPlayRate(FMath::Clamp(Speed / CrouchWalkClipSpeed, 0.4f, 1.1f));
+		PlayOverride(Mesh, CrouchBlend, true);
+		// the blend space mixes idle (speed 0) into the walks (speed 100), so starting and stopping
+		// ease in and out instead of snapping between two clips
+		BlendSpeed = FMath::FInterpTo(BlendSpeed, FMath::Min(Speed, 100.f), DeltaSeconds, 6.f);
+		float Direction = 0.f;
+		if (Speed > 5.f)
+		{
+			const FRotator Facing = Character->GetActorRotation();
+			Direction = FMath::FindDeltaAngleDegrees(Facing.Yaw, Velocity.Rotation().Yaw);
+		}
+		if (UAnimSingleNodeInstance* Single = Mesh->GetSingleNodeInstance())
+		{
+			Single->SetBlendSpacePosition(FVector(Direction, BlendSpeed, 0.f));
+		}
+		Mesh->SetPlayRate(FMath::Clamp(Speed / 100.f, 1.f, 1.3f));  // only speeds up past the clip's own pace
 	}
 	else if (PlayingOverride)
 	{

@@ -6,7 +6,9 @@
 
 class AMalikaneDoor;
 class AMalikaneSqueeze;
+class UAnimationAsset;
 class UAnimSequence;
+class UBlendSpace;
 class USkeletalMeshComponent;
 
 /**
@@ -35,13 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
 	float CrouchedHalfHeight = 55.f;
 
-	/** Crouched walking speed (cm/s); the crouch-walk clip is played at a rate matched to it. */
+	/** Crouched walking speed (cm/s). The crouch blend space reaches full walk at 100 on its speed axis. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
-	float CrouchSpeed = 140.f;
-
-	/** Speed (cm/s) at which the crouch-walk clip's feet don't slide at play rate 1. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
-	float CrouchWalkClipSpeed = 140.f;
+	float CrouchSpeed = 110.f;
 
 	/** Over-the-shoulder camera: boom length and offset to the right / up (cm). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kamera")
@@ -70,25 +68,27 @@ private:
 	ECrouchAnim AnimState = ECrouchAnim::Normal;
 	float StateTime = 0.f;
 
+	float BlendSpeed = 0.f;  // smoothed speed fed to the crouch blend space
+
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> CrouchEntry;
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimSequence> CrouchExit;
+	/** Crouch idle at speed 0, directional crouch walks at speed 100. */
 	UPROPERTY(Transient)
-	TObjectPtr<UAnimSequence> CrouchIdle;
+	TObjectPtr<UBlendSpace> CrouchBlend;
+	/** Standing side-step used to shuffle through narrow gaps. */
 	UPROPERTY(Transient)
-	TObjectPtr<UAnimSequence> CrouchWalk;
-	UPROPERTY(Transient)
-	TObjectPtr<UAnimSequence> CrouchStrafe;
+	TObjectPtr<UAnimSequence> SideStep;
 	UPROPERTY(Transient)
 	TObjectPtr<UClass> NormalAnimClass;
 	UPROPERTY(Transient)
-	TObjectPtr<UAnimSequence> PlayingOverride;
+	TObjectPtr<UAnimationAsset> PlayingOverride;
 
 	void TryBind();
 	void SetupCamera(APawn* Pawn);
 	void UpdateCrouchAnimation(float DeltaSeconds);
-	void PlayOverride(USkeletalMeshComponent* Mesh, UAnimSequence* Clip, bool bLoop);
+	void PlayOverride(USkeletalMeshComponent* Mesh, UAnimationAsset* Clip, bool bLoop);
 	void RestoreAnimBlueprint(USkeletalMeshComponent* Mesh);
 	/** A door near the pawn in the view direction, for when the trace is blocked by furniture. */
 	AMalikaneDoor* FindDoorInFront(const FVector& Eye, const FVector& ViewDir) const;

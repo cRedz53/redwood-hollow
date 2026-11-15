@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"EngineAssociation": "5.8",
 	"Category": "",
-	"Description": "Redwood Hollow - gece gecen slasher korku oyunu",
+	"Description": "Redwood Hollow - harita tasarimi",
 	"Modules": [
 		{ "Name": "RedwoodHollow", "Type": "Runtime", "LoadingPhase": "Default" }
 	],
