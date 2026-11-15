@@ -51,6 +51,7 @@ if os.environ.get("MALIKANE_SHOT_SET") == "dis":  # exterior: architectural shot
     SIZE, FOV, EXPOSURE = (1920, 1080), 62.0, 5.2  # brighter than play (exposure bias 3.5) so the stone reads
     SHOTS = [
         look("dis_on_cephe", (-1400, -200, 240), (2400, -200, 850)),          # front, from the drive
+        look("dis_alinlik", (-200, -200, 600), (1000, -200, 1350)),           # portico pediment
         look("dis_kose_gb", (300, 4700, 500), (3000, 800, 700)),             # south-west corner, 3/4
         look("dis_kose_kb", (800, -5000, 500), (3000, -1200, 700)),          # north-west corner, 3/4
         look("dis_galeri", (2400, 4650, 180), (5600, 4000, 550)),            # down the south veranda

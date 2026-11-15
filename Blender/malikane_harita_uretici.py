@@ -129,6 +129,9 @@ M = {
     "tile": material("M_Tile", (0.75, 0.74, 0.7), rough=0.2),
     "tile_dark": material("M_TileDark", (0.05, 0.12, 0.1), rough=0.2),
     "paint_cream": material("M_PaintCream", (0.66, 0.6, 0.5), rough=0.75),
+    "roof_tile": material("M_RoofTile", (0.34, 0.11, 0.055), rough=0.65),
+    "roof_tile_old": material("M_RoofTileOld", (0.22, 0.1, 0.06), rough=0.8),
+    "roof_tile_base": material("M_RoofTileBase", (0.14, 0.05, 0.03), rough=0.85),
     "silk_green": material("M_SilkGreen", (0.05, 0.11, 0.07), rough=0.55),
     "silk_red": material("M_SilkRed", (0.22, 0.03, 0.04), rough=0.55),
     "silk_blue": material("M_SilkBlue", (0.06, 0.08, 0.13), rough=0.55),
@@ -178,15 +181,57 @@ class Builder:
         bmesh.ops.create_icosphere(self.bm, subdivisions=subdiv, radius=radius, matrix=mat, calc_uvs=True)
         self._tag(before, mi)
 
-    def prism_roof(self, center, sx, sy, z0, height, rot_z=0.0, mi=0):
-        """Gable roof, ridge along local Y."""
+    def rod(self, p0, p1, r, segments=6, mi=0):
+        """Cylinder from p0 to p1 in any direction (roof tiles, ridge caps)."""
+        p0, p1 = Vector(p0), Vector(p1)
+        d = p1 - p0
+        rot = d.to_track_quat('Z', 'Y').to_matrix().to_4x4()
+        before = set(self.bm.faces)
+        bmesh.ops.create_cone(self.bm, cap_ends=True, segments=segments, radius1=r, radius2=r, depth=d.length,
+                              matrix=Matrix.Translation((p0 + p1) / 2) @ rot, calc_uvs=True)
+        self._tag(before, mi)
+
+    def tiled_roof(self, center, sx, sy, z0, height, rot_z=0.0, mats=(1, 2, 3), gable_mi=0,
+                   pitch=0.3, r=0.13, course=0.38, seed=1):
+        """prism_roof covered in clay barrel tiles: a row of tiles running down each slope every
+        `pitch` m (two shades mixed at random), a lap line every `course` m and a ridge cap.
+        mats = (tile, weathered tile, underlay)."""
+        tile_a, tile_b, base = mats
+        self.prism_roof(center, sx, sy, z0, height, rot_z, base, gable_mi)
+        rnd = random.Random(seed)
+        m = Matrix.Translation(Vector((center[0], center[1], z0))) @ Matrix.Rotation(rot_z, 4, 'Z')
+        hx, hy = sx / 2, sy / 2
+        rows = max(1, int(sy / pitch))
+        laps = max(1, int(math.hypot(hx, height) / course))
+        for s in (-1, 1):
+            n = Vector((s * height, 0, hx)).normalized()        # outward normal of this slope
+            for k in range(rows):
+                y = -hy + (k + 0.5) * sy / rows
+                off = n * (r * 0.45)
+                self.rod(m @ (Vector((s * hx, y, 0)) + off), m @ (Vector((0, y, height)) + off), r, 6,
+                         tile_b if rnd.random() < 0.3 else tile_a)
+            for j in range(1, laps):                                # lap lines where each course overlaps
+                t = j / laps
+                a = Vector((s * hx * (1 - t), -hy, height * t)) + n * (r * 1.3)
+                c = Vector((s * hx * (1 - t), hy, height * t)) + n * (r * 1.3)
+                self.beam(m @ a, m @ c, 0.07, 0.035, base)
+            e = n * (r * 0.9)                                       # eave course
+            self.rod(m @ (Vector((s * hx, -hy, 0)) + e), m @ (Vector((s * hx, hy, 0)) + e), r * 0.9, 6, tile_a)
+        self.rod(m @ Vector((0, -hy - 0.1, height + r * 1.4)), m @ Vector((0, hy + 0.1, height + r * 1.4)),
+                 r * 1.7, 8, tile_b)                                # ridge cap
+
+    def prism_roof(self, center, sx, sy, z0, height, rot_z=0.0, mi=0, gable_mi=None):
+        """Gable roof, ridge along local Y. gable_mi: material of the two end triangles (default mi)."""
         before = set(self.bm.faces)
         hx, hy = sx / 2, sy / 2
         local = [(-hx, -hy, 0), (hx, -hy, 0), (hx, hy, 0), (-hx, hy, 0), (0, -hy, height), (0, hy, height)]
         mat = Matrix.Translation(Vector((center[0], center[1], z0))) @ Matrix.Rotation(rot_z, 4, 'Z')
         v = [self.bm.verts.new(mat @ Vector(p)) for p in local]
         for idx in [(0, 1, 4), (2, 3, 5), (0, 4, 5, 3), (1, 2, 5, 4), (0, 3, 2, 1)]:
-            self.bm.faces.new([v[i] for i in idx])
+            f = self.bm.faces.new([v[i] for i in idx])
+            if gable_mi is not None and len(idx) == 3:
+                f.material_index = gable_mi
+                before.add(f)  # keep it out of the _tag below
         self._tag(before, mi)
 
     def wall(self, a, b, height, thick, openings=(), base_z=0.0, mi=0):
@@ -801,14 +846,15 @@ rf = Builder()
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, TOTAL_H + 0.1), (mx1 - mx0, my1 - my0, 0.2))
 # hipped-look gable roof sitting on the parapet with a 1.5 m overhang all round
 ROOF_Z, ROOF_H = TOTAL_H + 1.15, 9.5
-rf.prism_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, ROOF_Z, ROOF_H)
+rf.tiled_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, ROOF_Z, ROOF_H,
+              seed=11)  # clay tiles; stone gables and chimneys
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, ROOF_Z - 0.1), (mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, 0.2))  # soffit, also over the colonnade
 for cy in (my0 + 10, dy, my1 - 10):
     rf.box((mx0 + 30, cy, TOTAL_H + 6.0), (1.8, 1.8, 12.0))
     rf.box((mx0 + 30, cy, TOTAL_H + 12.15), (2.2, 2.2, 0.3))
     for k in (-0.4, 0.4):
         rf.cyl((mx0 + 30 + k, cy, TOTAL_H + 12.6), 0.18, 0.6, 10)  # chimney pots
-rf.finish("Malikane_Cati", [M["roof"]], C_MANSION)
+rf.finish("Malikane_Cati", [M["stone"], M["roof_tile"], M["roof_tile_old"], M["roof_tile_base"]], C_MANSION)
 
 # plinth, front terrace and grand staircase
 st = Builder()
@@ -835,13 +881,96 @@ for cy in (-10.0, -6.5, -3.2, 3.2, 6.5, 10.0):
     cb.cyl((col_x, dy + cy, (Z1 + col_top) / 2), 0.7, col_top - Z1 - 1.0, 24)
     cb.box((col_x, dy + cy, col_top - 0.25), (1.9, 1.9, 0.5))
 cb.box(((px0 + mx0) / 2 - 0.2, dy, col_top + 0.45), (PORT_D + 0.4, PORT_W + 0.4, 0.9))
-cb.prism_roof(((px0 + mx0) / 2 - 0.2, dy), PORT_W + 0.8, PORT_D + 0.4, col_top + 0.9, 3.8, rot_z=math.pi / 2)
+cb.tiled_roof(((px0 + mx0) / 2 - 0.2, dy), PORT_W + 0.8, PORT_D + 0.4, col_top + 0.9, 3.8, rot_z=math.pi / 2,
+              seed=12)  # tiled like the house, stone pediment
 cb.box(((px0 + mx0) / 2, dy, Z2 - 0.2), (PORT_D, PORT_W, 0.4))
 hw = PORT_W / 2 - 0.25
 balustrade(cb, (px0 + 0.25, dy - hw), (px0 + 0.25, dy + hw), Z2)
 balustrade(cb, (px0 + 0.25, dy - hw), (mx0 - GAL + 0.25, dy - hw), Z2)  # opens onto the colonnade balcony
 balustrade(cb, (px0 + 0.25, dy + hw), (mx0 - GAL + 0.25, dy + hw), Z2)
-cb.finish("Malikane_Sutunlar_Balkon", [M["column"]], C_MANSION)
+# ---- pediment over the portico: the bare gable read as a flat grey triangle, so it gets a proper
+# classical dress: raking and horizontal cornices, a dentil course, a warm stucco tympanum with a
+# round oculus and laurel garlands, and stone acroteria at the apex and the corners.
+P_COL, P_STUCCO, P_TRIM, P_GLASS = 0, 4, 5, 6
+PF_X = (px0 + mx0) / 2 - 0.2 - (PORT_D + 0.4) / 2      # front face of the gable / entablature
+PZ0, PH, PW = col_top + 0.9, 3.8, (PORT_W + 0.8) / 2   # gable base, height, half width
+
+
+def gable_z(y):
+    return PZ0 + PH * (1 - abs(y - dy) / PW)
+
+
+def plate(b, pts, x_front, depth, mi):
+    """Flat polygon in the gable plane (pts as (y, z)), `depth` thick in front of x_front."""
+    before = set(b.bm.faces)
+    front = [b.bm.verts.new((x_front - depth, y, z)) for y, z in pts]
+    back = [b.bm.verts.new((x_front, y, z)) for y, z in pts]
+    b.bm.faces.new(list(reversed(front)))
+    b.bm.faces.new(back)
+    k = len(pts)
+    for i in range(k):
+        j = (i + 1) % k
+        b.bm.faces.new([front[i], front[j], back[j], back[i]])
+    new = [f for f in b.bm.faces if f not in before]
+    bmesh.ops.recalc_face_normals(b.bm, faces=new)
+    b._tag(before, mi)
+
+
+# raking cornices (two mouldings each side) and the horizontal cornice
+for s in (-1, 1):
+    a, c = Vector((PF_X - 0.28, dy + s * (PW + 0.3), PZ0 - 0.05)), Vector((PF_X - 0.28, dy, PZ0 + PH + 0.1))
+    cb.beam(a, c, 0.56, 0.42, P_TRIM)
+    cb.beam(a + Vector((-0.06, 0, 0.27)), c + Vector((-0.06, 0, 0.27)), 0.68, 0.12, P_TRIM)
+    cb.beam(a + Vector((0.12, 0, -0.26)), c + Vector((0.12, 0, -0.26)), 0.3, 0.1, P_TRIM)
+cb.box((PF_X - 0.3, dy, PZ0 + 0.12), (0.6, 2 * PW + 0.9, 0.24), mi=P_TRIM)
+cb.box((PF_X - 0.36, dy, PZ0 - 0.05), (0.72, 2 * PW + 1.1, 0.12), mi=P_TRIM)
+y = dy - PW + 0.2
+while y < dy + PW - 0.1:                                   # dentils under the cornice
+    cb.box((PF_X - 0.09, y, PZ0 - 0.28), (0.18, 0.16, 0.22), mi=P_TRIM)
+    y += 0.34
+cb.box((PF_X - 0.05, dy, PZ0 - 0.5), (0.1, 2 * PW, 0.14), mi=P_TRIM)  # frieze fillet
+
+# tympanum: warm stucco, set back inside the mouldings
+inner_apex = PZ0 + PH - 0.5
+inner_base = PZ0 + 0.26
+half = (inner_apex - inner_base) * PW / PH
+plate(cb, [(dy - half, inner_base), (dy + half, inner_base), (dy, inner_apex)], PF_X, 0.04, P_STUCCO)
+
+# oculus: stone ring, dark glazing, cross bars and a keystone
+oz = inner_base + 1.15
+ox = PF_X - 0.04
+cb.rod((ox, dy, oz), (ox - 0.28, dy, oz), 0.95, 24, P_TRIM)
+cb.rod((ox - 0.05, dy, oz), (ox - 0.3, dy, oz), 0.72, 24, P_GLASS)
+cb.box((ox - 0.31, dy, oz), (0.05, 1.44, 0.07), mi=P_TRIM)
+cb.box((ox - 0.31, dy, oz), (0.05, 0.07, 1.44), mi=P_TRIM)
+cb.box((ox - 0.2, dy, oz + 0.98), (0.3, 0.32, 0.38), mi=P_TRIM)
+# laurel garlands swinging out from the oculus, ending in ribbon drops
+for s in (-1, 1):
+    for i in range(18):
+        t = i / 17
+        yy = dy + s * (1.05 + t * 3.4)
+        zz = oz - 0.15 - math.sin(t * math.pi) * 0.75 + t * 0.35
+        cb.blob((ox - 0.12, yy, zz), 0.15 + 0.05 * math.sin(t * math.pi), 0.8, mi=P_TRIM)
+    for k in range(3):
+        cb.blob((ox - 0.1, dy + s * 4.5, oz + 0.15 - k * 0.28), 0.09, 1.4, mi=P_TRIM)
+    # scroll volutes in the low corners
+    cb.rod((ox, dy + s * (half - 1.3), inner_base + 0.32), (ox - 0.22, dy + s * (half - 1.3), inner_base + 0.32),
+           0.28, 16, P_TRIM)
+    cb.box((ox - 0.1, dy + s * (half - 2.4), inner_base + 0.14), (0.2, 2.0, 0.12), mi=P_TRIM)
+
+# acroteria: palmette on the apex, urns on the corners
+az = PZ0 + PH + 0.55
+cb.box((PF_X - 0.3, dy, az + 0.1), (0.6, 0.9, 0.5), mi=P_TRIM)
+cb.cone((PF_X - 0.3, dy, az + 0.75), 0.42, 0.08, 0.8, 12, P_TRIM)
+cb.blob((PF_X - 0.3, dy, az + 1.2), 0.16, 1.2, mi=P_TRIM)
+for s in (-1, 1):
+    uy = dy + s * (PW + 0.1)
+    cb.box((PF_X - 0.3, uy, PZ0 + 0.45), (0.6, 0.6, 0.5), mi=P_TRIM)
+    cb.cyl((PF_X - 0.3, uy, PZ0 + 0.8), 0.14, 0.2, 12, P_TRIM)
+    cb.blob((PF_X - 0.3, uy, PZ0 + 1.12), 0.3, 1.15, mi=P_TRIM, subdiv=2)
+    cb.cone((PF_X - 0.3, uy, PZ0 + 1.5), 0.14, 0.03, 0.3, 10, P_TRIM)
+cb.finish("Malikane_Sutunlar_Balkon", [M["column"], M["roof_tile"], M["roof_tile_old"], M["roof_tile_base"],
+                                      M["paint_cream"], M["trim"], M["glass"]], C_MANSION)
 
 # ---- two-storey colonnade round the whole house: a paved veranda below, a balcony walk above,
 # giant columns (base + capital) carrying an entablature up to the roof, which now overhangs it all.
@@ -1727,13 +1856,15 @@ for i, (x, y, sx, sy, deg) in enumerate(HUTS, 1):
             for x0, x1 in ((-hx, -0.55 - 0.13), (0.55 + 0.13, hx)):
                 hb.box(((x0 + x1) / 2, -hy - t / 2 - 0.01, z), (x1 - x0, 0.02, 0.03))
     # roof with a generous overhang over all four walls, fascia boards along the eaves
-    hb.prism_roof((0, 0), sx + 2.4, sy + 2.0, h + 0.3, 2.6, rot_z=math.pi / 2, mi=2)
+    hb.tiled_roof((0, 0), sx + 2.4, sy + 2.0, h + 0.3, 2.6, rot_z=math.pi / 2, mats=(6, 7, 2), gable_mi=0,
+                  pitch=0.26, r=0.11, course=0.32, seed=20 + i)  # clay tiles, plank gables
     for s in (-1, 1):
         hb.box((0, s * (sy / 2 + 1.0), h + 0.25), (sx + 2.4, 0.06, 0.18), mi=3)
     if i % 3 == 0:
         hb.cyl((hx * 0.5, hy * 0.4, h + 2.4), 0.15, 2.8, 8, mi=1)            # stove pipe
     door_casing(hb, (-hx, -hy), (hx, -hy), hx, 1.1, 2.2, 0.3, t, 0.05, 0.12, mi=3)
-    hut = hb.finish(f"Kulube_{i}", [M["wood"], M["stone"], M["roof"], M["door"], M["lamp"], M["iron"]], C_HUTS,
+    hut = hb.finish(f"Kulube_{i}", [M["wood"], M["stone"], M["roof_tile_base"], M["door"], M["lamp"], M["iron"],
+                                    M["roof_tile"], M["roof_tile_old"]], C_HUTS,
                     location=(x, y, 0), rot_z=math.radians(deg))
     fr = hf.finish(f"Kulube_{i}_Pencere", [M["frame"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))
     gl = hg.finish(f"Kulube_{i}_Cam", [M["glass"]], C_HUTS, location=(x, y, 0), rot_z=math.radians(deg))

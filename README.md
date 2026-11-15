@@ -15,6 +15,8 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 |---|---|
 | ![Kuzeybatı köşesi ve iki katlı sütunlu galeri](Gorseller/dis_kose_kuzeybati.png) | ![Güneybatı köşesi, veranda ve balkon](Gorseller/dis_kose_guneybati.png) |
 
+![Giriş alınlığı](Gorseller/dis_alinlik.png)
+
 ![Kuş bakışı](Gorseller/dis_kus_bakisi.png)
 
 ## Haritayı gezmek
@@ -41,7 +43,7 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | Banyolar | 4 banyo (her kanatta, iki katta): ayaklı küvet, zincirli rezervuarlı klozet, ayaklı lavabo ve ayna, karo zemin, koyu yeşil fayans lambri, küçük avize |
 | Mobilya | Koltuk, kanepe, gotik yatak ve dolap, konsol, ayaklı saat, büst, ayna, tablo, şamdan; yemek ve çalışma masalarının altı çömelince girilecek yükseklikte |
 | Işık | 31 avize, 11 galeri feneri, 7 şömine ateşi, her pencerede kadife perde, gece ay ışığı ve sis |
-| Kulübeler | 7 kulübe: taş temel, saçaklı çatı, camlı pencereler, açılır tahta kapı, içinde ahşap tezgahlar ve duvara sabit gaz lambaları |
+| Kulübeler | 7 kulübe: taş temel, kiremit kaplı saçaklı çatı, ahşap kalkan duvarı, camlı pencereler, açılır tahta kapı, içinde ahşap tezgahlar ve duvara sabit gaz lambaları |
 | Gizli tünel | Bir kulübenin zeminindeki kapaktan inilen, çitin altından geçip dışarıda ikinci bir kapaktan çıkan ahşap destekli tünel |
 | Dar aralık | Güney yatak odasında dolapların yarı kapattığı kapı; arasından yan yan geçiliyor |
 
