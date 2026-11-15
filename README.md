@@ -11,6 +11,8 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 
 ![Malikanenin ön cephesi, gece](Gorseller/dis_on_cephe.png)
 
+![Malikanenin tamamı, önden ve hafif yukarıdan](Gorseller/dis_genel.png)
+
 | | |
 |---|---|
 | ![Kuzeybatı köşesi ve iki katlı sütunlu galeri](Gorseller/dis_kose_kuzeybati.png) | ![Güneybatı köşesi, veranda ve balkon](Gorseller/dis_kose_guneybati.png) |
