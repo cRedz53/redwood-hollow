@@ -125,6 +125,9 @@ M = {
     "book_r": material("M_BookRed", (0.2, 0.03, 0.02), rough=0.6),
     "book_g": material("M_BookGreen", (0.03, 0.1, 0.05), rough=0.6),
     "book_b": material("M_BookBrown", (0.12, 0.06, 0.025), rough=0.6),
+    "porcelain": material("M_Porcelain", (0.82, 0.8, 0.76), rough=0.08),
+    "tile": material("M_Tile", (0.75, 0.74, 0.7), rough=0.2),
+    "tile_dark": material("M_TileDark", (0.05, 0.12, 0.1), rough=0.2),
 }
 
 
@@ -632,6 +635,55 @@ back_len = my1 - my0 - T
 for z, doors in ((Z1, (dy - 20, dy + 20)), (Z2, (dy - 20, dy, dy + 20))):
     mw.wall((HALL_X1, my0 + T / 2), (HALL_X1, my1 - T / 2), FLOOR_H, 0.3,
             [(yy - (my0 + T / 2), 2.6, 0, 3.4) for yy in doors], z)
+
+# ---- room partitions (both floors). Each front wing (north / south of the hall) is split into
+#   R1 front room (hall doors)        | R2 side room (door to the east wing)
+#   R3 outer room                     | R4 dressing room
+#                                     | R5 bathroom
+# The back (east) wing is cut into three by two cross walls. Positions dodge the window curtains.
+PART_T = 0.2
+ROOM_DW, ROOM_DH = 1.2, 2.6         # single interior doors
+W2_X = mx0 + T / 2 + 14.0           # R1 | R2
+W3_X = mx0 + T / 2 + 18.6           # R3 | R4 / R5
+V1, V4 = 14.35, 21.85               # R1,R2 / R3,R4 and R4 / R5, measured out from the hall wall face
+EAST_DOOR_V = 7.85                  # the east-wing doors (dy +- 20) sit this far out from the hall wall
+BACK_CROSS = (dy + 12.0, dy - 12.0)  # cross walls in the east wing (y), doors at BACK_DOOR_X
+BACK_DOOR_X = 54.0
+
+
+def wing_y(side, v):
+    """World y of a point v metres out from the hall side wall into the north (+1) / south (-1) wing."""
+    return HALL_Y1 + 0.15 + v if side > 0 else HALL_Y0 - 0.15 - v
+
+
+ROOM_DOORS = []   # (name, a, c, s, z, swing side +1/-1 relative to the wall's left normal)
+
+
+def partition(name, a, c, z, doors=()):
+    """Interior wall a->c on the floor at z; doors: (offset along, swing side, tag)."""
+    mw.wall(a, c, FLOOR_H, PART_T, [(s, ROOM_DW, 0, ROOM_DH) for s, _, _ in doors], z)
+    for s, swing, tag in doors:
+        ROOM_DOORS.append((f"Kapi_Oda_{name}_{tag}", a, c, s, z, swing))
+
+
+x_in, x_out = mx0 + T / 2, HALL_X1 - 0.15
+for side, sk in ((1, "K"), (-1, "G")):
+    y1, y4 = wing_y(side, V1), wing_y(side, V4)
+    y_hall, y_outer = wing_y(side, 0) - side * 0.15, (my1 - T / 2) if side > 0 else (my0 + T / 2)
+    for z, fk in ((Z1, "Zemin"), (Z2, "Ust")):
+        tag = f"{sk}_{fk}"
+        # left normal of a wall running +x is +y: swing +side opens outwards (into R3 / R4)
+        partition(f"{tag}_A", (x_in, y1), (x_out, y1), z, [(24.0 - x_in, side, "1"), (41.0 - x_in, side, "2")])
+        if not (side < 0 and z == Z1):  # the long dining table spans the whole south ground-floor front
+            # wall runs outward (+side y); its left normal is -side x... swing into R2 (+x)
+            partition(f"{tag}_B", (W2_X, y_hall), (W2_X, y1), z, [(EAST_DOOR_V + 0.15, -side, "1")])
+        partition(f"{tag}_C", (W3_X, y1), (W3_X, y_outer), z,
+                  [(abs(wing_y(side, 18.1) - y1), -side, "1"), (abs(wing_y(side, 24.8) - y1), -side, "2")])
+        mw.wall((W3_X, y4), (x_out, y4), FLOOR_H, PART_T, (), z)
+for yc in BACK_CROSS:
+    for z, fk in ((Z1, "Zemin"), (Z2, "Ust")):
+        partition(f"D_{fk}_{'K' if yc > dy else 'G'}", (HALL_X1 + 0.15, yc), (mx1 - T / 2, yc), z,
+                  [(BACK_DOOR_X - HALL_X1 - 0.15, 1 if yc > dy else -1, "1")])
 mw.finish("Malikane_Duvarlar", [M["plaster"]], C_MANSION)
 wf.finish("Malikane_Pencere_Cerceve", [M["frame"]], C_MANSION)
 wg.finish("Malikane_Cam", [M["glass"]], C_MANSION)
@@ -805,6 +857,13 @@ for z, ys in ((Z1, (dy - 20, dy + 20)), (Z2, (dy - 20, dy, dy + 20))):  # into t
         double_door(f"Kapi_Dogu_{'Zemin' if z == Z1 else 'Ust'}_{int(yy - dy):+d}", LEAF_WIDE,
                     (HALL_X1, yy), (0, 1), (1, 0), 2.6, z)
         door_casing(casing, (HALL_X1, my0), (HALL_X1, my1), yy - my0, 2.6, 3.4, z, 0.3)
+LEAF_ROOM = panel_leaf("Kapi_Oda", ROOM_DW, ROOM_DH, 0.06, [0.35, 0.65])
+for name, a, c, s, z, swing in ROOM_DOORS:                       # single doors in the partitions
+    a3, c3 = Vector((*a, 0)), Vector((*c, 0))
+    d = (c3 - a3).normalized()
+    hinge = a3 + d * (s - ROOM_DW / 2)
+    door(name, LEAF_ROOM, (hinge.x, hinge.y, z), d, Vector((-d.y, d.x, 0)) * swing, C_DOORS)
+    door_casing(casing, a, c, s, ROOM_DW, ROOM_DH, z, PART_T, 0.04, 0.1)
 casing.finish("Malikane_Kapi_Kasalari", [M["dark_wood"], M["column"]], C_MANSION)
 
 for s, tag in ((1, "L"), (-1, "R")):
@@ -832,19 +891,33 @@ C_CHAND = collection("Avizeler")
 CX_N, CX_S = (HALL_Y1 + my1) / 2, (HALL_Y0 + my0) / 2          # room centre lines (y)
 CX_MID = (mx0 + HALL_X1) / 2                                     # front rooms centre (x)
 CX_BACK = (HALL_X1 + mx1) / 2                                    # library centre (x)
-rooms = {
-    "Zemin": (Z2 - 0.2, [(CX_MID - 6, CX_N), (CX_MID + 6, CX_N), (CX_MID - 4, CX_S), (CX_MID + 4, CX_S),
-                         (CX_BACK, my1 - 14), (CX_BACK, dy), (CX_BACK, my0 + 14)]),
-    "Ust": (TOTAL_H, [(CX_MID - 6, CX_N), (CX_MID + 6, CX_N), (CX_MID - 6, CX_S), (CX_MID + 6, CX_S),
-                      (CX_BACK, my1 - 14), (CX_BACK, my0 + 14)]),
-}
+R1_X, R2_X, R3_X, R45_X = (mx0 + W2_X) / 2 + 0.1, (W2_X + HALL_X1) / 2, (mx0 + W3_X) / 2 + 0.1, (W3_X + HALL_X1) / 2
+rooms = {"Zemin": (Z2 - 0.2, []), "Ust": (TOTAL_H, [])}
+for side in (1, -1):
+    for lvl, (ceil, spots) in rooms.items():
+        if side < 0 and lvl == "Zemin":                                   # dining room: two over the table
+            spots += [(CX_MID - 4, wing_y(side, V1 / 2)), (CX_MID + 4, wing_y(side, V1 / 2))]
+        else:
+            spots += [(R1_X, wing_y(side, V1 / 2)), (R2_X, wing_y(side, V1 / 2))]
+        spots += [(R3_X, wing_y(side, (V1 + 27.6) / 2)), (R45_X, wing_y(side, (V1 + V4) / 2))]
 for lvl, (ceil, spots) in rooms.items():
+    spots += [(CX_BACK, 21.0), (CX_BACK, 35.0), (CX_BACK, dy), (CX_BACK, -17.0), (CX_BACK, -31.0)]  # east wing, 3 rooms
     for i, (x, y) in enumerate(spots):
         ob = bpy.data.objects.new(f"Avize_{lvl}_{i + 1}", chandelier.data)
         ob.location = (x, y, ceil)
         ob.visible_shadow = False  # the light sits inside the chandelier
         C_CHAND.objects.link(ob)
         point_light(f"Avize_{lvl}_{i + 1}_Isik", (x, y, ceil - 0.9), 400, (1.0, 0.62, 0.32), 0.6)
+# bathrooms: a small chandelier each
+for side, sk in ((1, "K"), (-1, "G")):
+    for lvl, z in (("Zemin", Z2 - 0.2), ("Ust", TOTAL_H)):
+        x, y = R45_X, wing_y(side, (V4 + 27.6) / 2)
+        ob = bpy.data.objects.new(f"Avize_Banyo_{sk}_{lvl}", chandelier.data)
+        ob.location = (x, y, z)
+        ob.scale = (0.6, 0.6, 0.6)
+        ob.visible_shadow = False
+        C_CHAND.objects.link(ob)
+        point_light(f"Avize_Banyo_{sk}_{lvl}_Isik", (x, y, z - 0.6), 220, (1.0, 0.65, 0.38), 0.4)
 # great chandelier in the double-height hall
 ob = bpy.data.objects.new("Avize_Hol", chandelier.data)
 ob.location = ((ix0 + 4 + SX0) / 2, dy, TOTAL_H)
@@ -857,8 +930,9 @@ point_light("Avize_Hol_Isik", ((ix0 + 4 + SX0) / 2, dy, TOTAL_H - 2.4), 1500, (1
 # ---------------------------------------------------------------- palace furniture (shared meshes, local front = +X)
 C_FURN = collection("Mobilya")
 FM = [M["dark_wood"], M["upholstery"], M["brass"], M["marble_w"], M["linen"], M["velvet"],
-      M["lacquer"], M["canvas"], M["fire"], M["book_r"], M["book_g"], M["book_b"], M["carpet"], M["rug_border"]]
-WOOD, UPH, BRASS, MARBLE, LINEN, VELVET, LACQ, CANVAS, FIRE, BR, BG, BB, CARPET, BORDER = range(14)
+      M["lacquer"], M["canvas"], M["fire"], M["book_r"], M["book_g"], M["book_b"], M["carpet"], M["rug_border"],
+      M["porcelain"]]
+WOOD, UPH, BRASS, MARBLE, LINEN, VELVET, LACQ, CANVAS, FIRE, BR, BG, BB, CARPET, BORDER, PORC = range(15)
 
 
 def proto(name, build):
@@ -1056,12 +1130,50 @@ def small_vase(b):  # placeholder; Poly Haven ceramic vase replaces it
     b.blob((0, 0, 0.2), 0.13, 1.6, mi=LACQ)
 
 
+def bathtub(b):
+    """Claw-foot tub, long side along local Y, taps at the -Y end."""
+    L, W, H, t = 1.7, 0.78, 0.62, 0.06
+    b.box((0, 0, 0.2), (W - 0.1, L - 0.1, 0.06), mi=PORC)                   # bottom
+    for s in (-1, 1):
+        b.box((s * (W / 2 - t / 2), 0, 0.2 + H / 2), (t, L, H), mi=PORC)    # long sides
+        b.box((0, s * (L / 2 - t / 2), 0.2 + H / 2), (W, t, H), mi=PORC)    # ends
+        b.box((s * (W / 2 - t / 2), 0, 0.2 + H), (t + 0.04, L + 0.04, 0.04), mi=PORC)  # rolled rim
+        b.box((0, s * (L / 2 - t / 2), 0.2 + H), (W + 0.04, t + 0.04, 0.04), mi=PORC)
+        for e in (-1, 1):
+            b.blob((s * (W / 2 - 0.12), e * (L / 2 - 0.2), 0.1), 0.08, 1.3, mi=BRASS)  # claw feet
+    b.box((0, 0, 0.3), (W - 2 * t, L - 2 * t, 0.02), mi=LACQ)                 # shadowed inside
+    b.cyl((0, -L / 2 - 0.05, 0.2 + H + 0.2), 0.025, 0.4, 8, BRASS)            # tap column
+    b.box((0, -L / 2 + 0.05, 0.2 + H + 0.38), (0.04, 0.22, 0.04), mi=BRASS)
+
+
+def toilet(b):
+    """High-tank Victorian toilet; front +X, back against the wall at local -X."""
+    b.cyl((0.12, 0, 0.2), 0.14, 0.4, 16, PORC)                                # pedestal
+    b.blob((0.2, 0, 0.36), 0.22, 0.45, mi=PORC, subdiv=2)                     # bowl
+    b.box((0.2, 0, 0.44), (0.46, 0.38, 0.035), mi=WOOD)                       # seat
+    b.box((-0.05, 0, 0.6), (0.06, 0.38, 0.3), mi=WOOD)                        # lid, raised
+    b.box((-0.13, 0, 1.9), (0.22, 0.48, 0.3), mi=WOOD)                        # high cistern
+    b.cyl((-0.08, 0, 1.15), 0.025, 1.4, 8, BRASS)                             # flush pipe
+    b.cyl((-0.02, 0.2, 1.5), 0.008, 0.6, 6, BRASS)                            # pull chain
+
+
+def basin(b):
+    """Pedestal washbasin; front +X, back against the wall at local -X."""
+    b.cyl((0.02, 0, 0.4), 0.11, 0.8, 16, PORC)
+    b.box((0.05, 0, 0.84), (0.48, 0.62, 0.14), mi=PORC)
+    b.box((0.08, 0, 0.9), (0.34, 0.46, 0.02), mi=LACQ)                        # bowl hollow
+    b.box((-0.22, 0, 1.0), (0.04, 0.62, 0.22), mi=PORC)                       # splash back
+    for s in (-1, 1):
+        b.cyl((-0.15, s * 0.14, 0.98), 0.02, 0.12, 8, BRASS)                  # taps
+
+
 P = {n: proto(n, f) for n, f in (
     ("Kaide", pedestal), ("Bust", bust), ("Ayna", mirror), ("Vazo_Kucuk", small_vase),
     ("Koltuk", armchair), ("Kanepe", sofa), ("Sehpa", coffee_table), ("Yemek_Masasi", dining_table),
     ("Sandalye", chair), ("Somine", fireplace), ("Kitaplik", bookcase), ("Yatak", bed), ("Gardirop", wardrobe),
     ("Konsol", sideboard), ("Saat", clock), ("Piyano", piano), ("Tablo", painting), ("Hali", rug),
-    ("Samdan", candelabra), ("Vazo", pedestal_vase), ("Calisma_Masasi", desk))}
+    ("Samdan", candelabra), ("Vazo", pedestal_vase), ("Calisma_Masasi", desk),
+    ("Kuvet", bathtub), ("Klozet", toilet), ("Lavabo", basin))}
 count = {}
 
 
@@ -1089,45 +1201,168 @@ for s in (-1, 1):
         place("Tablo", x, dy + s * 11.75, Z2 + 2.3, -90 * s, 1.3)
     place("Saat", HALL_X1 - 0.5, dy + s * 10.5, Z1, 180)
 
-# salon (north, ground floor)
-place("Somine", CX_MID, NW - 0.25, Z1, -90)
-place("Hali", CX_MID, CX_N + 2, Z1, 0, (1.5, 1.6, 1))
-place("Kanepe", CX_MID, CX_N - 1.5, Z1, 90)
-place("Sehpa", CX_MID, CX_N + 1.5, Z1, 90)
-place("Koltuk", CX_MID - 3, CX_N + 2, Z1, 0)
-place("Koltuk", CX_MID + 3, CX_N + 2, Z1, 180)
-place("Piyano", mx0 + 5, HALL_Y1 + 6, Z1, 30)
-place("Saat", BACK_W - 0.3, NW - 2, Z1, 180)
-for y in (HALL_Y1 + 3, HALL_Y1 + 13, HALL_Y1 + 15, HALL_Y1 + 17, HALL_Y1 + 19):
-    place("Kitaplik", BACK_W - 0.25, y, Z1, 180)
-for x in (mx0 + 4, CX_MID + 7):
-    place("Tablo", x, N_IN + 0.05, Z1 + 2.5, 90, 1.5)
-place("Koltuk", mx0 + 4, NW - 4, Z1, -45)
-place("Koltuk", mx0 + 6.5, NW - 4, Z1, -135)
-place("Sehpa", mx0 + 5.2, NW - 5.2, Z1, 0, 0.6)
+# ---- front wings, both floors (rooms R1-R5, see the partition layout above)
+FIRES = []
 
-# dining room (south, ground floor)
-place("Hali", CX_MID, CX_S, Z1, 0, (2.8, 1.3, 1))
-place("Yemek_Masasi", CX_MID, CX_S, Z1)
-for i in range(9):  # 1.5 m apart: the gaps between chairs are wide enough to crawl under the table
-    x = CX_MID - 6 + i * 1.5
-    place("Sandalye", x, CX_S + DINING_W / 2 + 0.4, Z1, -90, CHAIR_SCALE)
-    place("Sandalye", x, CX_S - DINING_W / 2 - 0.4, Z1, 90, CHAIR_SCALE)
-place("Sandalye", CX_MID - 8.0, CX_S, Z1, 0, CHAIR_SCALE)
-place("Sandalye", CX_MID + 8.0, CX_S, Z1, 180, CHAIR_SCALE)
-for x in (-4.5, -1.5, 1.5, 4.5):
-    place("Samdan", CX_MID + x, CX_S, Z1 + TABLE_CLEAR + 0.09)
-place("Somine", CX_MID, SW + 0.25, Z1, 90)
-for y in (my0 + 6, HALL_Y0 - 4):
-    place("Konsol", BACK_W - 0.3, y, Z1, 180)
-    place("Samdan", BACK_W - 0.3, y, Z1 + 0.9)
-for x in (mx0 + 4, CX_MID + 7):
-    place("Tablo", x, S_IN - 0.05, Z1 + 2.5, -90, 1.6)
+
+def fire(x, y, z, deg):
+    place("Somine", x, y, z, deg)
+    a = math.radians(deg)
+    FIRES.append((x + 0.35 * math.cos(a), y + 0.35 * math.sin(a), z))
+
+
+tiles = Builder()  # bathroom floor tiles and dark tiled dado
+for side in (1, -1):
+    def fy(v, side=side):
+        return wing_y(side, v)
+    out_d, in_d = 90 * side, -90 * side           # furniture front facing away from / towards the hall
+    W1_F, W1_B = V1 - 0.1, V1 + 0.1               # faces of the R1/R2 | R3/R4 wall (v)
+    W4_B = V4 + 0.1                               # bathroom face of the R4 | R5 wall (v)
+    W2_F, W3_F, W3_B = W2_X - 0.1, W3_X - 0.1, W3_X + 0.1
+    for z in (Z1, Z2):
+        # R4 dressing room
+        for v in (15.5, 17.4):
+            place("Gardirop", BACK_W - 0.4, fy(v), z, 180)
+        place("Konsol", R45_X, fy(V4 - 0.1 - 0.3), z, in_d)
+        place("Ayna", R45_X, fy(V4 - 0.1 - 0.05), z + 1.9, in_d, 1.0)
+        place("Samdan", R45_X - 0.6, fy(V4 - 0.1 - 0.3), z + 0.92)
+        # R5 bathroom: claw-foot tub under the window, toilet and washbasin on the partition
+        place("Kuvet", 42.5, fy(27.6 - 0.45), z, 90)
+        place("Klozet", 44.6, fy(W4_B + 0.25), z, out_d)
+        place("Lavabo", 40.0, fy(W4_B + 0.25), z, out_d)
+        place("Ayna", 40.0, fy(W4_B + 0.05), z + 1.75, out_d, 0.7)
+        x0, x1, v0, v1 = W3_B, BACK_W, W4_B, 27.6
+        tiles.box(((x0 + x1) / 2, fy((v0 + v1) / 2), z + 0.012), (x1 - x0, v1 - v0, 0.024))
+        for v in (v0 + 0.015, v1 - 0.015):
+            tiles.box(((x0 + x1) / 2, fy(v), z + 0.5), (x1 - x0, 0.03, 1.0), mi=1)
+        tiles.box((x1 - 0.015, fy((v0 + v1) / 2), z + 0.5), (0.03, v1 - v0, 1.0), mi=1)
+        for va, vb in ((v0, 24.8 - ROOM_DW / 2 - 0.1), (24.8 + ROOM_DW / 2 + 0.1, v1)):   # door gap
+            tiles.box((x0 + 0.015, fy((va + vb) / 2), z + 0.5), (0.03, vb - va, 1.0), mi=1)
+        place("Kaide", W_IN + 1.2, fy(26.4), z)
+        place("Bust", W_IN + 1.2, fy(26.4), z + 1.15, -45 * side)
+
+    # ---------------- ground floor
+    if side > 0:
+        # R1 salon: sofa group round a fireplace on the side wall, piano in the corner
+        fire(W2_F - 0.25, fy(11.3), Z1, 180)
+        place("Hali", W2_X - 3.8, fy(11.3), Z1, 0, (0.9, 0.9, 1))
+        place("Kanepe", W2_X - 5.6, fy(11.3), Z1, 0)
+        place("Sehpa", W2_X - 3.6, fy(11.3), Z1, 90)
+        place("Koltuk", W2_X - 3.6, fy(9.3), Z1, out_d)
+        place("Koltuk", W2_X - 3.6, fy(13.3), Z1, in_d)
+        place("Piyano", W_IN + 2.4, fy(3.4), Z1, 30)
+        place("Hali", W_IN + 2.6, fy(3.6), Z1, 30, (0.6, 0.7, 1))
+        place("Konsol", 31.0, fy(0.3), Z1, out_d)
+        place("Vazo_Kucuk", 31.4, fy(0.3), Z1 + 0.92)
+        place("Samdan", 30.6, fy(0.3), Z1 + 0.92)
+        place("Tablo", 22.0, fy(0.05), Z1 + 2.5, out_d, 1.5)
+        place("Saat", W2_F - 0.3, fy(2.0), Z1, 180)
+        place("Kaide", W_IN + 1.2, fy(13.0), Z1)
+        place("Bust", W_IN + 1.2, fy(13.0), Z1 + 1.15, -45)
+        # R2 smoking room / small library
+        for v in (1.4, 3.3, 5.2, 10.6, 12.45):
+            place("Kitaplik", BACK_W - 0.25, fy(v), Z1, 180)
+        for x in (34.2, 36.05):
+            place("Kitaplik", x, fy(W1_F - 0.25), Z1, in_d)
+        place("Hali", R2_X, fy(7.5), Z1, 0, (0.8, 0.8, 1))
+        place("Koltuk", R2_X - 1.6, fy(7.5), Z1, 0)
+        place("Koltuk", R2_X + 1.6, fy(7.5), Z1, 180)
+        place("Sehpa", R2_X, fy(7.5), Z1, 90, 0.6)
+        place("Samdan", R2_X, fy(7.5), Z1 + 0.48)
+        # R3 parlour
+        fire(W3_F - 0.25, fy(21.45), Z1, 180)
+        place("Hali", W3_X - 3.8, fy(21.45), Z1, 0, (0.9, 0.9, 1))
+        place("Kanepe", W3_X - 5.8, fy(21.45), Z1, 0)
+        place("Sehpa", W3_X - 3.8, fy(21.45), Z1, 90)
+        place("Koltuk", W3_X - 3.8, fy(19.4), Z1, out_d)
+        place("Koltuk", W3_X - 3.8, fy(23.5), Z1, in_d)
+        place("Calisma_Masasi", W_IN + 3.0, fy(20.5), Z1, 0)
+        place("Sandalye", W_IN + 2.2, fy(20.5), Z1, 0, CHAIR_SCALE)
+        place("Samdan", W_IN + 3.0, fy(21.1), Z1 + TABLE_CLEAR + 0.06)
+        place("Konsol", 29.0, fy(W1_B + 0.3), Z1, out_d)
+        place("Samdan", 29.0, fy(W1_B + 0.3), Z1 + 0.9)
+    else:
+        # dining room across the whole front: 14 m table (crawl space underneath), fireplace facing the hall
+        cy = fy(V1 / 2)
+        place("Hali", CX_MID, cy, Z1, 0, (2.8, 1.3, 1))
+        place("Yemek_Masasi", CX_MID, cy, Z1)
+        for i in range(9):  # 1.5 m apart: the gaps between chairs are wide enough to crawl under the table
+            x = CX_MID - 6 + i * 1.5
+            place("Sandalye", x, cy + DINING_W / 2 + 0.4, Z1, -90, CHAIR_SCALE)
+            place("Sandalye", x, cy - DINING_W / 2 - 0.4, Z1, 90, CHAIR_SCALE)
+        place("Sandalye", CX_MID - 8.0, cy, Z1, 0, CHAIR_SCALE)
+        place("Sandalye", CX_MID + 8.0, cy, Z1, 180, CHAIR_SCALE)
+        for x in (-4.5, -1.5, 1.5, 4.5):
+            place("Samdan", CX_MID + x, cy, Z1 + TABLE_CLEAR + 0.09)
+        fire(CX_MID, fy(W1_F - 0.25), Z1, in_d)
+        for v in (2.5, 12.2):
+            place("Konsol", BACK_W - 0.3, fy(v), Z1, 180)
+            place("Samdan", BACK_W - 0.3, fy(v) - 0.5, Z1 + 0.9)
+            place("Ayna", BACK_W - 0.05, fy(v), Z1 + 2.1, 180, 1.0)
+            place("Vazo_Kucuk", BACK_W - 0.3, fy(v) + 0.6, Z1 + 0.92)
+        for x in (21.0, 36.0, 42.0):
+            place("Tablo", x, fy(0.05), Z1 + 2.5, out_d, 1.6)
+        for v in (1.2, 13.1):
+            place("Kaide", W_IN + 1.2, fy(v), Z1)
+            place("Bust", W_IN + 1.2, fy(v), Z1 + 1.15, 45)
+        # R3 library corner
+        for x in (27.0, 28.85, 30.7, 32.55):
+            place("Kitaplik", x, fy(W1_B + 0.25), Z1, out_d)
+        place("Hali", 26.0, fy(21.5), Z1, 0, (0.8, 0.8, 1))
+        place("Koltuk", 24.4, fy(21.5), Z1, 0)
+        place("Koltuk", 27.6, fy(21.5), Z1, 180)
+        place("Sehpa", 26.0, fy(21.5), Z1, 90, 0.6)
+        place("Piyano", W3_X - 2.6, fy(23.5), Z1, -60 * side)
+        place("Calisma_Masasi", W_IN + 3.0, fy(24.0), Z1, 0)
+        place("Sandalye", W_IN + 2.2, fy(24.0), Z1, 0, CHAIR_SCALE)
+        place("Samdan", W_IN + 3.0, fy(24.6), Z1 + TABLE_CLEAR + 0.06)
+
+    # ---------------- upper floor
+    # R1 bedroom: canopy bed on the side wall, fireplace on the hall wall
+    place("Yatak", W2_F - 1.2, fy(11.3), Z2, 180)
+    place("Hali", W2_X - 3.0, fy(11.3), Z2, 0, (0.9, 1.1, 1))
+    for dv in (-1.75, 1.75):
+        place("Konsol", W2_F - 0.3, fy(11.3 + dv), Z2, 180, (0.8, 0.3, 0.7))
+    fire(21.8, fy(0.25), Z2, out_d)
+    place("Koltuk", 20.3, fy(3.0), Z2, 45 * side)
+    place("Koltuk", 23.3, fy(3.0), Z2, 135 * side)
+    place("Hali", 21.8, fy(3.0), Z2, 0, (0.7, 0.8, 1))
+    place("Tablo", 28.0, fy(W1_F - 0.05), Z2 + 2.4, in_d, 1.5)
+    place("Kaide", W_IN + 1.2, fy(13.1), Z2)
+    place("Bust", W_IN + 1.2, fy(13.1), Z2 + 1.15, -45 * side)
+    # R2 study. South: the two wardrobes stand half in front of the door to the east wing,
+    # leaving only a sliver to squeeze through (data["squeeze"]) - kept on purpose
+    if side < 0:
+        place("Gardirop", BACK_W - 0.4, dy - 22.0, Z2, 180)
+        place("Gardirop", BACK_W - 0.4, dy - 20.0, Z2, 180)
+    else:
+        for v in (2.0, 3.85):
+            place("Kitaplik", BACK_W - 0.25, fy(v), Z2, 180)
+    vv = 12.6 if side < 0 else 12.3                                          # vanity
+    place("Konsol", BACK_W - 0.3, fy(vv), Z2, 180)
+    place("Ayna", BACK_W - 0.05, fy(vv), Z2 + 1.9, 180, 1.0)
+    place("Vazo_Kucuk", BACK_W - 0.3, fy(vv) - 0.6, Z2 + 0.92)
+    dv = 4.5 if side < 0 else 7.5
+    place("Calisma_Masasi", R2_X - 1.0, fy(dv), Z2, 0)
+    place("Sandalye", R2_X - 1.8, fy(dv), Z2, 0, CHAIR_SCALE)
+    place("Samdan", R2_X - 1.0, fy(dv) + 0.6, Z2 + TABLE_CLEAR + 0.06)
+    place("Kanepe", 39.0, fy(W1_F - 0.45), Z2, in_d)
+    # R3 second bedroom
+    place("Yatak", 30.0, fy(W1_B + 1.2), Z2, out_d)
+    place("Hali", 30.0, fy(W1_B + 3.0), Z2, 0, (0.9, 1.1, 1))
+    for dx in (-1.75, 1.75):
+        place("Konsol", 30.0 + dx, fy(W1_B + 0.3), Z2, out_d, (0.8, 0.3, 0.7))
+    fire(W3_F - 0.25, fy(21.45), Z2, 180)
+    place("Koltuk", W3_X - 3.2, fy(20.4), Z2, 0)
+    place("Koltuk", W3_X - 3.2, fy(22.5), Z2, 0)
+    place("Calisma_Masasi", W_IN + 3.0, fy(22.5), Z2, 0)
+    place("Samdan", W_IN + 3.0, fy(22.5), Z2 + TABLE_CLEAR + 0.06)
+tiles.finish("Malikane_Banyo_Fayans", [M["tile"], M["tile_dark"]], C_MANSION)
 
 # library (east, ground floor)
 y = my0 + 2.0
 while y < my1 - 2.0:
-    if all(abs(y - d) > 2.2 for d in (dy - 20, dy + 20)):
+    if all(abs(y - d) > 2.2 for d in (dy - 20, dy + 20)) and all(abs(y - c) > 1.1 for c in BACK_CROSS):
         place("Kitaplik", BACK_E + 0.25, y, Z1, 0)
     y += 1.85
 for yy in (my1 - 14, my0 + 14):
@@ -1141,32 +1376,10 @@ place("Samdan", CX_BACK + 3, dy + 0.6, Z1 + TABLE_CLEAR + 0.06)
 place("Hali", CX_BACK + 2, dy, Z1, 90, (1.0, 1.0, 1))
 place("Saat", E_IN - 0.3, dy + 4, Z1, 180)
 
-# upper floor: master bedroom (north), guest bedroom + study (south), portrait gallery (east)
-for side, yc, wall_y, face in ((1, CX_N, NW, -90), (-1, CX_S, SW, 90)):
-    place("Yatak", CX_MID + 4, wall_y - side * 1.3, Z2, face)
-    place("Hali", CX_MID + 4, wall_y - side * 3.5, Z2, 0, (0.9, 1.1, 1))
-    for dx in (-1.6, 1.6):
-        place("Konsol", CX_MID + 4 + dx * 1.2, wall_y - side * 0.4, Z2, face, (0.8, 0.3, 0.7))
-    # in the south bedroom these two wardrobes stand half in front of the door to the east wing,
-    # leaving only a sliver to squeeze through (see SQUEEZE_GAPS) — kept on purpose
-    place("Gardirop", BACK_W - 0.4, yc + 4, Z2, 180)
-    place("Gardirop", BACK_W - 0.4, yc + 6, Z2, 180)
-    # fireplace on the hall wall, clear of the gallery door at mx0 + 8
-    place("Somine", mx0 + 18, (N_IN if side > 0 else S_IN) + side * 0.25, Z2, 90 * side)
-    place("Koltuk", mx0 + 16.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 45 * side)
-    place("Koltuk", mx0 + 19.5, (N_IN if side > 0 else S_IN) + side * 3, Z2, 135 * side)
-    place("Hali", mx0 + 18, (N_IN if side > 0 else S_IN) + side * 3, Z2, 0, (0.7, 0.8, 1))
-    place("Konsol", BACK_W - 0.3, yc - 5, Z2, 180)                                   # vanity
-    place("Ayna", BACK_W - 0.05, yc - 5, Z2 + 1.9, 180, 1.0)
-    place("Vazo_Kucuk", BACK_W - 0.3, yc - 5.6, Z2 + 0.92)
-    place("Kaide", mx0 + 1.2, wall_y - side * 1.2, Z2)
-    place("Bust", mx0 + 1.2, wall_y - side * 1.2, Z2 + 1.15, -side * 45)
-    place("Calisma_Masasi", mx0 + 3, yc - side * 6, Z2, 0)
-    place("Samdan", mx0 + 3, yc - side * 6, Z2 + TABLE_CLEAR + 0.06)
-    place("Tablo", CX_MID - 6, wall_y - side * 0.05, Z2 + 2.4, face, 1.5)
+# upper floor: portrait gallery (east wing)
 y = my0 + 3.0
 while y < my1 - 3.0:
-    if all(abs(y - d) > 2.0 for d in (dy - 20, dy, dy + 20)):
+    if all(abs(y - d) > 2.0 for d in (dy - 20, dy, dy + 20)) and all(abs(y - c) > 1.0 for c in BACK_CROSS):
         place("Tablo", BACK_E + 0.05, y, Z2 + 2.3, 0, 1.4)
     y += 4.0
 for yy in (my1 - 14, my0 + 14):
@@ -1187,21 +1400,6 @@ for s in (-1, 1):
     place("Kaide", mx0 + 3.5, dy + s * 10.9, Z2)
     place("Bust", mx0 + 3.5, dy + s * 10.9, Z2 + 1.15, -90 * s)
     place("Hali", mx0 + 10, dy + s * 8.5, Z2, 0, (2.0, 0.55, 1))     # gallery runners
-# salon
-place("Konsol", mx0 + 4, N_IN + 0.3, Z1, 90)
-place("Vazo_Kucuk", mx0 + 4.4, N_IN + 0.3, Z1 + 0.92)
-place("Samdan", mx0 + 3.6, N_IN + 0.3, Z1 + 0.92)
-place("Hali", mx0 + 5, HALL_Y1 + 6, Z1, 30, (0.6, 0.7, 1))
-for x, y in ((W_IN + 1.2, NW - 1.2), (BACK_W - 1.4, N_IN + 1.3)):
-    place("Kaide", x, y, Z1)
-    place("Bust", x, y, Z1 + 1.15, 225)
-# dining room
-for y in (my0 + 6, HALL_Y0 - 4):
-    place("Ayna", BACK_W - 0.05, y, Z1 + 2.1, 180, 1.0)
-    place("Vazo_Kucuk", BACK_W - 0.3, y + 0.6, Z1 + 0.92)
-for x, y in ((W_IN + 1.2, SW + 1.2), (W_IN + 1.2, S_IN - 1.2)):
-    place("Kaide", x, y, Z1)
-    place("Bust", x, y, Z1 + 1.15, 45)
 # library
 for y in (my1 - 4, my0 + 4):
     place("Kaide", E_IN - 1.2, y, Z1)
@@ -1217,8 +1415,7 @@ for y in (my0 + 9, my1 - 9, dy - 9, dy + 9):
     place("Bust", BACK_E + 1.0, y, Z2 + 1.15, 0)
 
 # fireplaces glow
-for i, (x, y, z) in enumerate([(CX_MID, NW - 0.6, Z1), (CX_MID, SW + 0.6, Z1),
-                               (mx0 + 18, N_IN + 0.6, Z2), (mx0 + 18, S_IN - 0.6, Z2)], 1):
+for i, (x, y, z) in enumerate(FIRES, 1):
     point_light(f"Somine_{i}_Ates", (x, y, z + 0.5), 250, (1.0, 0.45, 0.15), 0.4)
 
 

@@ -35,6 +35,17 @@ if os.environ.get("MALIKANE_SHOT_SET") == "tunel":  # hut 7 interior, the tunnel
         look("kamera_tunel", (-9000, 1000, -140), (-11000, 1000, -190)),
         look("kamera_tunel_cikis", (-11700, 700, 170), (-11350, 1000, 0)),
     ]
+if os.environ.get("MALIKANE_SHOT_SET") == "odalar":  # the split-up rooms and the bathrooms
+    SHOTS = [
+        look("kamera_oda_salon", (1900, -1500, 350), (3200, -2550, 200)),
+        look("kamera_oda_yemek", (1950, 1100, 380), (4000, 2400, 150)),
+        look("kamera_oda_oturma", (1900, -4050, 350), (3650, -3000, 200)),
+        look("kamera_banyo_zemin", (3750, -3680, 330), (4450, -4100, 200)),
+        look("kamera_banyo_ust", (3750, 3280, 830), (4450, 3700, 700)),
+        look("kamera_oda_yatak", (1900, -1500, 850), (3100, -2550, 700)),
+        look("kamera_oda_dar_gecit", (3800, 1300, 830), (4550, 1900, 720)),
+        look("kamera_oda_dogu", (6000, -3000, 330), (5400, -1400, 200)),
+    ]
 
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)

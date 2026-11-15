@@ -1,8 +1,8 @@
 #include "MalikaneInteractor.h"
 
 #include "Animation/AnimSequence.h"
-#include "Animation/AnimSingleNodeInstance.h"
-#include "Animation/BlendSpace.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/InputComponent.h"
@@ -107,34 +107,33 @@ void AMalikaneInteractor::SetupCamera(APawn* Pawn)
 	}
 }
 
-void AMalikaneInteractor::PlayOverride(USkeletalMeshComponent* Mesh, UAnimationAsset* Clip, bool bLoop)
+void AMalikaneInteractor::PlaySlot(UAnimInstance* Anim, UAnimSequence* Clip, bool bLoop, float Rate)
 {
-	if (!Clip || Clip == PlayingOverride)
+	if (!Clip)
 	{
 		return;
 	}
-	if (!PlayingOverride)
+	if (Clip == SlotClip && SlotMontage && Anim->Montage_IsPlaying(SlotMontage))
 	{
-		NormalAnimClass = Mesh->GetAnimClass();  // remember the blueprint to hand back to
+		Anim->Montage_SetPlayRate(SlotMontage, Rate);
+		return;
 	}
-	Mesh->PlayAnimation(Clip, bLoop);
-	PlayingOverride = Clip;
+	// a new montage in the same slot group fades the previous one out over its own blend-in time,
+	// so every change of clip (and the hand-over from / to locomotion) is a cross-fade
+	SlotMontage = Anim->PlaySlotAnimationAsDynamicMontage(Clip, TEXT("DefaultSlot"), CrouchBlendTime, CrouchBlendTime,
+		Rate, bLoop ? 100000 : 1);
+	SlotClip = Clip;
 	StateTime = 0.f;
 }
 
-void AMalikaneInteractor::RestoreAnimBlueprint(USkeletalMeshComponent* Mesh)
+void AMalikaneInteractor::StopSlot(UAnimInstance* Anim, float BlendOut)
 {
-	if (!PlayingOverride)
+	if (SlotClip)
 	{
-		return;
+		Anim->StopSlotAnimation(BlendOut, TEXT("DefaultSlot"));
 	}
-	Mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	if (NormalAnimClass)
-	{
-		Mesh->SetAnimInstanceClass(NormalAnimClass);
-	}
-	Mesh->SetPlayRate(1.f);
-	PlayingOverride = nullptr;
+	SlotClip = nullptr;
+	SlotMontage = nullptr;
 }
 
 void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
@@ -142,17 +141,29 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	ACharacter* Character = PC ? Cast<ACharacter>(PC->GetPawn()) : nullptr;
 	USkeletalMeshComponent* Mesh = Character ? Character->GetMesh() : nullptr;
-	if (!Mesh)
+	UAnimInstance* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
+	if (!Anim)
 	{
 		return;
 	}
-	if (!CrouchBlend)
+	if (PreparedAnim.Get() != Anim)
+	{
+		// the crouch-walk and side-step clips carry root motion; the capsule does the moving here,
+		// so extract it (keeps the mesh on the capsule) but never apply it
+		Anim->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		PreparedAnim = Anim;
+		AnimState = ECrouchAnim::Normal;
+		SlotClip = nullptr;
+		SlotMontage = nullptr;
+	}
+	if (!CrouchWalk)
 	{
 		const TCHAR* Dir = TEXT("/Game/Characters/Mannequins/Anims/Crouch/");
 		auto Path = [Dir](const TCHAR* Name) { return FString::Printf(TEXT("%s%s.%s"), Dir, Name, Name); };
 		CrouchEntry = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Entry")));
 		CrouchExit = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Exit")));
-		CrouchBlend = LoadObject<UBlendSpace>(nullptr, *Path(TEXT("BS_MM_CrouchStrafe")));
+		CrouchIdle = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Idle")));
+		CrouchWalk = LoadObject<UAnimSequence>(nullptr, *Path(TEXT("MM_Unarmed_Crouch_Walk_Fwd")));
 		SideStep = LoadObject<UAnimSequence>(nullptr,
 			TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Right.MF_Unarmed_Walk_Right"));
 		if (!SideStep)  // folder layout differs between template versions
@@ -162,8 +173,7 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 		}
 	}
 	StateTime += DeltaSeconds;
-	const FVector Velocity = Character->GetVelocity();
-	const float Speed = Velocity.Size2D();
+	const float Speed = Character->GetVelocity().Size2D();
 	const bool bCrouched = Character->bIsCrouched;
 	bool bSqueezing = false;
 	for (TActorIterator<AMalikaneSqueeze> It(GetWorld()); It; ++It)
@@ -171,52 +181,61 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 		bSqueezing |= It->IsBusy();
 	}
 	auto Length = [](const UAnimSequence* Clip) { return Clip ? Clip->GetPlayLength() : 0.f; };
+	const bool bMoving = Speed > 15.f;
+	// the template character turns to face where it walks, so the forward crouch walk covers all
+	// directions; the play rate keeps the feet in step with the actual speed (no fast shuffling)
+	const float WalkRate = FMath::Clamp(Speed / FMath::Max(CrouchWalkClipSpeed, 1.f), 0.45f, 1.1f);
 
-	// state machine: Normal -> Entering (crouch down) -> Crouched (blend space) -> Exiting (stand up) -> Normal
 	if (bSqueezing)
 	{
 		AnimState = ECrouchAnim::Squeezing;
-		PlayOverride(Mesh, SideStep, true);  // upright side-step, slowed to a shuffle
-		Mesh->SetPlayRate(0.55f);
+		PlaySlot(Anim, SideStep, true, 0.55f);  // upright side-step, slowed to a shuffle
 		return;
 	}
 	switch (AnimState)
 	{
 	case ECrouchAnim::Squeezing:
-		if (bCrouched)
+		AnimState = bCrouched ? ECrouchAnim::Crouched : ECrouchAnim::Normal;
+		if (!bCrouched)
 		{
-			AnimState = ECrouchAnim::Crouched;
-		}
-		else
-		{
-			AnimState = ECrouchAnim::Normal;
-			RestoreAnimBlueprint(Mesh);
+			StopSlot(Anim, CrouchBlendTime);
 		}
 		break;
 	case ECrouchAnim::Normal:
 		if (bCrouched)
 		{
-			AnimState = ECrouchAnim::Entering;
-			PlayOverride(Mesh, CrouchEntry, false);
+			// walking into a crouch goes straight to the crouch walk; standing still crouches down first
+			AnimState = bMoving ? ECrouchAnim::Crouched : ECrouchAnim::Entering;
+			if (!bMoving)
+			{
+				PlaySlot(Anim, CrouchEntry, false);
+			}
 		}
 		break;
 	case ECrouchAnim::Entering:
 		if (!bCrouched)
 		{
 			AnimState = ECrouchAnim::Exiting;
-			PlayOverride(Mesh, CrouchExit, false);
+			PlaySlot(Anim, CrouchExit, false);
 		}
-		else if (StateTime >= Length(CrouchEntry) || Speed > 15.f)
+		else if (bMoving || StateTime >= Length(CrouchEntry) - CrouchBlendTime)
 		{
-			AnimState = ECrouchAnim::Crouched;  // down (or already moving): hand over to the blend space
-			BlendSpeed = 0.f;
+			AnimState = ECrouchAnim::Crouched;  // fade into the idle / walk loop before the clip ends
 		}
 		break;
 	case ECrouchAnim::Crouched:
 		if (!bCrouched)
 		{
-			AnimState = ECrouchAnim::Exiting;
-			PlayOverride(Mesh, CrouchExit, false);
+			if (bMoving)
+			{
+				AnimState = ECrouchAnim::Normal;  // stand up while walking: fade back into locomotion
+				StopSlot(Anim, 0.4f);
+			}
+			else
+			{
+				AnimState = ECrouchAnim::Exiting;
+				PlaySlot(Anim, CrouchExit, false);
+			}
 		}
 		break;
 	case ECrouchAnim::Exiting:
@@ -224,36 +243,28 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 		{
 			AnimState = ECrouchAnim::Crouched;
 		}
-		else if (StateTime >= Length(CrouchExit) || Speed > 15.f)
+		else if (bMoving || StateTime >= Length(CrouchExit) - CrouchBlendTime)
 		{
 			AnimState = ECrouchAnim::Normal;
-			RestoreAnimBlueprint(Mesh);
+			StopSlot(Anim, bMoving ? 0.4f : CrouchBlendTime);
 		}
 		break;
 	}
 	if (AnimState == ECrouchAnim::Crouched)
 	{
-		PlayOverride(Mesh, CrouchBlend, true);
-		// the blend space mixes idle (speed 0) into the walks (speed 100), so starting and stopping
-		// ease in and out instead of snapping between two clips
-		BlendSpeed = FMath::FInterpTo(BlendSpeed, FMath::Min(Speed, 100.f), DeltaSeconds, 6.f);
-		float Direction = 0.f;
-		if (Speed > 5.f)
+		// hysteresis so the idle/walk cross-fade does not flicker around the threshold
+		const bool bWalkClip = SlotClip == CrouchWalk;
+		if (Speed > 20.f || (bWalkClip && Speed > 6.f))
 		{
-			const FRotator Facing = Character->GetActorRotation();
-			Direction = FMath::FindDeltaAngleDegrees(Facing.Yaw, Velocity.Rotation().Yaw);
+			PlaySlot(Anim, CrouchWalk, true, WalkRate);
 		}
-		if (UAnimSingleNodeInstance* Single = Mesh->GetSingleNodeInstance())
+		else
 		{
-			Single->SetBlendSpacePosition(FVector(Direction, BlendSpeed, 0.f));
+			PlaySlot(Anim, CrouchIdle, true);
 		}
-		Mesh->SetPlayRate(FMath::Clamp(Speed / 100.f, 1.f, 1.3f));  // only speeds up past the clip's own pace
-	}
-	else if (PlayingOverride)
-	{
-		Mesh->SetPlayRate(1.f);
 	}
 }
+
 
 AMalikaneSqueeze* AMalikaneInteractor::GetUsableGap(float& OutProgress) const
 {

@@ -31,6 +31,8 @@ SURFACES = {
     "M_Column": ("marble_01", 0.6, (1, 1, 1), 0, 0),
     "M_MarbleWhite": ("marble_01", 1.0, (1, 1, 1), 0, 0),
     "M_MarbleBlack": ("marble_01", 1.0, (0.07, 0.07, 0.07), 0, 0),
+    "M_Tile": ("marble_01", 3.0, (0.95, 0.95, 0.92), 0, 0),
+    "M_TileDark": ("marble_01", 3.0, (0.08, 0.17, 0.14), 0, 0),
     "M_Roof": ("roof_slates_02", 1.5, (1, 1, 1), 0, 0),
     "M_HutWood": ("weathered_planks", 1.0, (1, 1, 1), 0, 0),
     "M_DoorWood": ("dark_wood", 1.0, (1, 1, 1), 0, 0),
@@ -363,7 +365,7 @@ for a in list(actor_sub.get_all_level_actors()):
     elif label.startswith("Avize_"):
         mid = pick("Chandelier_03" if label == "Avize_Hol" else "Chandelier_01")
         if mid:
-            target = 380.0 if label == "Avize_Hol" else 160.0
+            target = 380.0 if label == "Avize_Hol" else 95.0 if label.startswith("Avize_Banyo") else 160.0
             new = spawn(mid, loc, yaw, target / max(height(mid), 1.0), label, "Malikane/Avizeler", shadow=False)
     elif label.startswith("Agac_"):
         comp = a.get_component_by_class(unreal.StaticMeshComponent)

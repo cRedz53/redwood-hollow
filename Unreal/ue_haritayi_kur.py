@@ -248,7 +248,11 @@ for l in scene["lights"]:
         c.set_editor_property("intensity", l["energy"] * LAMP_CD_PER_WATT * (INDOOR_LIGHT_SCALE if indoor else 1.0))
         c.set_editor_property("light_color", color8(l["color"]))
         small = "_Lamba_" in l["name"]  # hut gas lamps and tunnel lanterns light only their room
-        c.set_editor_property("attenuation_radius", 900.0 if small else 2200.0 if indoor else 1800.0)
+        # rooms are 9-14 m across: a short reach keeps the overlapping shadowed lights per pixel low
+        # (27 chandeliers at 22 m hung the GPU through virtual shadow maps)
+        bath = "_Banyo_" in l["name"]
+        c.set_editor_property("attenuation_radius", 900.0 if small else 650.0 if bath else 2200.0 if l["name"] == "Avize_Hol_Isik"
+                               else 1200.0 if indoor else 1800.0)
         c.set_editor_property("source_radius", 10.0)
     elif l["type"] == "SUN":
         # Blender sun: shines along local -Z after XYZ euler rotation

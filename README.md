@@ -11,6 +11,7 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 
 ![Yemek salonu](Gorseller/kamera_yemek.png)
 ![Saray holü ve merdiven](Gorseller/kamera_hol.png)
+![Banyo](Gorseller/kamera_banyo.png)
 ![Bahçe](Gorseller/ue_oyun_ici.png)
 ![Malikane girişi](Blender/Cikti/Onizlemeler/onizleme_giris.png)
 ![Üstten harita](Blender/Cikti/Onizlemeler/onizleme_ustten.png)
@@ -33,9 +34,10 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | Bahçe kapıları | Batıda ve güneyde kemerli, çift kanatlı demir kapılar |
 | Malikane | 44 m × 80 m, 2 kat, 1,5 m kaide. Büyük dış merdiven, 6 dev sütun, balkon, alınlık, 1,5 m saçaklı çatı |
 | Giriş holü | İki kat yüksekliğinde, siyah-beyaz mermer zemin, kapının karşısında kırmızı halılı imparatorluk merdiveni, üst galeri, dev avize, ahşap lambri |
-| Odalar | Zemin kat: şömineli salon, yemek salonu, kütüphane. Üst kat: sayvanlı yataklı iki yatak odası, portre galerisi |
+| Odalar | Holün iki yanındaki kanatlar her katta beşe bölünmüş: ön oda, yan oda, dış oda, giyinme odası ve banyo. Zemin kat: şömineli salon, sigara odası, yemek salonu, oturma odası. Üst kat: sayvanlı yataklı yatak odaları, çalışma odaları. Doğu kanadı üç bölüm: kütüphane ve portre galerisi. Odalar arası tek kanatlı kapılar açılıp kapanır |
+| Banyolar | 4 banyo (her kanatta, iki katta): ayaklı küvet, zincirli rezervuarlı klozet, ayaklı lavabo ve ayna, karo zemin, koyu yeşil fayans lambri, küçük avize |
 | Mobilya | Koltuk, kanepe, gotik yatak ve dolap, konsol, ayaklı saat, büst, ayna, tablo, şamdan; yemek ve çalışma masalarının altı çömelince girilecek yükseklikte |
-| Işık | 14 avize, 4 şömine ateşi, her pencerede kadife perde, gece ay ışığı ve sis |
+| Işık | 31 avize, 7 şömine ateşi, her pencerede kadife perde, gece ay ışığı ve sis |
 | Kulübeler | 7 kulübe: taş temel, saçaklı çatı, camlı pencereler, açılır tahta kapı, içinde ahşap tezgahlar ve duvara sabit gaz lambaları |
 | Gizli tünel | Bir kulübenin zeminindeki kapaktan inilen, çitin altından geçip dışarıda ikinci bir kapaktan çıkan ahşap destekli tünel |
 | Dar aralık | Güney yatak odasında dolapların yarı kapattığı kapı; arasından yan yan geçiliyor |
@@ -67,7 +69,7 @@ powershell -ExecutionPolicy Bypass -File Araclar\polyhaven_indir.ps1
 "C:\Program Files\Blender Foundation\Blender 5.3\blender.exe" -b -P Blender/polyhaven_hazirla.py -- Unreal/PolyHaven_Kaynak
 ```
 
-Karakter ve animasyonlar UE 5.8'in Third Person şablonundan geliyor. Çömelme animasyonları ise motorla gelen MoverExamples eklentisinden kopyalandı ve `Config/DefaultEngine.ini` içindeki CoreRedirects ile proje iskeletine bağlandı.
+Karakter ve animasyonlar UE 5.8'in Third Person şablonundan geliyor. Çömelme animasyonları ise motorla gelen MoverExamples eklentisinden kopyalandı ve `Config/DefaultEngine.ini` içindeki CoreRedirects ile proje iskeletine bağlandı. Animasyon blueprint'inin `DefaultSlot`'unda montaj olarak oynatılıyorlar; böylece ayakta durma, çömelme ve kalkma arasında yumuşak geçiş oluyor.
 
 ## Etkileşim kodu (C++)
 `Unreal/RedwoodHollow/Source/RedwoodHollow`:
