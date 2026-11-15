@@ -26,7 +26,7 @@ SURFACES = {
     "M_Grass": ("leafy_grass", 1.5, (1, 1, 1), 0, 0),
     "M_Gravel": ("gravel_floor_02", 1.5, (1, 1, 1), 0, 0),
     "M_Stone": ("castle_wall_slates", 1.0, (1, 1, 1), 0, 0),
-    "M_MansionWall": ("worn_plaster_wall", 0.5, (1, 1, 1), 0, 0),
+    # M_MansionWall: plain warm stucco from ue_haritayi_kur (the worn plaster texture looked blotchy)
     "M_Trim": ("marble_01", 1.0, (1, 1, 1), 0, 0),
     "M_Column": ("marble_01", 0.6, (1, 1, 1), 0, 0),
     "M_MarbleWhite": ("marble_01", 1.0, (1, 1, 1), 0, 0),

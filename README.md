@@ -20,14 +20,15 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 ![Kuş bakışı](Gorseller/dis_kus_bakisi.png)
 
 ## Haritayı gezmek
-`Unreal/RedwoodHollow/RedwoodHollow.uproject` dosyasını aç ve **Play**'e bas. Kamera üçüncü şahıs, omuz üstünden.
+`Unreal/RedwoodHollow/RedwoodHollow.uproject` dosyasını aç ve **Play**'e bas. Kamera üçüncü şahıs, omuz üstünden. WASD ile yürünür, fareyle etrafa bakılır.
 
-| Tuş | Ne yapar |
-|---|---|
-| WASD + fare | Yürü, etrafa bak |
-| Sol tık | Baktığın kapıyı ya da yer kapağını aç/kapa |
-| Ctrl (basılı tut) | Çömel; büyük masaların altına girilebilir |
-| E (basılı tut) | Dar bir aralığın önündeyken yan yan geç |
+## Mekanikler
+| Tuş | Mekanik | Nasıl çalışıyor |
+|---|---|---|
+| **Sol tık** | Kapı ve kapak açma | Baktığın kapıyı menteşesi üstünde yumuşakça açar ya da kapatır. Malikanenin ana kapısı, balkon kapısı, hol ve oda kapıları, kulübe kapıları ve yerdeki tahta kapaklar açılır. Çift kanatlı kapıların iki kanadı birlikte açılır. Kapının önünde mobilya olsa bile yakındaki kapıyı bulur. |
+| **Ctrl** (basılı tut) | Çömelme | Karakter yavaşça çömelir, bırakınca yavaşça doğrulur; yürürken basınca doğrudan çömelerek yürümeye geçer. Çömelikken daha yavaş yürünür, kamera da alçalır. Yemek salonundaki uzun masanın ve çalışma masalarının altına girilebilir. Bir masanın altındayken Ctrl bırakılırsa, başının üstünde yer açılana kadar çömelik kalır. |
+| **E** (basılı tut) | Dar aralıktan geçme | Dar bir aralığın önüne gelince ekranda beyaz daire içinde **E** belirir. E'ye 0,7 saniye basılı tutunca dairenin çevresindeki yeşil halka dolar ve karakter aralıktan yan yan geçer. Güney yatak odasında, dolapların yarı kapattığı kapıda var; kapının önce sol tıkla açılması gerekir. |
+| Sol tık + yer kapağı | Gizli tünel | Bir kulübenin zeminindeki tahta kapak açılınca merdivenle tünele inilir. Tünel çitin altından geçer ve bahçenin dışındaki ikinci bir kapaktan çıkar. |
 
 ## Harita
 | Bölüm | İçerik |
@@ -35,7 +36,8 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | Bahçe | ~200 m × 110 m, 330 ağaç, 180 çalı, 25.000 çimen öbeği, çakıl yollar |
 | Sınır | Taş kaide üstünde mızrak uçlu siyah demir çit, her ~14 m'de taş sütun |
 | Bahçe kapıları | Batıda ve güneyde kemerli, çift kanatlı demir kapılar |
-| Malikane | 44 m × 80 m, 2 kat, 1,5 m kaide. Büyük dış merdiven, 6 dev sütunlu giriş, balkon, alınlık |
+| Malikane | 44 m × 80 m, 2 kat, 1,5 m kaide. Büyük dış merdiven, 6 dev sütunlu giriş, balkon, krem badanalı sıva cephe, dört yana eğimli kiremit kaplı kırma çatı |
+| Alınlık | Giriş sütunlarının üstünde klasik alınlık: profilli eğik ve yatay korniş, diş sırası, sıvalı iç yüzeyde göz pencere ve kabartma çelenkler, tepede ve köşelerde taş süslemeler |
 | Sütunlu galeri | Malikaneyi dört yandan saran iki katlı galeri: altta mermer döşeli veranda, üstte korkuluklu balkon yolu, kaideli ve başlıklı dev sütunlar, tavana asılı demir fenerler, bahçeye inen üç merdiven. Çatı galeriyi de örtüyor |
 | Giriş holü | İki kat yüksekliğinde, siyah-beyaz mermer zemin, kapının karşısında kırmızı halılı imparatorluk merdiveni, üst galeri, dev avize, ahşap lambri |
 | İç mekân | Odalarda koyu ahşap lambri ve süpürgelik, üstünde ipek duvar kaplaması (kuzey kanat yeşil, güney kırmızı, doğu mavi), krem tavan, tavan pervazı ve avize göbekleri |

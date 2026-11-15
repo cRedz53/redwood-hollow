@@ -96,7 +96,7 @@ M = {
     "gravel": material("M_Gravel", (0.17, 0.15, 0.12)),
     "stone": material("M_Stone", (0.24, 0.23, 0.21)),
     "iron": material("M_Iron", (0.015, 0.015, 0.015), rough=0.45, metal=1.0),
-    "plaster": material("M_MansionWall", (0.36, 0.33, 0.29)),
+    "plaster": material("M_MansionWall", (0.62, 0.53, 0.4), rough=0.8),  # warm limewash stucco
     "trim": material("M_Trim", (0.55, 0.53, 0.49), rough=0.6),
     "column": material("M_Column", (0.55, 0.52, 0.47), rough=0.6),
     "floor": material("M_WoodFloor", (0.11, 0.06, 0.035), rough=0.5),
@@ -219,6 +219,73 @@ class Builder:
             self.rod(m @ (Vector((s * hx, -hy, 0)) + e), m @ (Vector((s * hx, hy, 0)) + e), r * 0.9, 6, tile_a)
         self.rod(m @ Vector((0, -hy - 0.1, height + r * 1.4)), m @ Vector((0, hy + 0.1, height + r * 1.4)),
                  r * 1.7, 8, tile_b)                                # ridge cap
+
+    def hipped_tiled_roof(self, center, sx, sy, z0, height, mats=(1, 2, 3), pitch=0.3, r=0.13, course=0.38,
+                          seed=1):
+        """Hip roof (all four sides slope, ridge along Y, needs sy > sx) in clay barrel tiles:
+        no gable walls at the ends. mats = (tile, weathered tile, underlay)."""
+        tile_a, tile_b, base = mats
+        rnd = random.Random(seed)
+        cx, cy = center
+        hx, hy = sx / 2, sy / 2
+        ry = hy - hx                                            # half length of the ridge
+        before = set(self.bm.faces)
+        v = [self.bm.verts.new((cx + x, cy + y, z0 + z)) for x, y, z in
+             ((-hx, -hy, 0), (hx, -hy, 0), (hx, hy, 0), (-hx, hy, 0), (0, -ry, height), (0, ry, height))]
+        for idx in [(0, 1, 4), (2, 3, 5), (0, 4, 5, 3), (1, 2, 5, 4), (0, 3, 2, 1)]:
+            self.bm.faces.new([v[i] for i in idx])
+        self._tag(before, base)
+        o = Vector((cx, cy, z0))
+
+        def pick():
+            return tile_b if rnd.random() < 0.3 else tile_a
+
+        laps = max(1, int(math.hypot(hx, height) / course))
+        for s in (-1, 1):
+            # long slopes (trapezoids), facing +-X
+            n = Vector((s * height, 0, hx)).normalized()
+            rows = int(sy / pitch)
+            for k in range(rows):
+                y = -hy + (k + 0.5) * sy / rows
+                t1 = min(1.0, (hy - abs(y)) / hx)
+                if t1 < 0.02:
+                    continue
+                off = n * (r * 0.45)
+                self.rod(o + Vector((s * hx, y, 0)) + off, o + Vector((s * hx * (1 - t1), y, height * t1)) + off,
+                         r, 6, pick())
+            for j in range(1, laps):
+                t = j / laps
+                a = Vector((s * hx * (1 - t), -hy + hx * t, height * t)) + n * (r * 1.3)
+                c = Vector((s * hx * (1 - t), hy - hx * t, height * t)) + n * (r * 1.3)
+                self.beam(o + a, o + c, 0.07, 0.035, base)
+            # end slopes (triangles), facing +-Y
+            n = Vector((0, s * height, hx)).normalized()
+            rows = int(sx / pitch)
+            for k in range(rows):
+                x = -hx + (k + 0.5) * sx / rows
+                u1 = 1 - abs(x) / hx
+                if u1 < 0.02:
+                    continue
+                off = n * (r * 0.45)
+                self.rod(o + Vector((x, s * hy, 0)) + off, o + Vector((x, s * (hy - hx * u1), height * u1)) + off,
+                         r, 6, pick())
+            for j in range(1, laps):
+                u = j / laps
+                a = Vector((-hx * (1 - u), s * (hy - hx * u), height * u)) + n * (r * 1.3)
+                c = Vector((hx * (1 - u), s * (hy - hx * u), height * u)) + n * (r * 1.3)
+                self.beam(o + a, o + c, 0.07, 0.035, base)
+            # eave courses
+            e = Vector((s * r * 0.6, 0, r * 0.6))
+            self.rod(o + Vector((s * hx, -hy, 0)) + e, o + Vector((s * hx, hy, 0)) + e, r * 0.9, 6, tile_a)
+            e = Vector((0, s * r * 0.6, r * 0.6))
+            self.rod(o + Vector((-hx, s * hy, 0)) + e, o + Vector((hx, s * hy, 0)) + e, r * 0.9, 6, tile_a)
+        # hip caps on the four arrises and the ridge cap
+        lift = Vector((0, 0, r * 1.4))
+        for sxn in (-1, 1):
+            for syn in (-1, 1):
+                self.rod(o + Vector((sxn * hx, syn * hy, 0)) + lift, o + Vector((0, syn * ry, height)) + lift,
+                         r * 1.6, 8, tile_b)
+        self.rod(o + Vector((0, -ry, height)) + lift, o + Vector((0, ry, height)) + lift, r * 1.7, 8, tile_b)
 
     def prism_roof(self, center, sx, sy, z0, height, rot_z=0.0, mi=0, gable_mi=None):
         """Gable roof, ridge along local Y. gable_mi: material of the two end triangles (default mi)."""
@@ -846,8 +913,9 @@ rf = Builder()
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, TOTAL_H + 0.1), (mx1 - mx0, my1 - my0, 0.2))
 # hipped-look gable roof sitting on the parapet with a 1.5 m overhang all round
 ROOF_Z, ROOF_H = TOTAL_H + 1.15, 9.5
-rf.tiled_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, ROOF_Z, ROOF_H,
-              seed=11)  # clay tiles; stone gables and chimneys
+rf.hipped_tiled_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL,
+                     ROOF_Z, ROOF_H,
+                     seed=11)  # clay tiles on all four sides (no bare gable walls); stone chimneys
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, ROOF_Z - 0.1), (mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, 0.2))  # soffit, also over the colonnade
 for cy in (my0 + 10, dy, my1 - 10):
     rf.box((mx0 + 30, cy, TOTAL_H + 6.0), (1.8, 1.8, 12.0))

@@ -83,7 +83,8 @@ def make_material(name, spec):
         setp(noise, "levels", 5)
         lerp = mel.create_material_expression(mat, unreal.MaterialExpressionLinearInterpolate, -200, 0)
         # painted plaster / porcelain only get a faint variation (the strong one reads as marble veins)
-        lo, hi = (0.94, 1.04) if name in ("M_PaintCream", "M_Porcelain") else (0.6, 1.25)
+        lo, hi = (0.94, 1.04) if name in ("M_PaintCream", "M_Porcelain") else \
+            (0.86, 1.06) if name == "M_MansionWall" else (0.6, 1.25)  # faint limewash variation
         dark = const3([c * lo for c in spec["base"]], None, -100, -450)
         light = const3([c * hi for c in spec["base"]], None, 50, -450)
         mel.connect_material_expressions(dark, "", lerp, "A")
