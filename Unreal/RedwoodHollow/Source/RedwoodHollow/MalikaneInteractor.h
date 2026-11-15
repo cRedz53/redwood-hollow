@@ -9,6 +9,7 @@ class AMalikaneSqueeze;
 class UAnimInstance;
 class UAnimMontage;
 class UAnimSequence;
+class UMaterialParameterCollection;
 
 /**
  * Placed once in the level. Listens for the left mouse button on the first player controller,
@@ -39,11 +40,11 @@ public:
 
 	/** Crouched walking speed (cm/s). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
-	float CrouchSpeed = 85.f;
+	float CrouchSpeed = 110.f;
 
 	/** Speed (cm/s) the crouch-walk clip's feet are authored for; its play rate is speed / this. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
-	float CrouchWalkClipSpeed = 95.f;
+	float CrouchWalkClipSpeed = 200.f;
 
 	/** Cross-fade time (s) between standing, crouching down, crouch idle/walk and standing up. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egilme")
@@ -92,6 +93,10 @@ private:
 	TObjectPtr<UAnimSequence> SlotClip;
 	UPROPERTY(Transient)
 	TObjectPtr<UAnimMontage> SlotMontage;
+	/** Holds the player position for the foliage material, which bends plants away from it. */
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialParameterCollection> FoliageParams;
+	void UpdateFoliagePush(APawn* Pawn);
 	TWeakObjectPtr<UAnimInstance> PreparedAnim;  // anim instance whose root motion has been switched off
 
 	void TryBind();

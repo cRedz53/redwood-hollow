@@ -343,7 +343,7 @@ def blocker(loc, radius, height_cm, label):
 counts = {}
 for a in list(actor_sub.get_all_level_actors()):  # extras from an earlier run of this script
     lbl = a.get_actor_label()
-    if lbl == "Cim_Ortusu" or lbl.endswith(("_Saat", "_Samdan-1", "_Samdan1", "_Model", "_Carpisma")):
+    if lbl in ("Cim_Ortusu", "Calilik_Egilen") or lbl.endswith(("_Saat", "_Samdan-1", "_Samdan1", "_Model", "_Carpisma")):
         actor_sub.destroy_actor(a)
 for a in list(actor_sub.get_all_level_actors()):
     if not isinstance(a, unreal.StaticMeshActor):
@@ -387,9 +387,7 @@ for a in list(actor_sub.get_all_level_actors()):
             # scale towards ~1.2 m but never blow a flat fern up into a sprawling 5 m mat
             s = min(random.uniform(100, 150) / max(height(mid), 1.0), 2.2)
             new = spawn(mid, loc, random.uniform(0, 360), s, label, "Malikane/Agaclar")
-            sx, sy, _ = meshes[mid][1]
-            if height(mid) * s >= 80.0:  # low ground cover stays walkable
-                blocker(loc, min(25.0 * max(sx, sy) * s, 55.0), 110.0, label)
+            # no collision blocker: every bush is walk-through and bends away (see M_PH_Bitki_Egilen)
     if new:
         actor_sub.destroy_actor(a)
         counts[label.split("_")[0]] = counts.get(label.split("_")[0], 0) + 1
@@ -411,6 +409,174 @@ for a in list(actor_sub.get_all_level_actors()):
     elif "_Fener_" in label and isinstance(a, unreal.PointLight) and pick("Lantern_01"):
         # the model is a small hand lantern; scale it up to read as a pillar lantern
         spawn(pick("Lantern_01"), unreal.Vector(loc.x, loc.y, loc.z - 30), 0, 2.0, label + "_Model", "Malikane/Kapilar")
+
+# ---------------------------------------------------------------- plants that bend away from the player
+# AMalikaneInteractor writes the player's feet position into MPC_Oyuncu every frame; this material
+# pushes leaves within ~1 m of it outwards and down (more at the top of the plant than at the root)
+# and adds a slow wind sway, so grass, ferns and low shrubs part as you walk through them.
+MPC_PATH = f"{PH}/Materyaller/MPC_Oyuncu"
+if eal.does_asset_exist(MPC_PATH):
+    mpc = eal.load_asset(MPC_PATH)
+else:
+    mpc = asset_tools.create_asset("MPC_Oyuncu", f"{PH}/Materyaller", unreal.MaterialParameterCollection,
+                                   unreal.MaterialParameterCollectionFactoryNew())
+    vp = unreal.CollectionVectorParameter()
+    vp.set_editor_property("parameter_name", "OyuncuKonum")
+    vp.set_editor_property("default_value", unreal.LinearColor(0, 0, -100000, 0))  # far away: no bending
+    mpc.set_editor_property("vector_parameters", [vp])
+    eal.save_loaded_asset(mpc)
+
+
+def make_bend_master():
+    name = "M_PH_Bitki_Egilen_v2"  # v2: the whole plant leans from its root instead of puffing up
+    path = f"{PH}/Materyaller/{name}"
+    if eal.does_asset_exist(path):
+        return eal.load_asset(path)
+    m = make_master(name, True, linear_default)                  # same textures / opacity as the leaves
+    E = lambda cls, x, y: mel.create_material_expression(m, cls, x, y)
+    C = mel.connect_material_expressions
+
+    def scalar(pname, default, x, y):
+        e = E(unreal.MaterialExpressionScalarParameter, x, y)
+        e.set_editor_property("parameter_name", pname)
+        e.set_editor_property("default_value", default)
+        return e
+
+    def mask(src, x, y, r=False, g=False, b=False):
+        e = E(unreal.MaterialExpressionComponentMask, x, y)
+        for c, on in (("r", r), ("g", g), ("b", b), ("a", False)):
+            e.set_editor_property(c, on)
+        C(src, "", e, "")
+        return e
+
+    def op(cls, a, b, x, y, a_out="", b_out=""):
+        e = E(cls, x, y)
+        C(a, a_out, e, "A")
+        C(b, b_out, e, "B")
+        return e
+
+    def const(v, x, y):
+        e = E(unreal.MaterialExpressionConstant, x, y)
+        e.set_editor_property("r", v)
+        return e
+
+    X = -2600
+    wp = E(unreal.MaterialExpressionWorldPosition, X, 1200)
+    cp = E(unreal.MaterialExpressionCollectionParameter, X, 1400)
+    cp.set_editor_property("collection", mpc)
+    cp.set_editor_property("parameter_name", "OyuncuKonum")
+    # distance and direction from the plant root (instance position), so the plant leans as a whole
+    obj = E(unreal.MaterialExpressionObjectPositionWS, X, 1000)
+    wp_xy, cp_xy = mask(obj, X + 250, 1200, r=True, g=True), mask(cp, X + 250, 1400, r=True, g=True)
+    dist = op(unreal.MaterialExpressionDistance, wp_xy, cp_xy, X + 500, 1300)
+    near = E(unreal.MaterialExpressionSaturate, X + 1000, 1300)
+    one_minus = E(unreal.MaterialExpressionOneMinus, X + 850, 1300)
+    C(op(unreal.MaterialExpressionDivide, dist, scalar("Yaricap", 130.0, X + 500, 1450), X + 700, 1300), "",
+      one_minus, "")
+    C(one_minus, "", near, "")
+    # not when the player is far above / below (upstairs in the house, in the tunnel)
+    cp_z, wp_z = mask(cp, X + 250, 1550, b=True), mask(wp, X + 250, 1650, b=True)
+    dz = E(unreal.MaterialExpressionAbs, X + 650, 1600)
+    C(op(unreal.MaterialExpressionSubtract, wp_z, cp_z, X + 450, 1600), "", dz, "")
+    zfade = E(unreal.MaterialExpressionSaturate, X + 1000, 1600)
+    zom = E(unreal.MaterialExpressionOneMinus, X + 900, 1600)
+    C(op(unreal.MaterialExpressionDivide, dz, const(250.0, X + 650, 1700), X + 800, 1600), "", zom, "")
+    C(zom, "", zfade, "")
+    diff = op(unreal.MaterialExpressionSubtract, wp_xy, cp_xy, X + 500, 1150)
+    nudge = op(unreal.MaterialExpressionAdd, diff, const(0.01, X + 500, 1050), X + 650, 1100)
+    direction = E(unreal.MaterialExpressionNormalize, X + 800, 1100)
+    C(nudge, "", direction, "")
+    # height up the plant (mesh-local, pivot at the root) so roots stay put and tips bend most
+    lp = E(unreal.MaterialExpressionLocalPosition, X, 1850)
+    lz = mask(lp, X + 250, 1850, b=True)
+    h = E(unreal.MaterialExpressionSaturate, X + 700, 1850)
+    C(op(unreal.MaterialExpressionDivide, lz, scalar("BitkiBoyu", 100.0, X + 250, 1950), X + 500, 1850), "", h, "")
+    h2 = op(unreal.MaterialExpressionMultiply, h, h, X + 850, 1850)
+    amt = op(unreal.MaterialExpressionMultiply,
+             op(unreal.MaterialExpressionMultiply, near, zfade, X + 1150, 1400), h2, X + 1300, 1500)
+    amt = op(unreal.MaterialExpressionMultiply, amt, scalar("Itme", 45.0, X + 1150, 1650), X + 1450, 1500)
+    push_xy = op(unreal.MaterialExpressionMultiply, direction, amt, X + 1600, 1200)
+    push_z = op(unreal.MaterialExpressionMultiply, amt, const(-0.4, X + 1450, 1650), X + 1600, 1600)
+    push = op(unreal.MaterialExpressionAppendVector, push_xy, push_z, X + 1800, 1350)
+    # slow wind sway, phase shifted across the garden
+    t = E(unreal.MaterialExpressionTime, X + 900, 2100)
+    wx = mask(wp, X + 900, 2250, r=True)
+    phase = op(unreal.MaterialExpressionAdd,
+               op(unreal.MaterialExpressionMultiply, t, const(0.35, X + 900, 2180), X + 1100, 2100),
+               op(unreal.MaterialExpressionMultiply, wx, const(0.0012, X + 900, 2330), X + 1100, 2250),
+               X + 1300, 2150)
+    sway = E(unreal.MaterialExpressionSine, X + 1450, 2150)
+    C(phase, "", sway, "")
+    sway = op(unreal.MaterialExpressionMultiply,
+              op(unreal.MaterialExpressionMultiply, sway, h2, X + 1600, 2150),
+              scalar("Ruzgar", 4.0, X + 1450, 2300), X + 1750, 2150)
+    wind = op(unreal.MaterialExpressionAppendVector,
+              op(unreal.MaterialExpressionAppendVector, sway, const(0.0, X + 1750, 2300), X + 1900, 2150),
+              const(0.0, X + 1900, 2300), X + 2050, 2150)
+    total = op(unreal.MaterialExpressionAdd, push, wind, X + 2200, 1500)
+    mel.connect_material_property(total, "", unreal.MaterialProperty.MP_WORLD_POSITION_OFFSET)
+    mel.recompile_material(m)
+    eal.save_loaded_asset(m)
+    return m
+
+
+M_BEND = make_bend_master()
+bend_cache = {}
+
+
+def bend_materials(mid):
+    """Bending copies of a plant's leaf materials, one per slot (cached per model)."""
+    if mid in bend_cache:
+        return bend_cache[mid]
+    sm, size = meshes[mid]
+    out = []
+    for i, slot in enumerate(sm.get_editor_property("static_materials")):
+        src = slot.get_editor_property("material_interface")
+        if not isinstance(src, unreal.MaterialInstanceConstant):
+            out.append(src)
+            continue
+        name = f"MI_PH_Egilen_{safe(mid)}_{i}"
+        path = f"{PH}/Materyaller/{name}"
+        if eal.does_asset_exist(path):
+            eal.delete_asset(path)
+        mi = asset_tools.create_asset(name, f"{PH}/Materyaller", unreal.MaterialInstanceConstant,
+                                      unreal.MaterialInstanceConstantFactoryNew())
+        mel.set_material_instance_parent(mi, M_BEND)
+        for pname in ("BaseColor", "Normal", "ARM", "Opacity"):
+            tx = mel.get_material_instance_texture_parameter_value(src, pname)
+            if tx:
+                mel.set_material_instance_texture_parameter_value(mi, pname, tx)
+        for pname in ("Tiling", "Desat", "Metallic", "UseARMMetal", "RoughMul"):
+            mel.set_material_instance_scalar_parameter_value(
+                mi, pname, mel.get_material_instance_scalar_parameter_value(src, pname))
+        mel.set_material_instance_vector_parameter_value(
+            mi, "Tint", mel.get_material_instance_vector_parameter_value(src, "Tint"))
+        mel.set_material_instance_scalar_parameter_value(mi, "BitkiBoyu", max(size[2] * 100.0, 20.0))
+        mel.update_material_instance(mi)
+        eal.save_loaded_asset(mi)
+        out.append(mi)
+    bend_cache[mid] = out
+    return out
+
+
+def apply_bend(comp, mid):
+    for i, mi in enumerate(bend_materials(mid)):
+        if mi:
+            comp.set_material(i, mi)
+    setp(comp, "bounds_scale", 1.6)  # the pushed leaves stay inside the culling bounds
+
+# the scattered bushes (Cali_*) become walk-through and bend like the undergrowth
+mesh_to_mid = {meshes[k][0].get_name(): k for k in meshes}
+bent = 0
+for a in actor_sub.get_all_level_actors():
+    if isinstance(a, unreal.StaticMeshActor) and a.get_actor_label().startswith("Cali_"):
+        comp = a.get_component_by_class(unreal.StaticMeshComponent)
+        k = mesh_to_mid.get(comp.static_mesh.get_name()) if comp and comp.static_mesh else None
+        if k:
+            comp.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+            apply_bend(comp, k)
+            bent += 1
+log(f"egilen calilar: {bent}")
 
 # ---------------------------------------------------------------- grass cover
 MAP_HW, MAP_HH, MAP_R = 10000.0, 5500.0, 2000.0
@@ -462,6 +628,7 @@ if grass:
             handle, _ = sds.add_new_subobject(params)
             comp = lib.get_object(lib.get_data(handle))
             comp.set_static_mesh(meshes[mid][0])
+            apply_bend(comp, mid)  # the lawn grass parts too
             comp.set_cast_shadow(False)
             comp.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
             setp(comp, "instance_end_cull_distance", 5000)
@@ -477,6 +644,63 @@ if grass:
         log(f"cim ortusu: {GRASS_COUNT} instance")
     except Exception as e:
         log(f"cim ortusu eklenemedi: {e}")
+
+
+# ---------------------------------------------------------------- undergrowth you can walk through
+# Patches of ferns, low shrubs and tall grass across the garden. No collision; they use the bending
+# material, so they part as the player pushes through them.
+UNDERGROWTH_PATCHES = 260
+under = []
+for base, lo, hi, weight in (("fern_02", 0.55, 1.1, 4), ("shrub_02", 0.5, 1.1, 2), ("shrub_03", 0.5, 1.1, 2),
+                             ("shrub_04", 0.5, 1.1, 2), ("grass_medium_01", 0.9, 1.5, 3),
+                             ("grass_medium_02", 0.9, 1.5, 3)):
+    for k in by_base.get(base, []):
+        sz = models[k]["size"][2]
+        if 0.15 < sz < 2.2:
+            under.append((k, lo / sz, hi / sz, weight))   # scale range that gives lo..hi metres tall
+if under:
+    try:
+        holder = actor_sub.spawn_actor_from_class(unreal.StaticMeshActor, unreal.Vector(0, 0, 0))
+        holder.set_actor_label("Calilik_Egilen")
+        holder.set_folder_path("Malikane/Agaclar")
+        sds = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)
+        root = sds.k2_gather_subobject_data_for_instance(holder)[0]
+        lib = unreal.SubobjectDataBlueprintFunctionLibrary
+        xforms = {k: [] for k, _, _, _ in under}
+        pool = [u for u in under for _ in range(u[3])]
+        centres, total = 0, 0
+        while centres < UNDERGROWTH_PATCHES:
+            cx, cy = random.uniform(-MAP_HW, MAP_HW), random.uniform(-MAP_HH, MAP_HH)
+            if not free(cx, cy):
+                continue
+            centres += 1
+            radius = random.uniform(250, 650)
+            for _ in range(random.randint(14, 34)):
+                a, d = random.uniform(0, math.tau), radius * math.sqrt(random.random())
+                x, y = cx + math.cos(a) * d, cy + math.sin(a) * d
+                if not free(x, y):
+                    continue
+                k, smin, smax, _ = random.choice(pool)
+                s = random.uniform(smin, smax)
+                xforms[k].append(unreal.Transform(unreal.Vector(x, y, 0), unreal.Rotator(0, 0, random.uniform(0, 360)),
+                                                  unreal.Vector(s, s, s)))
+                total += 1
+        for k, xs in xforms.items():
+            if not xs:
+                continue
+            params = unreal.AddNewSubobjectParams(parent_handle=root,
+                                                  new_class=unreal.HierarchicalInstancedStaticMeshComponent)
+            handle, _ = sds.add_new_subobject(params)
+            comp = lib.get_object(lib.get_data(handle))
+            comp.set_static_mesh(meshes[k][0])
+            comp.set_cast_shadow(False)
+            comp.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+            setp(comp, "instance_end_cull_distance", 6000)
+            apply_bend(comp, k)
+            comp.add_instances(xs, False, True)
+        log(f"egilen calilik: {total} bitki, {UNDERGROWTH_PATCHES} obek")
+    except Exception as e:
+        log(f"egilen calilik eklenemedi: {e}")
 
 levels.save_current_level()
 log("BITTI")

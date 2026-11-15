@@ -17,6 +17,9 @@
 #include "MalikaneDoor.h"
 #include "MalikaneHUD.h"
 #include "MalikaneSqueeze.h"
+#include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
 
 AMalikaneInteractor::AMalikaneInteractor()
 {
@@ -38,6 +41,7 @@ void AMalikaneInteractor::Tick(float DeltaSeconds)
 		SetupCamera(Pawn);  // again after a respawn
 	}
 	UpdateCrouchAnimation(DeltaSeconds);
+	UpdateFoliagePush(Pawn);
 	if (!bHoldingUse)
 	{
 		return;
@@ -184,7 +188,7 @@ void AMalikaneInteractor::UpdateCrouchAnimation(float DeltaSeconds)
 	const bool bMoving = Speed > 15.f;
 	// the template character turns to face where it walks, so the forward crouch walk covers all
 	// directions; the play rate keeps the feet in step with the actual speed (no fast shuffling)
-	const float WalkRate = FMath::Clamp(Speed / FMath::Max(CrouchWalkClipSpeed, 1.f), 0.45f, 1.1f);
+	const float WalkRate = FMath::Clamp(Speed / FMath::Max(CrouchWalkClipSpeed, 1.f), 0.3f, 0.8f);
 
 	if (bSqueezing)
 	{
@@ -394,4 +398,25 @@ void AMalikaneInteractor::KapilariDegistir()
 			It->SetOpen(!It->bOpen);
 		}
 	}
+}
+
+void AMalikaneInteractor::UpdateFoliagePush(APawn* Pawn)
+{
+	if (!FoliageParams)
+	{
+		FoliageParams = LoadObject<UMaterialParameterCollection>(nullptr,
+			TEXT("/Game/PolyHaven/Materyaller/MPC_Oyuncu.MPC_Oyuncu"));
+		if (!FoliageParams)
+		{
+			return;
+		}
+	}
+	// feet position: the bending material measures plant height from the ground up
+	FVector P(0.f, 0.f, -100000.f);
+	if (const ACharacter* Character = Cast<ACharacter>(Pawn))
+	{
+		P = Character->GetActorLocation();
+		P.Z -= Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	}
+	UKismetMaterialLibrary::SetVectorParameterValue(this, FoliageParams, TEXT("OyuncuKonum"), FLinearColor(P));
 }
