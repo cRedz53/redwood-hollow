@@ -33,6 +33,9 @@ SURFACES = {
     "M_MarbleBlack": ("marble_01", 1.0, (0.07, 0.07, 0.07), 0, 0),
     "M_Tile": ("marble_01", 3.0, (0.95, 0.95, 0.92), 0, 0),
     "M_TileDark": ("marble_01", 3.0, (0.08, 0.17, 0.14), 0, 0),
+    "M_SilkGreen": ("velour_velvet", 4.0, (0.2, 0.42, 0.26), 1, 0),
+    "M_SilkRed": ("velour_velvet", 4.0, (0.6, 0.1, 0.1), 1, 0),
+    "M_SilkBlue": ("velour_velvet", 4.0, (0.22, 0.3, 0.48), 1, 0),
     "M_Roof": ("roof_slates_02", 1.5, (1, 1, 1), 0, 0),
     "M_HutWood": ("weathered_planks", 1.0, (1, 1, 1), 0, 0),
     "M_DoorWood": ("dark_wood", 1.0, (1, 1, 1), 0, 0),
@@ -166,7 +169,7 @@ def make_master(name, masked, linear_default):
     return m
 
 
-ROUGH_MUL = {"M_WoodFloor": 2.6, "M_DarkWood": 1.6}  # these maps read as mirror-like under the chandeliers
+ROUGH_MUL = {"M_WoodFloor": 3.2, "M_DarkWood": 1.6}  # these maps read as mirror-like under the chandeliers
 
 
 def make_mi(name, master, base, normal, armtex, tiling=1.0, tint=(1, 1, 1), desat=0.0, metallic=0.0, arm_metal=0.0,
@@ -411,7 +414,7 @@ for a in list(actor_sub.get_all_level_actors()):
 
 # ---------------------------------------------------------------- grass cover
 MAP_HW, MAP_HH, MAP_R = 10000.0, 5500.0, 2000.0
-MANSION = (400.0, -4400.0, 6400.0, 4000.0)
+MANSION = (400.0, -4800.0, 6900.0, 4400.0)  # house + colonnade + garden steps
 PATHS = [[(-10000, -2400), (-6000, -1800), (-2000, -500), (600, -200)],
          [(500, -200), (0, 4600), (3500, 4800), (3500, 5500)]]
 

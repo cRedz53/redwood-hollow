@@ -9,12 +9,13 @@ Haritada şunlar var:
 
 Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıyor. Haritayı gezerken kullanılan birkaç küçük etkileşim de var: kapı açma, çömelme ve dar aralıktan geçme.
 
-![Yemek salonu](Gorseller/kamera_yemek.png)
-![Saray holü ve merdiven](Gorseller/kamera_hol.png)
-![Banyo](Gorseller/kamera_banyo.png)
-![Bahçe](Gorseller/ue_oyun_ici.png)
-![Malikane girişi](Blender/Cikti/Onizlemeler/onizleme_giris.png)
-![Üstten harita](Blender/Cikti/Onizlemeler/onizleme_ustten.png)
+![Malikanenin ön cephesi, gece](Gorseller/dis_on_cephe.png)
+
+| | |
+|---|---|
+| ![Kuzeybatı köşesi ve iki katlı sütunlu galeri](Gorseller/dis_kose_kuzeybati.png) | ![Güneybatı köşesi, veranda ve balkon](Gorseller/dis_kose_guneybati.png) |
+
+![Kuş bakışı](Gorseller/dis_kus_bakisi.png)
 
 ## Haritayı gezmek
 `Unreal/RedwoodHollow/RedwoodHollow.uproject` dosyasını aç ve **Play**'e bas. Kamera üçüncü şahıs, omuz üstünden.
@@ -32,12 +33,14 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | Bahçe | ~200 m × 110 m, 330 ağaç, 180 çalı, 25.000 çimen öbeği, çakıl yollar |
 | Sınır | Taş kaide üstünde mızrak uçlu siyah demir çit, her ~14 m'de taş sütun |
 | Bahçe kapıları | Batıda ve güneyde kemerli, çift kanatlı demir kapılar |
-| Malikane | 44 m × 80 m, 2 kat, 1,5 m kaide. Büyük dış merdiven, 6 dev sütun, balkon, alınlık, 1,5 m saçaklı çatı |
+| Malikane | 44 m × 80 m, 2 kat, 1,5 m kaide. Büyük dış merdiven, 6 dev sütunlu giriş, balkon, alınlık |
+| Sütunlu galeri | Malikaneyi dört yandan saran iki katlı galeri: altta mermer döşeli veranda, üstte korkuluklu balkon yolu, kaideli ve başlıklı dev sütunlar, tavana asılı demir fenerler, bahçeye inen üç merdiven. Çatı galeriyi de örtüyor |
 | Giriş holü | İki kat yüksekliğinde, siyah-beyaz mermer zemin, kapının karşısında kırmızı halılı imparatorluk merdiveni, üst galeri, dev avize, ahşap lambri |
+| İç mekân | Odalarda koyu ahşap lambri ve süpürgelik, üstünde ipek duvar kaplaması (kuzey kanat yeşil, güney kırmızı, doğu mavi), krem tavan, tavan pervazı ve avize göbekleri |
 | Odalar | Holün iki yanındaki kanatlar her katta beşe bölünmüş: ön oda, yan oda, dış oda, giyinme odası ve banyo. Zemin kat: şömineli salon, sigara odası, yemek salonu, oturma odası. Üst kat: sayvanlı yataklı yatak odaları, çalışma odaları. Doğu kanadı üç bölüm: kütüphane ve portre galerisi. Odalar arası tek kanatlı kapılar açılıp kapanır |
 | Banyolar | 4 banyo (her kanatta, iki katta): ayaklı küvet, zincirli rezervuarlı klozet, ayaklı lavabo ve ayna, karo zemin, koyu yeşil fayans lambri, küçük avize |
 | Mobilya | Koltuk, kanepe, gotik yatak ve dolap, konsol, ayaklı saat, büst, ayna, tablo, şamdan; yemek ve çalışma masalarının altı çömelince girilecek yükseklikte |
-| Işık | 31 avize, 7 şömine ateşi, her pencerede kadife perde, gece ay ışığı ve sis |
+| Işık | 31 avize, 11 galeri feneri, 7 şömine ateşi, her pencerede kadife perde, gece ay ışığı ve sis |
 | Kulübeler | 7 kulübe: taş temel, saçaklı çatı, camlı pencereler, açılır tahta kapı, içinde ahşap tezgahlar ve duvara sabit gaz lambaları |
 | Gizli tünel | Bir kulübenin zeminindeki kapaktan inilen, çitin altından geçip dışarıda ikinci bir kapaktan çıkan ahşap destekli tünel |
 | Dar aralık | Güney yatak odasında dolapların yarı kapattığı kapı; arasından yan yan geçiliyor |

@@ -46,13 +46,24 @@ if os.environ.get("MALIKANE_SHOT_SET") == "odalar":  # the split-up rooms and th
         look("kamera_oda_dar_gecit", (3800, 1300, 830), (4550, 1900, 720)),
         look("kamera_oda_dogu", (6000, -3000, 330), (5400, -1400, 200)),
     ]
+SIZE, FOV, EXPOSURE = (1600, 900), 80.0, None
+if os.environ.get("MALIKANE_SHOT_SET") == "dis":  # exterior: architectural shots for the README
+    SIZE, FOV, EXPOSURE = (1920, 1080), 62.0, 5.2  # brighter than play (exposure bias 3.5) so the stone reads
+    SHOTS = [
+        look("dis_on_cephe", (-1400, -200, 240), (2400, -200, 850)),          # front, from the drive
+        look("dis_kose_gb", (300, 4700, 500), (3000, 800, 700)),             # south-west corner, 3/4
+        look("dis_kose_kb", (800, -5000, 500), (3000, -1200, 700)),          # north-west corner, 3/4
+        look("dis_galeri", (2400, 4650, 180), (5600, 4000, 550)),            # down the south veranda
+        look("dis_arka", (6900, 4600, 450), (5500, 500, 600)),               # back corner, garden steps
+        look("dis_kus_bakisi", (-5500, 8000, 5200), (3600, -200, 300)),     # aerial
+    ]
 
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
 actors = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
 les.load_level("/Game/Maps/Malikane")
 world = ues.get_editor_world()
-rt = unreal.RenderingLibrary.create_render_target2d(world, 1600, 900, unreal.TextureRenderTargetFormat.RTF_RGBA8)
+rt = unreal.RenderingLibrary.create_render_target2d(world, SIZE[0], SIZE[1], unreal.TextureRenderTargetFormat.RTF_RGBA8)
 
 
 def steps():
@@ -66,8 +77,14 @@ def steps():
         comp = cap.get_component_by_class(unreal.SceneCaptureComponent2D)
         comp.set_editor_property("texture_target", rt)
         comp.set_editor_property("capture_source", unreal.SceneCaptureSource.SCS_FINAL_COLOR_LDR)
-        comp.set_editor_property("fov_angle", 80.0)
+        comp.set_editor_property("fov_angle", FOV)
         comp.set_editor_property("capture_every_frame", True)
+        if EXPOSURE is not None:
+            pps = comp.get_editor_property("post_process_settings")
+            pps.set_editor_property("override_auto_exposure_bias", True)
+            pps.set_editor_property("auto_exposure_bias", EXPOSURE)
+            comp.set_editor_property("post_process_settings", pps)
+            comp.set_editor_property("post_process_blend_weight", 1.0)
         yield SETTLE
         unreal.RenderingLibrary.export_render_target(world, rt, OUT, name + ".png")
         actors.destroy_actor(cap)

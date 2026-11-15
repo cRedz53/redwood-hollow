@@ -128,6 +128,10 @@ M = {
     "porcelain": material("M_Porcelain", (0.82, 0.8, 0.76), rough=0.08),
     "tile": material("M_Tile", (0.75, 0.74, 0.7), rough=0.2),
     "tile_dark": material("M_TileDark", (0.05, 0.12, 0.1), rough=0.2),
+    "paint_cream": material("M_PaintCream", (0.66, 0.6, 0.5), rough=0.75),
+    "silk_green": material("M_SilkGreen", (0.05, 0.11, 0.07), rough=0.55),
+    "silk_red": material("M_SilkRed", (0.22, 0.03, 0.04), rough=0.55),
+    "silk_blue": material("M_SilkBlue", (0.06, 0.08, 0.13), rough=0.55),
 }
 
 
@@ -548,6 +552,19 @@ STEP_N = 9
 px0 = mx0 - PORT_D           # teras / balkon on kenari
 STEP_RUN = (px0 - STAIR_FOOT_X) / (STEP_N - 1)
 WIN_W, WIN_ZB, WIN_ZT = 1.8, 1.0, 3.8
+GAL = 3.6                    # two-storey colonnade round the house: depth from the wall centre line
+FACES = []                   # interior wall faces to dress (wainscot, wall covering, cornice)
+
+
+def faces_of(a, b, thick, openings, z, sides, trim0=0.0, trim1=0.0):
+    """Record the faces of wall a->b (sides: +1 = left normal, -1 = right) for the interior dressing."""
+    a, b = Vector(a), Vector(b)
+    d = (b - a).normalized()
+    n = Vector((-d.y, d.x))
+    for s in sides:
+        off = n * s * (thick / 2)
+        p0, p1 = a + d * trim0 + off, b - d * trim1 + off
+        FACES.append((p0, p1, n * s, z, [(o - trim0, w, zb, zt) for o, w, zb, zt in openings]))
 
 
 def windows(length, skip=None):
@@ -602,8 +619,10 @@ for idx, (a, b) in enumerate(walls):
     door_s = dy - my0 if idx == 0 else None
     for floor, z in enumerate((Z1, Z2)):
         ops = windows(length, (door_s, 4.0) if door_s is not None else None)
-        mw.wall(a, b, FLOOR_H, T, ops + ([(door_s, DOOR_W, 0.0, DOOR_H)] if door_s is not None and floor == 0 else [])
-                + ([(door_s, 2.8, 0.0, 3.6)] if door_s is not None and floor == 1 else []), z)
+        all_ops = ops + ([(door_s, DOOR_W, 0.0, DOOR_H)] if door_s is not None and floor == 0 else []) \
+            + ([(door_s, 2.8, 0.0, 3.6)] if door_s is not None and floor == 1 else [])
+        mw.wall(a, b, FLOOR_H, T, all_ops, z)
+        faces_of(a, b, T, all_ops, z, (-1,), T / 2, T / 2)  # walls run clockwise: inside is on the right
         for s, w, zb, zt in ops:
             add_window(wf, wg, a, b, s, w, zb, zt, z, T)
             curtain(cu, a, b, s, w, zt, z)
@@ -629,12 +648,14 @@ SX_L = mx0 + 22.0             # landing starts here
 SX_B = mx0 + 26.0             # upper back gallery starts here
 ZM = Z1 + FLOOR_H / 2         # landing height
 for y in (HALL_Y0, HALL_Y1):
-    mw.wall((mx0 + T / 2, y), (HALL_X1, y), FLOOR_H, 0.3, [(10.0, 2.6, 0, 3.6)], Z1)
-    mw.wall((mx0 + T / 2, y), (HALL_X1, y), FLOOR_H, 0.3, [(8.0, 2.2, 0, 3.0)], Z2)
+    for z, op in ((Z1, (10.0, 2.6, 0, 3.6)), (Z2, (8.0, 2.2, 0, 3.0))):
+        mw.wall((mx0 + T / 2, y), (HALL_X1, y), FLOOR_H, 0.3, [op], z)
+        faces_of((mx0 + T / 2, y), (HALL_X1, y), 0.3, [op], z, (1 if y > dy else -1,), 0.0, 0.15)  # room side
 back_len = my1 - my0 - T
 for z, doors in ((Z1, (dy - 20, dy + 20)), (Z2, (dy - 20, dy, dy + 20))):
-    mw.wall((HALL_X1, my0 + T / 2), (HALL_X1, my1 - T / 2), FLOOR_H, 0.3,
-            [(yy - (my0 + T / 2), 2.6, 0, 3.4) for yy in doors], z)
+    ops = [(yy - (my0 + T / 2), 2.6, 0, 3.4) for yy in doors]
+    mw.wall((HALL_X1, my0 + T / 2), (HALL_X1, my1 - T / 2), FLOOR_H, 0.3, ops, z)
+    faces_of((HALL_X1, my0 + T / 2), (HALL_X1, my1 - T / 2), 0.3, ops, z, (1, -1))
 
 # ---- room partitions (both floors). Each front wing (north / south of the hall) is split into
 #   R1 front room (hall doors)        | R2 side room (door to the east wing)
@@ -659,9 +680,11 @@ def wing_y(side, v):
 ROOM_DOORS = []   # (name, a, c, s, z, swing side +1/-1 relative to the wall's left normal)
 
 
-def partition(name, a, c, z, doors=()):
+def partition(name, a, c, z, doors=(), trim0=0.0, trim1=0.0):
     """Interior wall a->c on the floor at z; doors: (offset along, swing side, tag)."""
-    mw.wall(a, c, FLOOR_H, PART_T, [(s, ROOM_DW, 0, ROOM_DH) for s, _, _ in doors], z)
+    ops = [(s, ROOM_DW, 0, ROOM_DH) for s, _, _ in doors]
+    mw.wall(a, c, FLOOR_H, PART_T, ops, z)
+    faces_of(a, c, PART_T, ops, z, (1, -1), trim0, trim1)
     for s, swing, tag in doors:
         ROOM_DOORS.append((f"Kapi_Oda_{name}_{tag}", a, c, s, z, swing))
 
@@ -676,10 +699,11 @@ for side, sk in ((1, "K"), (-1, "G")):
         partition(f"{tag}_A", (x_in, y1), (x_out, y1), z, [(24.0 - x_in, side, "1"), (41.0 - x_in, side, "2")])
         if not (side < 0 and z == Z1):  # the long dining table spans the whole south ground-floor front
             # wall runs outward (+side y); its left normal is -side x... swing into R2 (+x)
-            partition(f"{tag}_B", (W2_X, y_hall), (W2_X, y1), z, [(EAST_DOOR_V + 0.15, -side, "1")])
+            partition(f"{tag}_B", (W2_X, y_hall), (W2_X, y1), z, [(EAST_DOOR_V + 0.15, -side, "1")], 0.15, 0.1)
         partition(f"{tag}_C", (W3_X, y1), (W3_X, y_outer), z,
-                  [(abs(wing_y(side, 18.1) - y1), -side, "1"), (abs(wing_y(side, 24.8) - y1), -side, "2")])
+                  [(abs(wing_y(side, 18.1) - y1), -side, "1"), (abs(wing_y(side, 24.8) - y1), -side, "2")], 0.1)
         mw.wall((W3_X, y4), (x_out, y4), FLOOR_H, PART_T, (), z)
+        faces_of((W3_X, y4), (x_out, y4), PART_T, (), z, (1, -1), 0.1)
 for yc in BACK_CROSS:
     for z, fk in ((Z1, "Zemin"), (Z2, "Ust")):
         partition(f"D_{fk}_{'K' if yc > dy else 'G'}", (HALL_X1 + 0.15, yc), (mx1 - T / 2, yc), z,
@@ -777,8 +801,8 @@ rf = Builder()
 rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, TOTAL_H + 0.1), (mx1 - mx0, my1 - my0, 0.2))
 # hipped-look gable roof sitting on the parapet with a 1.5 m overhang all round
 ROOF_Z, ROOF_H = TOTAL_H + 1.15, 9.5
-rf.prism_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0, my1 - my0 + 3.0, ROOF_Z, ROOF_H)
-rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, ROOF_Z - 0.1), (mx1 - mx0 + 3.0, my1 - my0 + 3.0, 0.2))  # soffit
+rf.prism_roof(((mx0 + mx1) / 2, (my0 + my1) / 2), mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, ROOF_Z, ROOF_H)
+rf.box(((mx0 + mx1) / 2, (my0 + my1) / 2, ROOF_Z - 0.1), (mx1 - mx0 + 3.0 + 2 * GAL, my1 - my0 + 3.0 + 2 * GAL, 0.2))  # soffit, also over the colonnade
 for cy in (my0 + 10, dy, my1 - 10):
     rf.box((mx0 + 30, cy, TOTAL_H + 6.0), (1.8, 1.8, 12.0))
     rf.box((mx0 + 30, cy, TOTAL_H + 12.15), (2.2, 2.2, 0.3))
@@ -815,9 +839,106 @@ cb.prism_roof(((px0 + mx0) / 2 - 0.2, dy), PORT_W + 0.8, PORT_D + 0.4, col_top +
 cb.box(((px0 + mx0) / 2, dy, Z2 - 0.2), (PORT_D, PORT_W, 0.4))
 hw = PORT_W / 2 - 0.25
 balustrade(cb, (px0 + 0.25, dy - hw), (px0 + 0.25, dy + hw), Z2)
-balustrade(cb, (px0 + 0.25, dy - hw), (mx0 - 0.3, dy - hw), Z2)
-balustrade(cb, (px0 + 0.25, dy + hw), (mx0 - 0.3, dy + hw), Z2)
+balustrade(cb, (px0 + 0.25, dy - hw), (mx0 - GAL + 0.25, dy - hw), Z2)  # opens onto the colonnade balcony
+balustrade(cb, (px0 + 0.25, dy + hw), (mx0 - GAL + 0.25, dy + hw), Z2)
 cb.finish("Malikane_Sutunlar_Balkon", [M["column"]], C_MANSION)
+
+# ---- two-storey colonnade round the whole house: a paved veranda below, a balcony walk above,
+# giant columns (base + capital) carrying an entablature up to the roof, which now overhangs it all.
+# The front strip stops at the portico, which already has its own terrace, columns and balcony.
+gx0, gx1, gy0, gy1 = mx0 - GAL, mx1 + GAL, my0 - GAL, my1 + GAL
+PY0, PY1 = dy - PORT_W / 2, dy + PORT_W / 2            # portico span on the front
+gb = Builder()  # mats: stone, marble, column, cream paint, lamp glow, iron
+G_STONE, G_MARBLE, G_COL, G_PAINT, G_LAMP, G_IRON = range(6)
+strips = [(gx0, gx1, my1, gy1), (gx0, gx1, gy0, my0), (mx1, gx1, my0, my1),
+          (gx0, mx0, my0, PY0), (gx0, mx0, PY1, my1)]
+for x0, x1, y0, y1 in strips:
+    cx, cy, sx, sy = (x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0
+    gb.box((cx, cy, (Z1 - 0.05) / 2), (sx, sy, Z1 - 0.05), mi=G_STONE)        # plinth
+    gb.box((cx, cy, Z1 - 0.025), (sx, sy, 0.05), mi=G_MARBLE)                  # paving
+    gb.box((cx, cy, Z2 - 0.2), (sx, sy, 0.4), mi=G_MARBLE)                     # balcony floor
+    gb.box((cx, cy, Z2 - 0.41), (sx, sy, 0.02), mi=G_PAINT)                    # veranda ceiling
+    gb.box((cx, cy, ROOF_Z - 0.21), (sx, sy, 0.02), mi=G_PAINT)               # balcony ceiling
+
+E = 0.55  # column line inset from the outer edge
+col_lines = [((gx0 + E, gy1 - E), (gx1 - E, gy1 - E)), ((gx0 + E, gy0 + E), (gx1 - E, gy0 + E)),
+             ((gx1 - E, gy0 + E), (gx1 - E, gy1 - E)),
+             ((gx0 + E, gy0 + E), (gx0 + E, PY0 + 0.6)), ((gx0 + E, PY1 - 0.6), (gx0 + E, gy1 - E))]
+done = set()
+for a, c in col_lines:
+    a, c = Vector(a), Vector(c)
+    n = max(1, round((c - a).length / 4.4))
+    for i in range(n + 1):
+        q = a.lerp(c, i / n)
+        key = (round(q.x, 1), round(q.y, 1))
+        if key in done:
+            continue
+        done.add(key)
+        gb.box((q.x, q.y, Z1 + 0.18), (1.15, 1.15, 0.36), mi=G_COL)                       # plinth block
+        gb.cyl((q.x, q.y, Z1 + 0.45), 0.52, 0.18, 24, G_COL)                               # torus
+        gb.cyl((q.x, q.y, (Z1 + 0.54 + col_top - 0.5) / 2), 0.42, col_top - Z1 - 1.04, 24, G_COL)
+        for z in (Z2 - 0.55, Z2 + 0.15):                                                   # rings at the balcony
+            gb.cyl((q.x, q.y, z), 0.47, 0.1, 24, G_COL)
+        gb.cone((q.x, q.y, col_top - 0.42), 0.42, 0.6, 0.16, 24, G_COL)                    # capital
+        gb.box((q.x, q.y, col_top - 0.17), (1.25, 1.25, 0.34), mi=G_COL)                   # abacus
+    # entablature from the capitals up to the roof soffit
+    mid, d = (a + c) / 2, c - a
+    h = ROOF_Z - 0.2 - col_top
+    gb.box((mid.x, mid.y, col_top + h / 2), (d.length + 1.25, 1.0, h), math.atan2(d.y, d.x), G_COL)
+    gb.box((mid.x, mid.y, col_top + h - 0.12), (d.length + 1.45, 1.2, 0.24), math.atan2(d.y, d.x), G_COL)
+
+# balustrades: full run upstairs, with gaps for the garden steps downstairs
+B = 0.25
+up = [((gx0 + B, gy1 - B), (gx1 - B, gy1 - B)), ((gx0 + B, gy0 + B), (gx1 - B, gy0 + B)),
+      ((gx1 - B, gy0 + B), (gx1 - B, gy1 - B)),
+      ((gx0 + B, gy0 + B), (gx0 + B, PY0 + B)), ((gx0 + B, PY1 - B), (gx0 + B, gy1 - B))]
+for a, c in up:
+    balustrade(gb, a, c, Z2, mi=G_MARBLE)
+STEP_X = (mx0 + mx1) / 2           # garden steps on the north and south sides, and at the back
+down = [((gx0 + B, gy1 - B), (STEP_X - 3.2, gy1 - B)), ((STEP_X + 3.2, gy1 - B), (gx1 - B, gy1 - B)),
+        ((gx0 + B, gy0 + B), (STEP_X - 3.2, gy0 + B)), ((STEP_X + 3.2, gy0 + B), (gx1 - B, gy0 + B)),
+        ((gx1 - B, gy0 + B), (gx1 - B, dy - 3.2)), ((gx1 - B, dy + 3.2), (gx1 - B, gy1 - B)),
+        ((gx0 + B, gy0 + B), (gx0 + B, PY0 + B)), ((gx0 + B, PY1 - B), (gx0 + B, gy1 - B)),
+        ((px0 + B, PY0 + B), (gx0 + B, PY0 + B)), ((px0 + B, PY1 - B), (gx0 + B, PY1 - B))]  # terrace sides
+for a, c in down:
+    balustrade(gb, a, c, Z1, mi=G_MARBLE)
+
+
+def garden_steps(cx, cy, ox, oy, width=6.0, n=5):
+    """Steps from the veranda edge (cx, cy) down to the lawn, going out along (ox, oy)."""
+    rise, run = Z1 / n, 0.4
+    for j in range(1, n):
+        length = (n - j) * run
+        if ox:
+            gb.box((cx + ox * length / 2, cy, rise * j / 2), (length, width, rise * j), mi=G_STONE)
+        else:
+            gb.box((cx, cy + oy * length / 2, rise * j / 2), (width, length, rise * j), mi=G_STONE)
+    for s in (-1, 1):                                                       # cheek blocks with urns
+        p = Vector((cx, cy)) + (Vector((0, s * (width / 2 + 0.35))) if ox else Vector((s * (width / 2 + 0.35), 0)))
+        q = p + Vector((ox, oy)) * 0.9
+        gb.box((q.x, q.y, Z1 / 2), (1.8 if ox else 0.7, 0.7 if ox else 1.8, Z1), mi=G_STONE)
+        gb.cyl((p.x, p.y, Z1 + 0.35), 0.22, 0.7, 12, G_MARBLE)
+
+
+garden_steps(STEP_X, gy1, 0, 1)
+garden_steps(STEP_X, gy0, 0, -1)
+garden_steps(gx1, dy, 1, 0)
+
+# iron lanterns hanging under the balcony
+lanterns = [(x, my1 + GAL / 2) for x in (26.0, 40.0, 54.0)] + [(x, my0 - GAL / 2) for x in (26.0, 40.0, 54.0)] \
+    + [(mx1 + GAL / 2, y) for y in (-22.0, dy, 26.0)] + [(mx0 - GAL / 2, y) for y in (-26.0, 30.0)]
+for i, (x, y) in enumerate(lanterns, 1):
+    zt = Z2 - 0.42
+    gb.cyl((x, y, zt - 0.3), 0.012, 0.6, 6, G_IRON)                         # chain
+    gb.cone((x, y, zt - 0.66), 0.2, 0.05, 0.12, 8, G_IRON)                   # hood
+    gb.box((x, y, zt - 0.92), (0.26, 0.26, 0.4), mi=G_LAMP)                  # glass
+    for sx in (-0.13, 0.13):
+        for sy in (-0.13, 0.13):
+            gb.box((x + sx, y + sy, zt - 0.92), (0.025, 0.025, 0.42), mi=G_IRON)
+    gb.box((x, y, zt - 1.14), (0.3, 0.3, 0.04), mi=G_IRON)
+    point_light(f"Galeri_Lamba_{i}", (x, y, zt - 0.95), 60, (1.0, 0.7, 0.42), 0.1)
+gb.finish("Malikane_Sutunlu_Galeri", [M["stone"], M["trim"], M["column"], M["paint_cream"], M["lamp"], M["iron"]],
+          C_MANSION)
 
 # ---- openable doors: main entrance, balcony, interior double doors (all leaves hinge-origin)
 C_DOORS = collection("Kapilar_Malikane")
@@ -907,7 +1028,7 @@ for lvl, (ceil, spots) in rooms.items():
         ob.location = (x, y, ceil)
         ob.visible_shadow = False  # the light sits inside the chandelier
         C_CHAND.objects.link(ob)
-        point_light(f"Avize_{lvl}_{i + 1}_Isik", (x, y, ceil - 0.9), 400, (1.0, 0.62, 0.32), 0.6)
+        point_light(f"Avize_{lvl}_{i + 1}_Isik", (x, y, ceil - 0.9), 400, (1.0, 0.74, 0.5), 0.6)
 # bathrooms: a small chandelier each
 for side, sk in ((1, "K"), (-1, "G")):
     for lvl, z in (("Zemin", Z2 - 0.2), ("Ust", TOTAL_H)):
@@ -917,14 +1038,107 @@ for side, sk in ((1, "K"), (-1, "G")):
         ob.scale = (0.6, 0.6, 0.6)
         ob.visible_shadow = False
         C_CHAND.objects.link(ob)
-        point_light(f"Avize_Banyo_{sk}_{lvl}_Isik", (x, y, z - 0.6), 220, (1.0, 0.65, 0.38), 0.4)
+        point_light(f"Avize_Banyo_{sk}_{lvl}_Isik", (x, y, z - 0.6), 220, (1.0, 0.78, 0.56), 0.4)
+
+# ---------------------------------------------------------------- interior dressing
+# Bare plaster read as fake: every room wall gets a skirting board, a panelled dark-wood dado with
+# a chair rail, a silk wall covering above it (green in the north wing, red in the south, blue in
+# the east wing) and a cream cornice; bathrooms get paint above their tiles. Ceilings are cream
+# plaster with a ceiling rose above each chandelier instead of the underside of the floor boards.
+ic = Builder()  # mats: dark wood, cream paint, green / red / blue silk
+I_WOOD, I_PAINT, I_GREEN, I_RED, I_BLUE = range(5)
+BATHS = []
+for side in (1, -1):
+    ya, yb = sorted((wing_y(side, V4), (my1 - T / 2) if side > 0 else (my0 + T / 2)))
+    BATHS.append((W3_X, HALL_X1, ya, yb))
+
+
+def region(p):
+    for x0, x1, y0, y1 in BATHS:
+        if x0 < p.x < x1 and y0 < p.y < y1:
+            return "bath"
+    if p.x < HALL_X1 and HALL_Y0 < p.y < HALL_Y1:
+        return None                                    # the hall keeps its own panelling
+    return I_BLUE if p.x > HALL_X1 else I_GREEN if p.y > HALL_Y1 else I_RED
+
+
+def band(p0, d, n, rot, sa, sb, ops, zlo, zhi, t, mi, base, stiles=False):
+    """Strip of trim t thick on a wall face between s = sa..sb and z = zlo..zhi, cut round openings."""
+    def piece(s0, s1, z0, z1):
+        if s1 - s0 < 0.02 or z1 - z0 < 0.01:
+            return
+        p = p0 + d * ((s0 + s1) / 2) + n * (t / 2)
+        ic.box((p.x, p.y, base + (z0 + z1) / 2), (s1 - s0, t, z1 - z0), rot, mi)
+        if stiles:                                     # raised mouldings dividing the dado into panels
+            k = int((s1 - s0) / 0.85)
+            for j in range(1, k + 1):
+                q = p0 + d * (s0 + j * (s1 - s0) / (k + 1)) + n * (t + 0.008)
+                ic.box((q.x, q.y, base + (z0 + z1) / 2), (0.06, 0.016, z1 - z0 - 0.12), rot, mi)
+            q = p + n * (t / 2 + 0.008)
+            for zz in (z0 + 0.06, z1 - 0.06):
+                ic.box((q.x, q.y, base + zz), (s1 - s0, 0.016, 0.04), rot, mi)
+    cursor = sa
+    for off, w, zb, zt in sorted(ops):
+        s0, s1 = max(sa, off - w / 2), min(sb, off + w / 2)
+        if s1 <= s0 or zt <= zlo or zb >= zhi:
+            continue
+        piece(cursor, s0, zlo, zhi)
+        piece(s0, s1, zlo, min(zhi, zb))
+        piece(s0, s1, max(zlo, zt), zhi)
+        cursor = s1
+    piece(cursor, sb, zlo, zhi)
+
+
+for p0, p1, n, z, ops in FACES:
+    d = p1 - p0
+    L = d.length
+    d.normalize()
+    rot = math.atan2(d.y, d.x)
+    ceil_h = (Z2 - 0.2 - Z1) if z == Z1 else (TOTAL_H - Z2)
+    # split where the face passes from one room colour / bathroom / the hall into another
+    cuts = {0.0, L}
+    for x in (HALL_X1, W3_X):
+        if abs(d.x) > 0.5:
+            s = (x - p0.x) / d.x
+            if 0 < s < L:
+                cuts.add(s)
+    for y in (HALL_Y0, HALL_Y1, wing_y(1, V4), wing_y(-1, V4)):
+        if abs(d.y) > 0.5:
+            s = (y - p0.y) / d.y
+            if 0 < s < L:
+                cuts.add(s)
+    cuts = sorted(cuts)
+    for sa, sb in zip(cuts, cuts[1:]):
+        reg = region(p0 + d * ((sa + sb) / 2) + n * 0.3)
+        if reg is None:
+            continue
+        top = ceil_h - 0.2
+        if reg == "bath":
+            bands = [(1.0, top, 0.012, I_PAINT, False)]
+        else:
+            bands = [(0.0, 0.24, 0.035, I_WOOD, False), (0.24, 0.96, 0.022, I_WOOD, True),
+                     (0.96, 1.04, 0.05, I_WOOD, False), (1.04, top, 0.012, reg, False)]
+        bands.append((top, ceil_h, 0.11, I_PAINT, False))
+        bands.append((top - 0.06, top, 0.05, I_PAINT, False))
+        for zlo, zhi, t, mi, st in bands:
+            band(p0, d, n, rot, sa, sb, ops, zlo, zhi, t, mi, z, st)
+
+# ceilings: just under the upper floor (open over the hall void) and under the roof slab
+slab_with_holes(ic, (ix0, ix1, iy0, iy1), [VOID_C, VOID_S], Z2 - 0.2, 0.02, I_PAINT)
+ic.box(((ix0 + ix1) / 2, (iy0 + iy1) / 2, TOTAL_H - 0.01), (ix1 - ix0, iy1 - iy0, 0.02), mi=I_PAINT)
+for lvl, (ceil, spots) in rooms.items():
+    for x, y in spots:
+        ic.cyl((x, y, ceil - 0.045), 0.55, 0.05, 24, I_PAINT)              # ceiling rose
+        ic.cyl((x, y, ceil - 0.08), 0.3, 0.04, 24, I_PAINT)
+ic.finish("Malikane_Ic_Kaplama", [M["dark_wood"], M["paint_cream"], M["silk_green"], M["silk_red"], M["silk_blue"]],
+          C_MANSION)
 # great chandelier in the double-height hall
 ob = bpy.data.objects.new("Avize_Hol", chandelier.data)
 ob.location = ((ix0 + 4 + SX0) / 2, dy, TOTAL_H)
 ob.scale = (2.4, 2.4, 2.4)
 ob.visible_shadow = False
 C_CHAND.objects.link(ob)
-point_light("Avize_Hol_Isik", ((ix0 + 4 + SX0) / 2, dy, TOTAL_H - 2.4), 1500, (1.0, 0.62, 0.32), 1.0)
+point_light("Avize_Hol_Isik", ((ix0 + 4 + SX0) / 2, dy, TOTAL_H - 2.4), 1500, (1.0, 0.74, 0.5), 1.0)
 
 
 # ---------------------------------------------------------------- palace furniture (shared meshes, local front = +X)
@@ -1643,7 +1857,7 @@ def inside_rounded(pt, inset):
 def blocked(pt, clear):
     if not inside_rounded(pt, 2.0 + clear * 0.3):
         return True
-    if STAIR_FOOT_X - 2 - clear < pt.x < mx1 + 2 + clear and my0 - 2 - clear < pt.y < my1 + 2 + clear:
+    if STAIR_FOOT_X - 2 - clear < pt.x < mx1 + GAL + 4 + clear and my0 - GAL - 4 - clear < pt.y < my1 + GAL + 4 + clear:
         return True
     for x, y, sx, sy, _ in HUTS:
         if (pt - Vector((x, y))).length < max(sx, sy) * 0.6 + 1.0 + clear:
