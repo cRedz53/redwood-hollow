@@ -1,18 +1,19 @@
 # Redwood Hollow – Harita Tasarımı
+---------------------------------------------------------------------------------------------------------------------------------------
 🇹🇷 Türkçe Açıklama
 
 Bilgilendirme:
 
 Bu harita, tamamen tek başıma, yapay zekayı bir rehber ve yardımcı araç olarak kullanarak kısıtlı boş zamanlarımda tasarlayıp geliştirmeye çalıştığım kişisel bir projedir. Yoğun bir üniversite sınavı (YKS) hazırlık sürecinde olduğum için zamanım oldukça kısıtlı; bu nedenle gözümden kaçmış olabilecek ufak hatalar veya eksiklikler için anlayış gösteren herkese şimdiden teşekkür ederim. Eğer gözden kaçırdığım büyük hatalar veya önemli sorunlar fark ederseniz lütfen beni bilgilendirin.
 
-
+---------------------------------------------------------------------------------------------------------------------------------------
 🇬🇧 English Description
 
 Information:
 
 This map is a personal project that I have been designing and developing entirely on my own in my limited spare time, using AI strictly as a guide and assisting tool. As I am currently preparing intensively for university entrance exams, my free time is very limited. Thank you in advance for your understanding regarding any minor bugs or oversights you might encounter. If you notice any major bugs or critical issues that I may have overlooked, please let me know.
 
-
+---------------------------------------------------------------------------------------------------------------------------------------
 
 
 
