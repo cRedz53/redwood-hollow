@@ -17,3 +17,6 @@ __pycache__/
 # Poly Haven ham indirmeleri (Araclar/polyhaven_indir.ps1 ile tekrar indirilir)
 Unreal/PolyHaven_Kaynak/
 
+
+# Blender onizleme renderlari (her calistirmada yeniden uretilir)
+Blender/Cikti/Onizlemeler/

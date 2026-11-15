@@ -14,10 +14,7 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | | |
 |---|---|
 | ![Kuzeybatı köşesi ve iki katlı sütunlu galeri](Gorseller/dis_kose_kuzeybati.png) | ![Güneybatı köşesi, veranda ve balkon](Gorseller/dis_kose_guneybati.png) |
-
-![Giriş alınlığı](Gorseller/dis_alinlik.png)
-
-![Kuş bakışı](Gorseller/dis_kus_bakisi.png)
+| ![Bahçenin giriş kapısı](Gorseller/dis_giris_kapisi.png) | ![Giriş alınlığı](Gorseller/dis_alinlik.png) |
 
 ## Haritayı gezmek
 `Unreal/RedwoodHollow/RedwoodHollow.uproject` dosyasını aç ve **Play**'e bas. Kamera üçüncü şahıs, omuz üstünden. WASD ile yürünür, fareyle etrafa bakılır.
@@ -58,9 +55,9 @@ Harita Blender'da Python ile üretiliyor ve Unreal Engine'e otomatik aktarılıy
 | `Unreal/ue_megascans_uygula.py` | İstenirse Fab'dan eklenen Megascans asset'lerini haritaya uygular |
 | `Blender/malikane_harita_uretici.py` | Haritayı Blender'da sıfırdan üreten script (ölçüler en üstte) |
 | `Blender/polyhaven_hazirla.py` | Poly Haven modellerini UE için hazırlar |
-| `Blender/Cikti/` | Üretilen `.blend` sahnesi, önizleme render'ları ve UE'ye giden FBX + `scene.json` |
-| `Araclar/` | Poly Haven indirme, ekran görüntüsü alma ve kamera görüntüsü script'leri |
-| `Gorseller/` | UE ekran görüntüleri |
+| `Blender/Cikti/` | Üretilen `.blend` sahnesi ve UE'ye giden FBX + `scene.json` (önizleme render'ları yerelde kalır) |
+| `Araclar/` | Poly Haven indirme, oyun penceresi ekran görüntüsü ve kamera görüntüsü script'leri (`ue_kamera_goruntuleri.py`: `dis` seti README fotoğraflarını, `odalar` seti iç mekânı çeker) |
+| `Gorseller/` | README'deki fotoğraflar (UE'de SceneCapture ile çekildi) |
 
 ## Haritayı değiştirip yeniden kurmak
 1. `Blender/malikane_harita_uretici.py` üstündeki değerleri değiştir, sonra depo kök klasöründen çalıştır:
@@ -81,7 +78,7 @@ Karakter ve animasyonlar UE 5.8'in Third Person şablonundan geliyor. Çömelme 
 ## Etkileşim kodu (C++)
 `Unreal/RedwoodHollow/Source/RedwoodHollow`:
 - `AMalikaneDoor`: menteşeden dönen kapı ve yer kapağı; çift kanatlar birlikte açılır.
-- `AMalikaneInteractor`: sol tık, Ctrl ve E tuşları, çömelme animasyonları ve omuz üstü kamera ayarı.
+- `AMalikaneInteractor`: sol tık, Ctrl ve E tuşları, çömelme animasyonları, omuz üstü kamera ayarı; her karede oyuncunun konumunu `MPC_Oyuncu`ya yazar (çalı ve otlar buna göre eğilir).
 - `AMalikaneSqueeze`: dar aralıktan yan geçiş.
 - `AMalikaneHUD`: E istemi (beyaz daire ve dolan yeşil halka).
 - `UMalikaneCrouchCamera`: çömelirken kamera yüksekliğini yumuşatır.

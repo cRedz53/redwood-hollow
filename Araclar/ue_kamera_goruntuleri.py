@@ -54,9 +54,7 @@ if os.environ.get("MALIKANE_SHOT_SET") == "dis":  # exterior: architectural shot
         look("dis_alinlik", (-200, -200, 600), (1000, -200, 1350)),           # portico pediment
         look("dis_kose_gb", (300, 4700, 500), (3000, 800, 700)),             # south-west corner, 3/4
         look("dis_kose_kb", (800, -5000, 500), (3000, -1200, 700)),          # north-west corner, 3/4
-        look("dis_galeri", (2400, 4650, 180), (5600, 4000, 550)),            # down the south veranda
-        look("dis_arka", (6900, 4600, 450), (5500, 500, 600)),               # back corner, garden steps
-        look("dis_kus_bakisi", (-5500, 8000, 5200), (3600, -200, 300)),     # aerial
+        look("dis_giris_kapisi", (-11300, -2400, 330), (-8000, -2150, 300)),  # garden gate, looking in from the lane
     ]
 
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
